@@ -1,0 +1,70 @@
+version: '2'
+services:
+  pgwebsite:
+    image: postgres:9.6.6
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=nicesecret
+    ports:
+      - "5432:5432"
+    volumes:
+      - websitedb:/var/lib/postgresql/data
+
+  website:
+    build: ../src/website
+    ports:
+      - "5123:5123"
+    command: "/bin/bash -c 'rake docker:pause_for_db      && \
+                            rake docker:if_db_is_migrated && \
+                            rake appjson:to_dotenv        && \
+                            foreman start web'"
+    links:
+      - pgwebsite
+    environment:
+      - RACK_ENV=development
+      - PORT=5123
+      - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
+      - DOCKER_ENV_STORE=/var/lib/website/env
+      - ASSETS_HOST=https://assets.pushtech.de
+      - PROFILE_HOST=https://profile.pushtech.de
+      - LOGIN_HOST=localhost:5123
+      - CDN_HOSTS=localhost:5123,127.0.0.1:5123
+      - NOTIFIER_HOST=https://notify.pushtech.de
+      - GOOGLE_API_KEY="!!! needed comes from secret place"
+      - MANDRILL_API_KEY="!!! needed comes from secret place"
+      - PUSHTECH_API_USER="!!! needed comes from secret place"
+      - PUSHTECH_API_PASSWORD="!!! needed comes from secret place"
+      - PUSHTECH_API_HOST=https://store.pushtech.de
+      - SENDBIRD_API_TOKEN="!!! needed comes from secret place"
+      - SENDBIRD_API_ID="!!! needed comes from secret place"
+      - TRACKING_HOST=https://trk.pushtech.de
+      - DB_POOL_SIZE=20
+      - DB_TIMEOUT_MSEC=5000
+    volumes:
+      - websiteenv:/var/lib/website/env
+    restart: always
+
+  website-migrate-db:
+    build: ../src/website
+    command: "/bin/bash -c 'rake docker:pause_for_db               && \
+                            rake docker:if_db_not_migrated         && \
+                            rake db:create                         && \
+                            rake docker:create_postgres_extensions && \
+                            rake db:migrate'"
+    links:
+      - pgwebsite
+    environment:
+      - RACK_ENV=production
+      - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
+    restart: "no"
+
+networks:
+  default:
+    external:
+      name: thenetwork
+
+volumes:
+  websitedb:
+    external: true
+  websiteenv:
+    external: true

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: consumer-stats
-          image: consumers.nodejs:v1
+          image: pushtech.consumers.nodejs:v1
           env:
             - name: KAFKA_HOST
               value: kafkasrv.pushtech.svc.cluster.local:9092

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tracker
-          image: tracker:v1
+          image: pushtech.tracker:v1
           env:
             - name: REDIS_URL
               value: redis://redistsrv.pushtech.svc.cluster.local:6379?db=6

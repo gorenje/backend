@@ -34,7 +34,7 @@ spec:
         - name: redis-tracker
           image: redis
         - name: tracker
-          image: tracker:v1
+          image: pushtech.tracker:v1
           env:
             - name: REDIS_URL
               value: redis://localhost:6379?db=6
@@ -46,7 +46,7 @@ spec:
             - name: tracker
               containerPort: 5000
         - name: kafkastore
-          image: kafkastore:v1
+          image: pushtech.kafkastore:v1
           env:
             - name: REDIS_TRACKING_1
               value: redis://localhost:6379?db=6

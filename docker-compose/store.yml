@@ -1,0 +1,34 @@
+version: '2'
+services:
+  mongo_store:
+    image: mongo:3.6
+    ports:
+      - "27017"
+    volumes:
+      - mongostoredb:/data/db
+
+  storage:
+    build: ../src/storage
+    links:
+      - mongo_store
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - IMAGE_HOST=https://assets.pushtech.de
+      - GOOGLE_API_KEY="!!! needed comes from secret place"
+      - NOTIFY_HOST=http://localhost:5123
+      - MONGOHQ_URL=mongodb://mongo_store:27017/store
+      - TRACKER_HOST=https://trk.pushtech.de
+      - WEB_CONCURRENCY=8
+      - COOKIE_SECRET=X1n4zsExsKtngfv4HqGGIz6bZoL5YIvo
+    restart: always
+
+networks:
+  default:
+    external:
+      name: thenetwork
+
+volumes:
+  mongostoredb:
+    external: true
