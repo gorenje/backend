@@ -21,7 +21,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var requestIp    = require('request-ip');
 
-var index    = require('./routes/index');
 var tracking = require('./routes/tracking');
 
 var app = express();
@@ -46,8 +45,7 @@ app.use(session({
   activeDuration: 1000 * 60 * 5
 }));
 
-app.use('/',  index);
-app.use('/t', tracking);
+app.use('/', tracking);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

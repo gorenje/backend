@@ -3,10 +3,10 @@ services:
   kafidx:
     build: ../src/kafidx
     ports:
-      - "5321:5321"
+      - "$KAFIDX_PORT:$KAFIDX_PORT"
     environment:
       - KAFKA_HOST=kafka:9092
-      - PORT=5321
+      - PORT=$KAFIDX_PORT
       - WEB_CONCURRENCY=3
 
 networks:

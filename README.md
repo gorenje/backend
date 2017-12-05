@@ -100,26 +100,51 @@ Using Docker Compose
 This assumes that [docker](https://www.docker.com/docker-mac) has been
 installed.
 
-Set up the network
+Set up the network and volumes:
 
+    docker volume create --name=offerserverdb
+    docker volume create --name=mongostoredb
+    docker volume create --name=websitedb
+    docker volume create --name=websiteenv
     docker network create thenetwork
+
+Compile all the images
+
+    eval $(cat .env)
+    for n in docker-compose/*.yml ; do
+      docker-compose -f $n build
+    done
 
 Start up the images (ordering important, each in separate window):
 
-    cd docker-compose
-    docker-compose -f kafka-zookeeper.yml up
-    docker-compose -f tracker.yml up
-    docker-compose -f kafkastore.yml up
-    docker-compose -f consumers.nodejs.yml up
-    docker-compose -f kafidx.yml up
+    eval $(cat .env)
+    docker-compose -f docker-compose/kafka-zookeeper.yml up
+    docker-compose -f docker-compose/tracker.yml up
+    docker-compose -f docker-compose/kafkastore.yml up
+    docker-compose -f docker-compose/consumers.nodejs.yml up
+    docker-compose -f docker-compose/kafidx.yml up
+
+    docker-compose -f docker-compose/storage.yml up
+    docker-compose -f docker-compose/offerserver.yml up
+    docker-compose -f docker-compose/website.yml up
 
 Then browser to:
 
-    open -a Firefox http://localhost:5000/t/event?d=1
+    eval $(cat .env)
+    open -a Firefox http://localhost:$TRACKER_PORT/event?d=1
 
 and
 
-    open -a Firefox http://localhost:5321/kafidx
+    eval $(cat .env)
+    open -a Firefox http://localhost:$KAFIDX_PORT/kafidx
+
+To shut things down:
+
+    eval $(cat .env)
+    for n in docker-compose/*.yml ; do
+      docker-compose -f $n down
+    done
+
 
 Events
 ===

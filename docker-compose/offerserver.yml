@@ -1,0 +1,53 @@
+version: '2'
+services:
+  redis_offerserver:
+    image: redis
+    ports:
+      - "6379"
+    volumes:
+      - offerserverdb:/data
+
+  offerserver:
+    build: ../src/offerserver
+    links:
+      - redis_offerserver
+    ports:
+      - "$OFFERSERVER_PORT:$OFFERSERVER_PORT"
+    environment:
+      - RACK_ENV=production
+      - REDISTOGO_URL=redis://redis_offerserver:6379?db=6
+      - PORT=$OFFERSERVER_PORT
+      - ACCESS_DOMAINS=pushtech.de,eccrine.io
+      - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+      - REDIS_POOL_SIZE=20
+    command: "foreman start web"
+    restart: always
+
+  offerserver-worker:
+    build: ../src/offerserver
+    links:
+      - redis_offerserver
+    environment:
+      - REDIS_POOL_SIZE=20
+      - RACK_ENV=production
+      - REDISTOGO_URL=redis://redis_offerserver:6379?db=6
+      - CAR2GO_CONSUMER_KEY=$CAR2GO_CONSUMER_KEY
+      - CARJUMP_SECRET=$CARJUMP_SECRET
+      - PUSHTECH_API_USER=$PUSHTECH_API_USER
+      - PUSHTECH_API_PASSWORD=$PUSHTECH_API_PASSWORD
+      - PUSHTECH_API_HOST=http://storage:$STORAGE_PORT
+      - TRACKER_HOST=http://tracker:$TRACKER_PORT
+      - COOKIE_SECRET=x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
+      - IMAGE_HOST=https://assets.pushtech.de
+    command: "foreman start worker"
+    restart: always
+
+networks:
+  default:
+    external:
+      name: thenetwork
+
+volumes:
+  offerserverdb:
+    external: true

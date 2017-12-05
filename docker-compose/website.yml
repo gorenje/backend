@@ -6,14 +6,14 @@ services:
     environment:
       - POSTGRES_PASSWORD=nicesecret
     ports:
-      - "5432:5432"
+      - "5432"
     volumes:
       - websitedb:/var/lib/postgresql/data
 
   website:
     build: ../src/website
     ports:
-      - "5123:5123"
+      - "$WEBSITE_PORT:$WEBSITE_PORT"
     command: "/bin/bash -c 'rake docker:pause_for_db      && \
                             rake docker:if_db_is_migrated && \
                             rake appjson:to_dotenv        && \
@@ -22,22 +22,22 @@ services:
       - pgwebsite
     environment:
       - RACK_ENV=development
-      - PORT=5123
+      - PORT=$WEBSITE_PORT
       - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
       - DOCKER_ENV_STORE=/var/lib/website/env
       - ASSETS_HOST=https://assets.pushtech.de
       - PROFILE_HOST=https://profile.pushtech.de
-      - LOGIN_HOST=localhost:5123
-      - CDN_HOSTS=localhost:5123,127.0.0.1:5123
+      - LOGIN_HOST=localhost:$WEBSITE_PORT
+      - CDN_HOSTS=localhost:$WEBSITE_PORT,127.0.0.1:$WEBSITE_PORT
       - NOTIFIER_HOST=https://notify.pushtech.de
-      - GOOGLE_API_KEY="!!! needed comes from secret place"
-      - MANDRILL_API_KEY="!!! needed comes from secret place"
-      - PUSHTECH_API_USER="!!! needed comes from secret place"
-      - PUSHTECH_API_PASSWORD="!!! needed comes from secret place"
-      - PUSHTECH_API_HOST=https://store.pushtech.de
-      - SENDBIRD_API_TOKEN="!!! needed comes from secret place"
-      - SENDBIRD_API_ID="!!! needed comes from secret place"
-      - TRACKING_HOST=https://trk.pushtech.de
+      - GOOGLE_API_KEY=$GOOGLE_API_KEY
+      - MANDRILL_API_KEY=$MANDRILL_API_KEY
+      - PUSHTECH_API_USER=$PUSHTECH_API_USER
+      - PUSHTECH_API_PASSWORD=$PUSHTECH_API_PASSWORD
+      - PUSHTECH_API_HOST=http://storage:$STORAGE_PORT
+      - SENDBIRD_API_TOKEN=$SENDBIRD_API_TOKEN
+      - SENDBIRD_API_ID=$SENDBIRD_API_ID
+      - TRACKING_HOST=http://tracker:$TRACKER_PORT
       - DB_POOL_SIZE=20
       - DB_TIMEOUT_MSEC=5000
     volumes:
