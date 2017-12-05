@@ -1,0 +1,284 @@
+---
+de:
+  errors:
+    object_no_longer_exists: Object no longer exists
+  menu:
+    aboutus: About Us
+    addresses: Pins
+    app_name: LocalRadar
+    app_title: Radar
+    contactus: Contact Us
+    notifications: Notifications
+    offers: Offers Nearby
+    register: Register
+    searches: My Searches
+    whatareyouoffering:
+      searches: Searches in the Vicinity
+      offers: Offers in the Vicinity
+      profile: Profile
+      login: Login
+      register: Register
+      get_app: Install Android Application
+  menu_item:
+    offers: My Offers
+    searches: Searches Nearby
+  pages:
+    addresses:
+      button:
+        add: Add address to Pins
+        add_home: Add as Home
+        add_work: Add as Work
+      help:
+        drag_to_create_address: Drag Pin to select and update Addresses
+      placeholder:
+        name: Name
+      title: Pins
+      metres_around: metres around
+    confirmation:
+      DataCorrupt: Data was corrupted.
+      EmailUnknown: Email Unknown.
+      MissingData: Data is missing, error.
+      TokenMismatch: Token Mismatch.
+      email_already_confirmed: |-
+        Email already confirmed, <a href='/login'>Login</a>.
+      email_resent: Confirmation Email resent.
+      user_unknown: Unknown User.
+    create_search:
+      button:
+        chat: Chat with Offerer
+        create: Create Search
+      fields:
+        meters_around: meters around
+        text: Text
+      image_upload:
+        text: Click or Drag Image Here
+      title: Create Search
+    create_offer:
+      button:
+        chat: Chat with Searcher
+        create: Create Offer
+      fields:
+        meters_around: meters around
+        text: Text
+      image_upload:
+        text: Click or Drag Image Here
+      title: Create Offer
+    create_offer_for_search:
+      button:
+        add_images: Add Images
+        cancel: Cancel
+        create: Create
+      fields:
+        text: Text
+      title: Create New Offer
+    create_search_for_offer:
+      button:
+        add_images: Add Images
+        cancel: Cancel
+        create: Create
+      fields:
+        text: Text
+      title: Create New Search
+    index:
+      text: |-
+        Helping you to succeed in your business is our purpose.
+        %p
+           We provide you a way to directly approach customers
+           and provide them with products they want.
+        %p
+           Our location based searches and location based offers
+           provide a unique service for your business.
+      title: Radar Service
+    login:
+      button:
+        login: Login
+      email_not_confirmed: Email not yet confirmed, check your inbox
+      email_or_password_wrong: Unknown Email or Wrong Password.
+      fields:
+        email: Email
+        password: Password
+      logout:
+        logout_link: Logout?
+        title: Already Logged In
+      title: Login
+    notifications:
+      header:
+        actions: Actions
+        date: When
+        kind: Type
+        title: Title
+      title: Notifications
+    offers:
+      placeholder:
+        filter: Filter
+      title: Offers in the Vicinity
+    profile:
+      button:
+        update: Update
+      fields:
+        email: Email
+        name: Name
+      title: Your Profile
+    profile_external:
+      title: Profile
+      fields:
+        email: Email
+        name: Name
+    register:
+      fields:
+        email: Email
+        owner: Owner (First and Lastname)
+        password: Password
+        password_repeat: Repeat Password
+        submit: Register!
+      messages:
+        email_already_registered_login: |-
+          Email already registered, <a href='/login'>Login</a>.
+        email_already_registered_not_confirmed: |-
+          Email not yet confirmed. <a href='/resend/email/%{external_id}'>Resend
+          Confirmation Email</a>.
+        email_confirmation_sent: |-
+          Thank You! Confirmation email has been sent. Once
+          you have confirmed your email, you can login.
+        email_confirmed: Email Confirmed!
+        password_not_matched: Passwords did not match
+        email_empty: Email field not allowed to be empty.
+        password_blank: Password was blank
+      text: Register your email to become an offerer.
+      title: Offerer Registeration
+    searches:
+      placeholder:
+        filter: Filter
+      title: Searches in the vicinity
+    update_offer:
+      button:
+        update: Update Offer
+        delete: Delete
+        deactivate: Deactivate
+        activate: Activate
+      fields:
+        meters_around: meters around
+        text: Text
+      image_upload:
+        text: Click or Drag Image Here
+      title: Update Offer
+    update_search:
+      button:
+        update: Update Search
+        delete: Delete
+        deactivate: Deactivate
+        activate: Activate
+      fields:
+        meters_around: meters around
+        text: Text
+      image_upload:
+        text: Click or Drag Image Here
+      title: Update Search
+    user_offers:
+      button:
+        create_offer: Create Offer
+      placeholder:
+        filter: Filter
+      title: My Offers
+    user_searches:
+      button:
+        create_search: Create Search
+      placeholder:
+        filter: Filter
+      title: My Searches
+    whatareyouoffering:
+      title: LocalRadar
+      local_searches: Searchers in your vicinity
+      call_to_action: What are you offering?
+      button:
+        submit: Go!
+      chat:
+        title: Login or Sign Up
+        fields:
+          text: Chatting with searchers only for registered users.
+        button:
+          login: Login
+          register: Sign Up
+      createoffer:
+        title: Login or Sign Up
+        fields:
+          text: Create offer only for registered users.
+        button:
+          login: Login
+          register: Sign Up
+      location:
+        title: Login or Sign Up
+        fields:
+          text: To see exactly location, login or register.
+        button:
+          login: Login
+          register: Sign Up
+  partials:
+    address_selector:
+      add_new: Add new Pin
+      select_one: "-- Pinned On: --"
+    notification_row:
+      button:
+        chat_reply: Reply
+        chat_with_offerer: Chat with Offerer
+        chat_with_searcher: Chat with Searcher
+        delete: Delete
+        mark_as_read: Mark As Read
+        mark_as_unread: Mark As Unread
+      types:
+        new_chat_message: New Chat Message
+        offer_matched_search: "Your offer '<a class=%{cssclass} href='/offer/%{id}/edit'>%{title}</a>' matched Search"
+        search_matched_offer: "Your search '<a class=%{cssclass} href='/search/%{id}/edit'>%{title}</a>' matched Offer"
+    offer_obj_resultslist:
+      around: around
+      button:
+        chat: Chat with Offerer
+        create: Create Search
+      icon:
+        create: search2
+      created_on: Offer created on
+      keywords: 'Keywords: '
+      metres_around: metres around
+    response:
+      title: Response
+    search_obj_resultslist:
+      from_you: from you
+      around: around
+      at: at
+      button:
+        chat: Chat with Searcher
+        create: Create Offer
+      icon:
+        create: local_offer
+      created_on: Search created on
+      created_ago: Search created
+      keywords: 'Keywords: '
+      metres_around: metres around
+    user_address_resultslist:
+      button:
+        delete: Delete
+        update: Update
+      metres_around: metres around
+    user_offer_obj_resultslist:
+      around: around
+      button:
+        delete: Delete
+        edit: Edit Offer
+        deactivate: Deactivate
+        activate: Activate
+      created_on: Offer created on
+      keywords: 'Keywords: '
+      metres_around: metres around
+    user_search_obj_resultslist:
+      around: around
+      button:
+        delete: Delete
+        edit: Edit Search
+        deactivate: Deactivate
+        activate: Activate
+      created_on: Offer created on
+      keywords: 'Keywords: '
+      metres_around: metres around
+  server:
+    message:
+      unknown_interaction: Unknown Interaction With Server

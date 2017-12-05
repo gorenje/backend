@@ -1,0 +1,20 @@
+
+- @mappings.each do |mapping|
+  = haml :"_mapping_entry", :locals => { :mapping => mapping }
+  %hr
+%br
+%a{ :href => "/register" } Create New Mapping
+
+:css
+  table.mapping_entry td {
+    padding-right: 5px;
+  }
+  .empty {
+    color: white;
+  }
+  .highlight {
+    color: #777;
+  }
+  td.highlight {
+    width: 165px;
+  }

@@ -1,0 +1,24 @@
+= haml :"_response_panel"
+
+- i18n = TranslatorHelper.new("pages.profile_external")
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n })
+  .panel-body
+    .row
+      .col-md-4
+        %img.avatar{ :height => 80, :src => @user.gravatar_image }
+    - tmp = i18n.fields.c
+    .row.pt-10px
+      .col-md-12.fw-900= tmp.name.t
+    .row
+      .col-md-12
+        = @user.name
+    .row.pt-10px
+      .col-md-12.fw-900= tmp.email.t
+    .row
+      .col-md-12
+        = @user.email
+    .row.pt-10px
+      .col-md-12
+        %a{ :href => "#{cdn_host}/app-release.apk" } Download Android App

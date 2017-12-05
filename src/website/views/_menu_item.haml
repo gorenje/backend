@@ -1,0 +1,4 @@
+- i18n = TranslatorHelper.new("menu_item")
+%li{ :class => path == request.path_info ? "active" : "" }
+  %a{ "data-icon" => icon, :href => path }
+    = i18n.send(name).t

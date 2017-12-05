@@ -1,0 +1,23 @@
+- ws_scheme = ENV['RACK_ENV'] == "production" ? "wss" : "ws"
+:javascript
+  var websocket = null;
+
+  function setupWebsocket() {
+    var scheme   = "#{ws_scheme}://";
+    var uri      = scheme + window.document.location.host + "/wsnot";
+    var ws       = new WebSocket(uri);
+
+    ws.onmessage = function(message) {
+      var data = JSON.parse(message.data);
+      $('#ncbadge').prop('src', data.image_src);
+    };
+
+    ws.onclose = function() {
+      websocket = setupWebsocket();
+    };
+    return ws;
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    websocket = setupWebsocket();
+  });

@@ -1,0 +1,15 @@
+version: '2'
+services:
+  kafidx:
+    build: ../src/kafidx
+    ports:
+      - "5321:5321"
+    environment:
+      - KAFKA_HOST=kafka:9092
+      - PORT=5321
+      - WEB_CONCURRENCY=3
+
+networks:
+  default:
+    external:
+      name: thenetwork

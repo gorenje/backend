@@ -1,0 +1,42 @@
+# -*- ruby -*-
+source 'http://rubygems.org'
+
+ruby '2.2.5'
+
+gem 'rake', '10.5.0'
+
+gem 'pry'
+gem 'json'
+gem 'i18n'
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'sinatra-support'
+gem 'haml'
+gem 'foreman'
+gem 'puma'
+
+gem 'activerecord'
+gem 'active_record_migrations'
+gem 'activerecord-postgis-adapter'
+gem 'pg'
+gem 'activerecord-import'
+
+gem 'mechanize'
+gem 'launchy'
+gem 'rest-client'
+gem 'geokit'
+
+gem 'adtekio_utilities', :github => "adtekio/utilities"
+gem 'jwe'
+gem 'mailchimp'
+gem 'faye-websocket'
+
+group :development do
+  gem 'html2haml'
+  gem 'dotenv', :github => 'gorenje/dotenv', :branch => 'squaure_brackets'
+  gem 'sass'
+  gem 'rerun'
+  gem 'term-ansicolor'
+  gem 'i18n-tasks'
+end

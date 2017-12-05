@@ -1,0 +1,11 @@
+development:
+  url:  redis://localhost:6379/12
+  pool_size: 25
+
+test:
+  url:  redis://localhost:6379/15
+  pool_size: 1
+
+production:
+  url:  <%= ENV['REDISTOGO_URL'] %>
+  pool_size: 25

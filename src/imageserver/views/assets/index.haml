@@ -1,0 +1,24 @@
+%h1 Add Image
+
+%form.dropzone{ :action => "/assets/upload", :method=>"post", :enctype=>"multipart/form-data" }
+
+%h1 Images
+
+%table.table
+  %thead
+    %th Image
+    %th Actions
+  %tbody
+    - @images.each do |img|
+      %tr
+        %td
+          %a{ :href => "/assets/images/#{img.id}", :title => "Click to view original" }
+            %img{ :src => "/assets/images/#{img.id}/thumb" }
+          %br
+          View:
+          - img.source.versions.keys.each do |key|
+            %a{ :href => "/assets/images/#{img.id}/#{key}" }= key
+        %td
+          %a{ :href => "/asset/#{img.id}/delete" } Delete
+
+= will_paginate @images, renderer: BootstrapPagination::Sinatra

@@ -1,0 +1,24 @@
+= haml :"_js_global_variables"
+= haml :"_js_include_files", :locals => {:files => ["code", "init_user_notifications"]}
+
+= haml :"_sendbird_widget"
+= haml :"_notification_websocket"
+- i18n = TranslatorHelper.new("pages.notifications")
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n, :icon => "notifications_none" })
+  .panel-body
+    .table-responsive
+      %table#notificationtable.table.table-striped
+        %thead
+          %tr
+            - tmp = i18n.header.c
+            %th= tmp.title.t
+            %th= tmp.kind.t
+            %th= tmp.date.t
+            %th= tmp.actions.t
+        %tbody
+          - @notifications.each do |notification|
+            - rowclass = notification.unread? ? "unread" : "read"
+            %tr{ :id => "notrow_#{notification.id}", :class => rowclass }
+              = haml(:"_notification_row", :locals => { :notification => notification })

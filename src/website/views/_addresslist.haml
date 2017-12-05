@@ -1,0 +1,10 @@
+- i18n = TranslatorHelper.new("partials.address_selector")
+
+.input-group
+  %select.form-control#addressselector
+    %option= i18n.select_one.t
+    - @user.addresses.each do |addr|
+      %option.addrselector{:data => { :obj => addr.to_json }}
+        = addr.name
+  .input-group-btn
+    %a.btn.btn-default{"data-icon" => "pin8", :href => "/user/addresses", :title => i18n.add_new.t }

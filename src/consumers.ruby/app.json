@@ -1,0 +1,67 @@
+{
+  "name" : "Adtekio Kafka Consumers",
+  "description": "Handle kafka events in a sensible way.",
+  "keywords": [
+    "productivity",
+    "mobile advertising"
+  ],
+  "website": "https://github.com/adtekio/consumers/blob/master/README.md",
+  "repository": "https://github.com/adtekio/consumers",
+  "logo": "https://avatars2.githubusercontent.com/u/17549165",
+  "env": {
+    "ACCESS_DOMAINS": {
+      "description": "Comma separator list of domains that should have access",
+      "value": "eccrine.io"
+    },
+    "ACCESS_EMAILS": {
+      "description": "Comma separated list of external emails that should have access",
+      "required": false
+    },
+    "GOOGLE_CLIENT_ID": {
+      "description": "Key for OAuth2 authentication"
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "description": "Secret for OAuth2 authentication"
+    },
+    "REDIS_POOL_SIZE": {
+      "description": "How many parallel connections to redis",
+      "value": "4"
+    },
+    "COOKIE_SECRET": {
+      "description": "Secret for the cookie storage",
+      "generator": "secret"
+    },
+    "LIBRATO_PREFIX": {
+      "description": "Prefix for the librato metric names"
+    },
+    "LIBRATO_TOKEN": {
+      "description": "Librato API token"
+    },
+    "LIBRATO_USER": {
+      "description": "Name of the librato user, i.e. email"
+    },
+    "KAFKA_HOST": {
+      "description": "Name of the kafka host"
+    },
+    "TRACKING_HOST": {
+      "description": "Host for the inapp tracking events"
+    },
+    "CLICK_REDIS_URL": {
+      "description": "URL to the click-store database"
+    },
+    "API_SECRET_KEY": {
+      "description": "Secure the API with this key. Needs also to be set on the analytics side.",
+      "generator": "secret"
+    },
+    "CLICK_STATS_REDIS_URL": {
+      "description": "URL to the click-statistics database. Usually the redis used for the analytics application"
+    }
+  },
+  "addons": [
+    "papertrail",
+    "redistogo",
+    "heroku-postgresql",
+    "heroku-redis",
+    "ssl:endpoint"
+  ]
+}

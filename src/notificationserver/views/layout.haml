@@ -1,0 +1,39 @@
+!!!
+%html
+  %head
+    %title Push - Notifications
+    %meta{:charset => "UTF-8"}/
+    %meta{:content => "QhCg3qAgvr2gcN_l9N_H89_WaqSr_I6z5pMPIvPZtwg", :name => "google-site-verification"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %link{:href => "/stylesheets/normalize.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/stylesheets/sandbox.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/stylesheets/icons.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/stylesheets/app.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/stylesheets/bootstrap.min.css", :rel => "stylesheet"}/
+    %link{:href => "//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.8/css/theme.blue.css", :rel => "stylesheet", :type => "text/css"}/
+
+    %script{ :src => "//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" }
+    %script{ :src => "//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.8/js/jquery.tablesorter.combined.min.js" }
+    %script{:crossorigin => "anonymous", :integrity => "sha256-El0fEiD3YOM7uIVZztyQzmbbPlgEj0oJVxRWziUh4UE=", :src => "https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.6.1/clipboard.min.js"}
+
+  %body.bgc-grey
+    %nav.navbar.navbar-default.navbar-fixed-top
+      .container
+        .navbar-header
+          %button.navbar-toggle.collapsed{"aria-controls" => "navbar", "aria-expanded" => "false", "data-target" => "#navbar", "data-toggle" => "collapse", :type => "button"}
+            %span.sr-only Toggle navigation
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
+          %a.navbar-brand{:href => "/"} Push Technologies - Notification Server
+
+
+    .container
+      = yield
+
+    %footer.footer
+      .container
+        %p.text-muted Copyright 2017 Push Technologies UG (HB)
+
+    %script{:src => "/javascript/enc/bootstrap.min.js"}

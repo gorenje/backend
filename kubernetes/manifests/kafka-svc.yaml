@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafkasrv
+  labels:
+    name: kafkasrv
+  namespace: pushtech
+spec:
+  clusterIP: None
+  ports:
+  - port: 9092
+    targetPort: 9092
+  selector:
+    name: kafka

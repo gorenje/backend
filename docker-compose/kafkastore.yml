@@ -1,0 +1,14 @@
+version: '2'
+services:
+  kafkastore:
+    build: ../src/kafkastore
+    environment:
+      - REDIS_TRACKING_1=redis://redis:6379?db=6
+      - KAFKA_HOST=kafka:9092
+      - ZOOKEEPER_SERVICE_HOST=zookeeper
+      - ZOOKEEPER_SERVICE_PORT=2181
+
+networks:
+  default:
+    external:
+      name: thenetwork

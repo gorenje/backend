@@ -1,0 +1,31 @@
+= haml :"_response_panel"
+= haml :"_sendbird_widget"
+= haml :"_notification_websocket"
+
+- i18n = TranslatorHelper.new("pages.profile")
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n, :icon => "person" })
+  .panel-body
+    - tmp = i18n.fields.c
+    %form{ :action => "/profile", :method => :post }
+      .row.pt-10px
+        .col-md-12.fw-900= tmp.name.t
+      .row
+        .col-md-12
+          %input.form-control{ :type => :text, :value => @user.name, :name => :username }
+      .row.pt-10px
+        .col-md-12.fw-900= tmp.email.t
+      .row
+        .col-md-12
+          %input.form-control{ :type => :text, :value => @user.email, :disabled => true }
+      .row.pt-10px
+        .col-md-12
+          %input.btn{ :type => :submit, :value => i18n.button.update.t }
+      .row.pt-10px
+        .col-md-12
+          %a{ :href => "https://pushtech.de/app/open" } Open App
+          = "|"
+          %a{ :href => "#{cdn_host}/app-release.apk" } Download Android App
+          = "|"
+          %a{ :href => "/profile/#{@user.external_id}" } External Profile

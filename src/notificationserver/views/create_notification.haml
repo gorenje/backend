@@ -1,0 +1,31 @@
+.panel.panel-primary
+  .panel-heading
+    %h3.panel-title Create Notification
+  .panel-body
+    - type = params[:type] || "freeform"
+    - value = params[:value] || ""
+    .row
+      .col-md-6
+        %form{ :action => "/notification", :method => :post }
+          %input{ :type => :hidden, :name => :deviceid, :value => @deviceid }
+          .row
+            .col-md-12
+              %input#ff{ :type => :radio, :name => :type, :value => "freeform" }
+                %label{ :for => "ff" }
+                  Freeform
+          .row
+            .col-md-6
+              %input{ :type => :text, :size => 60, :name => :msg, :value => "", :placeholder => "Enter Text" }
+          .row.pt-10px
+            .col-md-6
+              %input{ :type => :text, :size => 60, :name => :url, :value => "", :placeholder => "Enter URL" }
+
+          .row.pt-10px
+            .col-md-6
+              %input.btn.btn-warning{:type => "submit", :value => "Submit"}
+
+:javascript
+  $(document).ready(function(){
+    $("input[type=radio][value=#{type}]").prop('checked', true);
+    $("input[type=text][name=#{type}_value]").prop('value', '#{value}');
+  });

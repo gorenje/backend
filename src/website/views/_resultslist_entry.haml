@@ -1,0 +1,47 @@
+%li{ :id => "resultslistitem#{ranking_num}" }
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-8
+      %h3
+        = "#{ranking_num}. #{text}"
+      %span
+        = i18n.keywords.t
+        = keywords.join(", ")
+    .col-md-4
+      - if images && !images.empty?
+        .rounded-image-corners
+          %img{ ImageSize, :src => $hosthandler.assets.url + images.first + "/iconbigger" }
+      - else
+        %span.missing-image-icon{icon("image2") }
+
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-12
+      %span
+        = i18n.created_on.t
+        %span{ :id => "createdat#{ranking_num}" }
+
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-12
+      %span
+        = "#{radius}m"
+        = i18n.around.t
+        - if address
+          %span= address
+        - else
+          %span{ :id => "addrline#{ranking_num}" } ...
+
+  .row
+    - tmp = i18n.button.c
+    .col-md-12
+      .btn-group.btn-group-sm{:role => :group, :style => "padding-bottom: 2px;"}
+        %a.btn.btn-default{ icon18(:chat), :href=> "#", :onclick => "startChatWithOwner('#{_id}', #{ranking_num});", :title => tmp.chat.t }
+        %a.btn.btn-default{ icon18(i18n.icon.create.t), :href=> "#", :onclick => "createSubjectFromSubject('#{_id}', #{ranking_num});", :title => tmp.create.t }
+        - if ENV['RACK_ENV'] == "development"
+          %a.btn.btn-default{ icon18("details"), :href => $hosthandler.pushtech_api.url + "/store/details/#{_id}", :target => "_blank" }
+
+:javascript
+  $(document).ready(function(){
+    $('#createdat#{ranking_num}')
+      .html(moment.utc("#{validfrom}","x")
+                  .local()
+                  .format(moment.localeData().longDateFormat("lll")));
+  })

@@ -1,0 +1,95 @@
+{
+  "name" : "Push Website",
+  "description": "Push Website for Offerers",
+  "keywords": [
+    "local search global offering"
+  ],
+  "website": "https://www.pushtech.de",
+  "repository": "https://github.com/pushtech-de/push-www",
+  "env": {
+    "RACK_ENV": {
+      "description": "Rack environment",
+      "value": "production"
+    },
+    "PORT": {
+      "description": "Web port for local testing, delete on heroku.",
+      "value": "3000"
+    },
+    "COOKIE_SECRET": {
+      "description": "Secret for the cookie storage",
+      "generator": "secret"
+    },
+    "PASSWORD_PEPPER": {
+      "description": "Pepper spice in the password hashing",
+      "generator": "secret"
+    },
+    "DATABASE_URL": {
+      "description": "Database URL set by Heroku when using Postgres",
+      "required": true
+    },
+    "CRED_KEY_BASE64": {
+      "description": "Used for encrypting sensitive data before storing in database. See Readme.",
+      "required": true
+    },
+    "CRED_IV_BASE64": {
+      "description": "Used for encrypting sensitive data before storing in database. See Readme.",
+      "required": true
+    },
+    "RSA_PRIVATE_KEY": {
+      "description": "Decrypt sensitive data sent from the client. See Readme.",
+      "required": true
+    },
+    "RSA_PUBLIC_KEY": {
+      "description": "Encrypt sensitive data sent from the client. See Readme.",
+      "required": true
+    },
+    "MANDRILL_API_KEY": {
+      "description": "Mandrill API Key to send emails.",
+      "required": true
+    },
+    "HOSTS_WITH_NO_SSL": {
+      "description": "Comma-separated-list of hosts that do not use SSL.",
+      "value": "localhost"
+    },
+    "PUSHTECH_API_HOST": {
+      "description": "Store host, where searches and offers live.",
+      "value": "https://store.pushtech.de"
+    },
+    "PUSHTECH_API_USER": {
+      "description": "Username of the store user",
+      "required": true
+    },
+    "PUSHTECH_API_PASSWORD": {
+      "description": "Password of the store user",
+      "required": true
+    },
+    "LOGIN_HOST": {
+      "description": "Host where the email confirmation and co. come to.",
+      "value": "https://www.pushtech.de"
+    },
+    "ASSETS_HOST": {
+      "description": "Where the assets for searches and offers live",
+      "value": "https://assets.pushtech.de"
+    },
+    "PROFILE_HOST": {
+      "description": "Host for the user profile links",
+      "value": "https://profile.pushtech.de"
+    },
+    "GOOGLE_API_KEY": {
+      "description": "API Key to user google maps. Requires several Google APIs",
+      "required": true
+    },
+    "SENDBIRD_API_TOKEN": {
+      "description": "Sendbird configuration",
+      "required": true
+    },
+    "SENDBIRD_API_ID": {
+      "description": "Sendbird configuration",
+      "required": true
+    },
+    "NOTIFIER_HOST": {
+      "description": "Where does the notification server live",
+      "value": "https://notify.pushtech.de"
+    }
+  }
+}

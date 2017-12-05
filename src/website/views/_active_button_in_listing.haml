@@ -1,0 +1,4 @@
+- if obj.isActive
+  %a.btn.btn-default{icon18("blocked2"), :href => "#", :onclick => "deactivateSubject('#{obj._id}', #{obj.ranking_num});", :title => obj.i18n.deactivate.t, :id => "actbut#{obj.ranking_num}" }
+- else
+  %a.btn.btn-default{icon18("play2"), :href => "#", :onclick => "activateSubject('#{obj._id}', #{obj.ranking_num});", :title => obj.i18n.activate.t, :id => "actbut#{obj.ranking_num}"  }

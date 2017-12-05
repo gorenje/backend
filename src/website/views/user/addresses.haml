@@ -1,0 +1,37 @@
+= haml :"_js_global_variables"
+= haml :"_js_include_files", :locals => {:files => ["geolocation","code","google","init_user_addresses"]}
+
+= haml :"_sendbird_widget"
+= haml :"_notification_websocket"
+- i18n = TranslatorHelper.new("pages.addresses")
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n, :icon => "notebook" })
+  .panel-body
+    .row
+      .col-md-6
+        %center
+          %span#radius= InitialCircleRadiusMeters
+          = i18n.metres_around.t
+          %span#address
+            = i18n.help.drag_to_create_address.t
+      .col-md-6
+        - tmp = i18n.button.c
+        .input-group
+          %input.form-control#address_name{:type => "text", :value => "", :placeholder => i18n.placeholder.name.t }/
+          .input-group-btn
+            %a.btn.btn-default{"data-icon" => "file-add2", :href => "#", :onclick => "addAddress($('#address_name').val())", :title => tmp.add.t }
+            %a.btn.btn-default{"data-icon" => "home-outline", :href => "#", :onclick => "addAddress('Home')", :title => tmp.add_home.t }
+            %a.btn.btn-default{"data-icon" => "work", :href => "#", :onclick => "addAddress('Work')", :title => tmp.add_work.t }
+
+    .row.pt-10px
+      .col-md-6
+        .google-maps
+          #map
+      .col-md-6
+        = haml :"_resultslist"
+
+:css
+  #radius, #address {
+    font-weight: bold;
+  }

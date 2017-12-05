@@ -1,0 +1,23 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kafkastore
+  labels:
+    name: kafkastore
+  namespace: pushtech
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: kafkastore
+    spec:
+      containers:
+        - name: kafkastore
+          image: kafkastore:v1
+          env:
+            - name: REDIS_TRACKING_1
+              value: redis://redistsrv.pushtech.svc.cluster.local:6379?db=6
+            - name: KAFKA_HOST
+              value: kafkasrv.pushtech.svc.cluster.local:9092

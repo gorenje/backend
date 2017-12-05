@@ -1,0 +1,34 @@
+:javascript
+  Dropzone.options.dropzoneform = {
+    autoProcessQueue: false,
+    uploadMultiple: true,
+    addRemoveLinks: true,
+    parallelUploads: 10,
+    maxFiles: 10,
+
+    init: function() {
+      var _this = this;
+
+      this.element.querySelector("button[type=submit]").
+        addEventListener("click", function(e) {
+          if ( _this.getQueuedFiles().length > 0 ) {
+            e.preventDefault();
+            e.stopPropagation();
+            _this.processQueue();
+          }
+        });
+
+      this.on("maxfilesexceeded", function(file) { });
+      this.on("sendingmultiple", function() {
+      });
+      this.on("successmultiple", function(files, response) {
+      });
+      this.on("errormultiple", function(files, response) {
+      });
+      this.on("success", function(files, response) {
+        window.location = window.location.protocol + "//" +
+                          window.location.hostname + ":" +
+                          window.location.port + "#{redirect_to}";
+      });
+    }
+  }

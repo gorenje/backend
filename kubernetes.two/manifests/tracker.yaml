@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trackersrv
+  labels:
+    name: trackersrv
+  namespace: pushtech
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30322
+  selector:
+    name: tracker
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tracker
+  labels:
+    name: tracker
+  namespace: pushtech
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: tracker
+    spec:
+      containers:
+        - name: redis-tracker
+          image: redis
+        - name: tracker
+          image: tracker:v1
+          env:
+            - name: REDIS_URL
+              value: redis://localhost:6379?db=6
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - name: tracker
+              containerPort: 5000
+        - name: kafkastore
+          image: kafkastore:v1
+          env:
+            - name: REDIS_TRACKING_1
+              value: redis://localhost:6379?db=6
+            - name: KAFKA_HOST
+              value: kafkasrv.pushtech.svc.cluster.local:9092

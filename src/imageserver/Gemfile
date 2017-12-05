@@ -1,0 +1,32 @@
+# -*- ruby -*-
+source 'https://rubygems.org'
+
+ruby '2.4.2'
+
+gem 'puma'
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'oauth2'
+gem 'haml'
+
+gem 'will_paginate-bootstrap'
+gem 'activerecord'
+gem 'active_record_migrations'
+gem 'state_machine', :require => 'state_machine/core'
+gem 'state_machines-activerecord'
+gem 'pg'
+
+gem 'chunky_png'
+gem 'mini_magick'
+gem 'carrierwave'
+gem 'fog-aws'
+
+gem 'pry'
+gem 'rake'
+gem 'json'
+
+group :development do
+  gem 'foreman'
+  gem 'dotenv-rails'
+  gem 'rerun'
+end

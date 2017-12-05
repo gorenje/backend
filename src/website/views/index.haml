@@ -1,0 +1,5 @@
+- i18n = TranslatorHelper.new("pages.index")
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n })
+  .panel-body
+    = render_as_haml(i18n.text.t)

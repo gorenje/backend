@@ -1,0 +1,21 @@
+- i18n = @i18n
+- but = i18n.button.c
+
+%form#createsearchform{ :method => :post, :action => "/search/#{@offer._id}/create" }
+  .row.pt-10px
+    .col-md-12= i18n.fields.text.t
+  .row
+    .col-md-12
+      %input.form-control#text{:type => "text", :name => :text, :value => @offer.text }/
+
+  .row.pt-30px
+    .col-md-4.col-xs-4
+      %button.btn{:onclick => "submitCreateSearchForm(); return false;", :style => "margin-top: 10px;" }
+        %span{ "data-icon" => "check4" }
+        = but.create.t
+    .col-md-4.col-xs-4{ :style => "text-align: center;" }
+      %a{icon("image-outline"), :href => "/search/#{@offer._id}/create", :target => "_blank", :title => but.add_images.t, :style => "font-size: 40px;" }
+    .col-md-4.col-xs-4
+      %button.btn{:onclick => "dialog.dialog('close'); return false;", :style => "margin-top: 10px;" }
+        %span{ "data-icon" => "close" }
+        = but.cancel.t

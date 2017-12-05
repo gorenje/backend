@@ -1,0 +1,219 @@
+.row
+  .col-md-6
+    .pull-right
+      %a{ :href => "https://trk.pushtech.de/geo?lt=52.5322582&lg=13.4082089&a=unk&di=3e378e9b176c917e", :target => "_blank" }
+        Test Geo
+      %a{ :href => "https://trk.pushtech.de/mtf?oid=598f5887e9679600128162fb&olat=52.53114&olng=13.40024&olatd=0.0017342150719485971&olngd=0.0017342150719485971&sid=5992fbdb958fb2002284f151&slat=52.5311002&slng=13.4001576&slatd=0.03195596491607944&slngd=0.029542185366153717", :target => "_blank" }
+        Test Match
+      %span#counter
+
+Current Group Id:
+%b= session[:kafka_group_id]
+%a{ :href => "/kafidx/getgroupid" } Reset Group Id
+
+#map
+
+#jsgraveyard
+
+%script{:src => "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"}
+%script{ :src => "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" }
+%script{ :async=>"", :defer=>"defer", :src=>"https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_API_KEY']}&callback=initMap" }
+
+:javascript
+  var map;
+  var current_location;
+
+  function drawMatch(redCoords, greenCoords) {
+    var polyoffer = new google.maps.Polygon({
+      map: map,
+      paths: redCoords,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35,
+    });
+
+    var polysearch = new google.maps.Polygon({
+      map: map,
+      paths: greenCoords,
+      strokeColor: '#00FF00',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#00FF00',
+      fillOpacity: 0.35,
+    });
+
+    setTimeout(function() {
+      polyoffer.setMap(null);
+      polysearch.setMap(null);
+      polyoffer = null;
+      polysearch = null;
+    }, 5000);
+  }
+
+  function drawMarker(loc) {
+    var marker = new google.maps.Marker({
+      position: loc,
+      map: map
+    });
+
+    setTimeout(function() {
+       marker.setMap(null);
+       marker = null;
+    }, 5000);
+  }
+
+  function initMap() {
+    current_location =
+       new google.maps.LatLng(52.5322582, 13.4082089);
+
+    map = new google.maps.Map(document.getElementById('map'), {
+         zoom: 12,
+         gestureHandling: 'greedy',
+         mapTypeControl: false,
+         mapTypeId: google.maps.MapTypeId.ROADMAP,
+         styles: mapStyle(),
+         disableDefaultUI: true,
+         streetViewControl: false,
+         zoomControl: true,
+         zoomControlOptions: {
+           position: google.maps.ControlPosition.TOP_LEFT
+         }
+      });
+
+    map.setCenter(current_location);
+  }
+
+  function mapStyle(){
+    return [
+      {
+        "featureType": "administrative",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "administrative.land_parcel",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "poi",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.park",
+        "stylers": [
+          {
+            "visibility": "on"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.icon",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      },
+      {
+        "featureType": "transit",
+        "stylers": [
+          {
+            "visibility": "off"
+          }
+        ]
+      }
+    ];
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    _.templateSettings = {
+      interpolate: /\{\{(.+?)\}\}/g
+    };
+
+    var scheme      = "#{@ws_scheme}://";
+    var uri         = scheme + window.document.location.host + "/";
+    var ws          = new WebSocket(uri);
+
+    ws.onmessage = function(message) {
+      var data = JSON.parse(message.data);
+      $('#counter').html(data._offset_);
+
+      if ( data.type === "mtf" ) {
+        var lat = parseFloat(data.olat[0]);
+        var lng = parseFloat(data.olng[0]);
+        var lngDelta = parseFloat(data.olngd[0]) / 2.0;
+        var latDelta = parseFloat(data.olatd[0]) / 2.0;
+
+        var redCoords = [
+          {lat: lat + latDelta, lng: lng - lngDelta},
+          {lat: lat + latDelta, lng: lng + lngDelta},
+          {lat: lat - latDelta, lng: lng + lngDelta},
+          {lat: lat - latDelta, lng: lng - lngDelta},
+        ];
+
+        lat = parseFloat(data.slat[0]);
+        lng = parseFloat(data.slng[0]);
+        lngDelta = parseFloat(data.slngd[0]) / 2.0;
+        latDelta = parseFloat(data.slatd[0]) / 2.0;
+
+        var greenCoords = [
+          {lat: lat + latDelta, lng: lng - lngDelta},
+          {lat: lat + latDelta, lng: lng + lngDelta},
+          {lat: lat - latDelta, lng: lng + lngDelta},
+          {lat: lat - latDelta, lng: lng - lngDelta},
+        ];
+
+        drawMatch(redCoords, greenCoords);
+      }
+
+      if ( data.type === "geo" ) {
+        drawMarker(new google.maps.LatLng(data.lt, data.lg));
+      }
+    };
+  });
+
+:css
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  .kafkaevent a {
+    color: orange;
+    text-decoration: none;
+  }
+
+  .kafkaevent .kegame {
+    color: lightblue;
+  }
+
+  .kafkaevent .kedate {
+    color: pink;
+  }
+
+  .kafkaevent .kelag {
+    color: red;
+  }
+
+  .kafkaevent .keip a {
+    color: pink;
+  }
+
+  .kafkaevent .ketype {
+    color: pink;
+  }

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Details</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <script>
+    var current_location = null;
+    var circle = null;
+    var ignoreNextShowCircleCall = false;
+
+    function initMap() {
+      var lat =  <%= obj.latitude() %>;
+      var lng = <%= obj.longitude() %>;
+      var latDelta = <%= obj.latitudeDelta() %> / 2.0;
+      var lngDelta = <%= obj.longitudeDelta() %> / 2.0;
+
+      current_location = new google.maps.LatLng(lat, lng);
+
+      var bounds = generateBounds(lat, lng, latDelta, lngDelta);
+      bounds.extend(current_location);
+
+      var map = new google.maps.Map(document.getElementById('map'), {
+           zoom: 14,
+           gestureHandling: 'greedy',
+           mapTypeControl: false,
+           mapTypeId: google.maps.MapTypeId.ROADMAP,
+           styles: mapStyle(),
+           disableDefaultUI: true,
+           streetViewControl: false,
+           zoomControl: true,
+           zoomControlOptions: {
+             position: google.maps.ControlPosition.TOP_LEFT
+           }
+        });
+
+      map.setCenter(current_location);
+      map.fitBounds(bounds);
+
+      var marker = new google.maps.Marker({
+        position: current_location,
+        map: map
+      });
+
+      var rbounds = generateBounds(lat, lng, latDelta, lngDelta);
+
+      circle = new google.maps.Circle({
+        map: map,
+        center: current_location,
+        radius: <%= obj.location.radius %>,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        editable: true
+      });
+
+      circle.addListener('bounds_changed', showNewCircle);
+    }
+
+    function showNewCircle() {
+      if ( ignoreNextShowCircleCall ) {
+        ignoreNextShowCircleCall = false;
+        return;
+      }
+
+      var lat = current_location.lat();
+      var lng = current_location.lng();
+
+      var ne = circle.getBounds().getNorthEast();
+      var sw = circle.getBounds().getSouthWest();
+
+      var latDelta = ( ( ne.lat() - lat ) + ( lat - sw.lat() ) ) / 2.0;
+      var lngDelta = ( ( ne.lng() - lng ) + ( lng - sw.lng() ) ) / 2.0;
+
+      $('#latDelta').val(latDelta * 2.0);
+      $('#lngDelta').val(lngDelta * 2.0);
+      $('#radius').val(circle.getRadius());
+
+      ignoreNextShowCircleCall = true;
+    }
+
+    function generateBounds(lat, lng, latDelta, lngDelta ) {
+      var rbounds = new google.maps.LatLngBounds();
+
+      var redCoords = [
+        {lat: lat + latDelta, lng: lng - lngDelta},
+        {lat: lat + latDelta, lng: lng + lngDelta},
+        {lat: lat - latDelta, lng: lng + lngDelta},
+        {lat: lat - latDelta, lng: lng - lngDelta},
+      ];
+
+      rbounds.extend(redCoords[0]);
+      rbounds.extend(redCoords[1]);
+      rbounds.extend(redCoords[2]);
+      rbounds.extend(redCoords[3]);
+
+      return rbounds;
+    }
+
+    function mapStyle(){
+      return [
+        {
+          "featureType": "administrative",
+          "elementType": "geometry",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.land_parcel",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "poi",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "poi.park",
+          "stylers": [
+            {
+              "visibility": "on"
+            }
+          ]
+        },
+        {
+          "featureType": "road",
+          "elementType": "labels.icon",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "transit",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        }
+      ];
+    }
+
+    function toggleActivation(idstr, type_string, activeness) {
+      $.ajax({
+         url:  "/" + type_string + "/" + idstr + "/set_active/" +
+               (activeness ? "false" : "true"),
+         data: {},
+         method: 'get',
+         dataType: 'json'
+      }).done(function(data){
+         window.location.reload(true);
+      });
+    }
+
+    function notifyMatches(idstr, type_string) {
+      $.ajax({
+         url:  "/" + type_string + "/" + idstr + "/notify",
+         data: {},
+         method: 'get',
+         dataType: 'json'
+      }).done(function(data){
+         alert(data.status);
+      });
+    }
+  </script>
+
+  <script async="" defer="defer" src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GOOGLE_API_KEY %>&callback=initMap"></script>
+
+  <a href="/store/offers">All Offers</a> |
+  <a href="/store/searches">All Searches</a> |
+  <a href="/store/matches">Create Match</a>
+
+  <p>
+
+  <div id="map" style="width: 200px; height: 200px;"></div>
+
+  <% if (JSON.parse(JSON.stringify(obj))["images"]) { %>
+    <p>
+    <% for (path of obj["images"]) { %>
+       <img src="<%= process.env.IMAGE_HOST %><%= path %>/thumb" width=250 height=250/>
+    <% } %>
+  <% } %>
+
+  <h1>Details - Type: <%= obj.collection.name %></h1>
+  <table>
+    <tr>
+      <th>Valid?</th>
+      <td><%= obj.is_valid() %></td>
+    </tr>
+
+    <% for (key in JSON.parse(JSON.stringify(obj))) { %>
+      <tr>
+       <th><%= key %></th>
+       <td>
+         <% if (typeof(obj[key]) === "string" ) { %>
+         <%= obj[key] %>
+         <% } else { %>
+         <%= JSON.stringify(obj[key]) %>
+         <% } %>
+       </td>
+      </tr>
+    <% } %>
+
+    <tr>
+      <th>Google Maps</th>
+      <td><a target=_blank href="https://maps.google.com/maps?q=<%= obj.latitude() %>,<%= obj.longitude() %>">here</a></td>
+    </tr>
+  </table>
+
+
+  <h1>Update</h1>
+
+  <form method="post" action="/store/update/subject/<%= obj._id %>">
+    <input id="lngDelta" type="hidden" name="lngDelta" value="<%= obj.longitudeDelta() %>" size=60/>
+    <input id="latDelta" type="hidden" name="latDelta" value="<%= obj.latitudeDelta() %>" size=60/>
+    <table>
+      <tr>
+       <th>Owner</th>
+       <td><input type="text" name="owner" value="<%= obj.owner %>" size=60/></td>
+      </tr>
+      <tr>
+       <th>Valid Until</th>
+       <td><input type="text" name="validuntil" value="<%= obj.validuntil %>" size=60/></td>
+      </tr>
+      <tr>
+       <th>Text</th>
+       <td><input type="text" name="text" value="<%= obj.text %>" size=60/></td>
+      </tr>
+      <tr>
+       <th>Keywords</th>
+       <td><input type="text" name="keywords" value="<%= obj.keywords.join(', ') %>" size=60/></td>
+      </tr>
+
+      <tr>
+       <th>Radius</th>
+       <td><input id="radius" type="text" name="radius" value="<%= obj.location.radius %>" size=60/></td>
+      </tr>
+
+      <tr>
+       <th>isMobile</th>
+       <td><input type="checkbox" name="isMobile" <%= obj.isMobile ? 'checked' : '' %> size=60/></td>
+      </tr>
+      <tr>
+       <th>allowContacts</th>
+       <td><input type="checkbox" name="allowContacts" <%= obj.allowContacts ? 'checked' : ''%> size=60/></td>
+      </tr>
+      <tr>
+       <th>showLocation</th>
+       <td><input type="checkbox" name="showLocation" <%= obj.showLocation ? 'checked' : '' %> size=60/></td>
+      </tr>
+    </table>
+    <input type="submit" value="Update"/>
+  </form>
+
+  <a href="#" onclick="toggleActivation('<%= obj._id %>', '<%= obj.collection.name %>', <%= obj.isActive %>); return false;"><%= obj.isActive ? 'Deactivate' : 'Activate' %></a>
+  |
+  <a href="#" onclick="notifyMatches('<%= obj._id %>', '<%= obj.collection.name %>'); return false;">Find Matches</a>
+
+  </body>
+</html>

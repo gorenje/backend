@@ -1,0 +1,5 @@
+- if message = session.delete(:message)
+  .panel.panel-primary
+    = haml(:"_panel_heading", :locals => { :i18n => TranslatorHelper.new("partials.response") })
+    .panel-body
+      = message

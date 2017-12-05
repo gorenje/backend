@@ -1,0 +1,59 @@
+# -*- ruby -*-
+
+source 'http://rubygems.org'
+
+ruby '2.2.5'
+
+gem 'rake', '10.5.0'
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'puma'
+
+gem 'omniauth'
+gem "omniauth-google-oauth2"
+gem 'oauth2'
+
+gem 'pry'
+gem 'foreman'
+
+gem 'oj'
+gem 'oj_mimic_json'
+
+gem 'redis'
+gem 'hiredis'
+
+gem 'sidekiq'
+gem 'sidekiq-cron'
+
+gem 'librato-metrics'
+gem 'librato-rack'
+
+gem 'ruby-kafka'
+gem 'faye-websocket'
+
+gem 'addressable'
+
+gem 'erubis'
+gem 'uuidtools'
+
+gem 'net-http-persistent'
+gem 'adtekio_utilities', :github => "adtekio/utilities"
+gem 'adtekio_adnetworks'
+gem 'haml'
+gem 'rest-client'
+gem 'mechanize'
+gem 'geocoder'
+
+group :development do
+  gem 'dotenv'
+  gem 'rerun'
+end
+
+group :test do
+  gem 'rack-test'
+  gem 'rr', '1.0.4'
+  gem 'shoulda'
+  gem 'jasmine'
+  gem 'fakeweb'
+  gem 'minitest'
+end

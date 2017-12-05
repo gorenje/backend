@@ -1,0 +1,28 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kafidx
+  labels:
+    name: kafidx
+  namespace: pushtech
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: kafidx
+    spec:
+      containers:
+        - name: kafidx
+          image: kafidx:v1
+          env:
+            - name: PORT
+              value: "5321"
+            - name: WEB_CONCURRENCY
+              value: "3"
+            - name: KAFKA_HOST
+              value: kafkasrv.pushtech.svc.cluster.local:9092
+          ports:
+            - name: kafidx
+              containerPort: 5321

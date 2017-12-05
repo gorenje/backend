@@ -1,0 +1,10 @@
+de:
+  notification:
+    message:
+      offer_matched_search: Für dein Angebot "%{offer_title}" wurde eine übereinstimmende Suche gefunden
+      search_matched_offer: Für deine Suche "%{search_title}" wurde ein übereinstimmendes Angebot gefunden
+      new_chat_message: "%{chat_message}"
+    title:
+      offer_matched_search: Suche Gefunden
+      search_matched_offer: Angebot Gefunden
+      new_chat_message: Chat Nachricht

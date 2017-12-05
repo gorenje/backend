@@ -1,0 +1,34 @@
+- tmp = i18n.fields.c
+- but = i18n.button.c
+%form#dropzoneform.dropzone{ :method => :post, :action => action }
+  %input#latfld{:type => "hidden", :name => "latitude"}/
+  %input#lngfld{:type => "hidden", :name => "longitude"}/
+  %input#latDelta{:type => "hidden", :name => "latDelta"}/
+  %input#lngDelta{:type => "hidden", :name => "lngDelta"}/
+  %input#crlRadius{:type => "hidden", :name => "radius"}/
+  %input.address{:type => "hidden", :name => "address"}/
+  .row.pt-10px
+    .col-md-12= tmp.text.t
+  .row
+    .col-md-12
+      %input.form-control#text{:type => "text", :name => :text, :value => subject.text }/
+  .row.pt-10px
+    .col-md-12
+      %span#radiusText
+      = tmp.meters_around.t
+  .row
+    .col-md-12
+      %input.form-control.address{:type => "text", :disabled => true}/
+  .row.pt-10px
+    .col-md-10
+      %button.btn{:type => "submit" }
+        %span{ "data-icon" => "check4" }
+          = but.create.t
+    - if subject._id
+      .col-md-2
+        %a{ icon("chat"), :href=> "#", :onclick => "startChatWithOwner('#{subject._id}', null);", :title => but.chat.t }
+  .row.pt-10px
+    .dropzone-previews
+    .dz-message{"data-dz-message" => ""}
+      %span{"data-icon" => "image-outline", :style => "font-size: 20px"}
+        = i18n.image_upload.text.t

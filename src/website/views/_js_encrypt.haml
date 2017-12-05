@@ -1,0 +1,26 @@
+%script{:src => "#{cdn_host}/javascript/enc/jose.js"}
+%script{:src => "#{cdn_host}/javascript/enc/yahoo-min.js"}
+%script{:src => "#{cdn_host}/javascript/enc/jsbn.js"}
+%script{:src => "#{cdn_host}/javascript/enc/jsbn2.js"}
+%script{:src => "#{cdn_host}/javascript/enc/prng4.js"}
+%script{:src => "#{cdn_host}/javascript/enc/rng.js"}
+%script{:src => "#{cdn_host}/javascript/enc/base64.js"}
+%script{:src => "#{cdn_host}/javascript/enc/rsa.js"}
+%script{:src => "#{cdn_host}/javascript/enc/rsa2.js"}
+%script{:src => "#{cdn_host}/javascript/enc/ec.js"}
+%script{:src => "#{cdn_host}/javascript/enc/ec-patch.js"}
+%script{:src => "#{cdn_host}/javascript/enc/webcrypto-shim.js"}
+%script{:src => "#{cdn_host}/javascript/enc/asn1hex-1.1.min.js"}
+%script{:src => "#{cdn_host}/javascript/enc/base64x-1.1.min.js"}
+%script{:src => "#{cdn_host}/javascript/enc/ecdsa-modified-1.0.min.js"}
+%script{:src => "#{cdn_host}/javascript/enc/keyutil-1.0.min.js"}
+%script{:src => "#{cdn_host}/javascript/enc/encrypt.js"}
+/[if lt IE 9]
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+:javascript
+  function collect_figo_data() {
+      var data = [];
+      $('.figo_inputs').each(function(idx,elem) { data.push($(elem).val()) } )
+      return JSON.stringify(data);
+  }

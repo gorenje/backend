@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafidx
+  labels:
+    name: kafidx
+  namespace: pushtech
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5321
+    targetPort: 5321
+    nodePort: 30321
+  selector:
+    name: kafidx

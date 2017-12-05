@@ -1,0 +1,51 @@
+!!!
+- i18n = TranslatorHelper.new("menu")
+%html
+  %head
+    %title= i18n.app_title.t
+    %meta{:charset => "UTF-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1.0, shrink-to-fit=no,  maximum-scale=1, user-scalable=no", :name => "viewport"}/
+    %link{:color => "#000000", :href => "#{cdn_host}/images/marker/r.svg?c=%23000", :rel => "mask-icon"}/
+    %link{:href => "#{cdn_host}/images/favicon.ico", :rel => "icon", :type => "image/x-icon"}/
+    -# fonts have to come from the same server as text ... it seems.
+    %link{:href => "/stylesheets/icons.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "#{cdn_host}/stylesheets/normalize.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "#{cdn_host}/stylesheets/sandbox.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css", :rel => "stylesheet"}/
+    %link{:href => "#{cdn_host}/stylesheets/app.css?#{rand}", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css", :rel => "stylesheet"}/
+    %link{:href => "//cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.css", :rel => "stylesheet"}
+    %script{ :src => "//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" }
+    %script{ :src => "//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" }
+    %script{:src => "//cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.js" }
+    %script{ :src => "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js" }
+
+  %body
+    - tmp = i18n.whatareyouoffering.c
+    .pull-left{ :style => "padding-top: 5px; padding-left: 5px;" }
+      %a.btn.btn-xs.btn-default{ icon("get_app"), :href => "#{cdn_host}/app-release.apk", :title => tmp.get_app.t }
+
+    .pull-right{ :style => "padding-top: 5px; padding-right: 5px;" }
+      - if is_logged_in?
+        %a.btn.btn-xs.btn-default{ icon("search2"), :href => "/searches", :title => tmp.searches.t }
+        %a.btn.btn-xs.btn-default{ icon("tag8"), :href => "/offers", :title => tmp.offers.t }
+        %a.btn.btn-xs.btn-default{ icon("person"), :href => "/profile", :title => tmp.profile.t }
+      - else
+        %a.btn.btn-xs.btn-default{ icon("login"), :href => "/login", :title => tmp.login.t }
+        %a.btn.btn-xs.btn-default{ icon("person_add"), :href => "/register", :title => tmp.register.t }
+
+    #waitingForGedot
+
+    .container
+      = yield
+
+    %script{:src => "#{cdn_host}/javascript/enc/bootstrap.min.js"}
+
+:css
+  body {
+    min-height: 100%;
+  }
+  .container {
+    min-height: 100%;
+  }

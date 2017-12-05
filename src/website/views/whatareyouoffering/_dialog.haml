@@ -1,0 +1,12 @@
+- but = i18n.button.c
+
+.row.pt-10px
+  .col-md-12= i18n.fields.text.t
+
+.row.pt-50px
+  .col-md-6.col-xs-6
+    %a.btn.btn-default{"data-icon" => "login", :href => "/login" }
+      = but.login.t
+  .col-md-6.col-xs-6.pull-right
+    %a.btn.btn-default{"data-icon" => "person_add", :href => "/register" }
+      = but.register.t

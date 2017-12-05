@@ -1,0 +1,32 @@
+- i18n     = TranslatorHelper.new("partials.notification_row")
+- rowclass = notification.unread? ? "unread" : "read"
+- myobj    = notification.my_object
+- trnsdata = { :id => myobj.id, :title => myobj.title, :cssclass => rowclass }
+
+%td= notification.title
+%td= i18n.types.send(notification.kind, trnsdata).t
+%td{:data => {:timestamp => notification.created_at.utc.strftime("%s%L")}, :id => "tsrow#{notification.id}" }
+  = notification.created_at
+%td
+  - tmp = i18n.button.c
+  - if notification.unread?
+    %a{ icon("mail-read"), :class => rowclass, :href => "#", :onclick => "toggleNotificationReadState(#{notification.id}); return false;", :title => tmp.mark_as_read.t }
+  - else
+    %a{ icon("markunread"), :class => rowclass, :href => "#", :onclick => "toggleNotificationReadState(#{notification.id}); return false;", :title => tmp.mark_as_unread.t }
+
+  - if notification.is_chat_message?
+    %a{ icon(:chat), :href=> "#", :class => rowclass, :onclick => "startChatUsingChannelUrl('#{notification.chat_channel_url}');", :title => tmp.chat_reply.t }
+  - elsif notification.is_offer_matched_search?
+    %a{ icon(:chat), :href=> "#", :class => rowclass, :onclick => "startChatWithOwner('#{notification.search.id}', null);", :title => tmp.chat_with_searcher.t }
+  - elsif notification.is_search_matched_offer?
+    %a{ icon(:chat), :href=> "#", :class => rowclass, :onclick => "startChatWithOwner('#{notification.offer.id}', null);", :title => tmp.chat_with_offerer.t  }
+
+  %a{ icon("trash-o"), :class => rowclass, :href => "#", :onclick => "deleteNotification(#{notification.id}); return false;", :title => tmp.delete.t }
+
+:javascript
+  $(document).ready(function(){
+    $('#tsrow#{notification.id}')
+      .html( moment.utc($('#tsrow#{notification.id}').data().timestamp,"x")
+                   .local()
+                   .format(moment.localeData().longDateFormat("lll")));
+  });

@@ -1,0 +1,33 @@
+= haml :"_js_global_variables"
+= haml :"_js_include_files", :locals => {:files => ["geolocation","code","google","init_offers"]}
+
+= haml :"_sendbird_widget"
+= haml :"_notification_websocket"
+- i18n = TranslatorHelper.new("pages.offers")
+
+:css
+  .ui-widget-overlay {
+    background: #aaaaaa;
+    opacity: 0.6;
+    filter: Alpha(Opacity=60); /* support: IE8 */
+  }
+
+#dialog-form{ :style => "overflow:hidden;" }
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n, :icon => "tag8" })
+  .panel-body
+    .row
+      .col-md-6
+        %input.form-control#searchterms{:type => "text", :value => "", :placeholder => i18n.placeholder.filter.t, :style => "font-size: 16px;" }/
+      .col-md-6
+        = haml :"_addresslist"
+    .row.pt-10px
+      .col-md-6.col-md-push-6
+        .google-maps
+          #map
+      .col-md-6.col-md-pull-6
+        = haml :"_resultslist"
+    .row.pt-10px
+      .col-md-12
+        #pagination

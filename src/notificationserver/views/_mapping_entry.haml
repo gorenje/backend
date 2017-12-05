@@ -1,0 +1,38 @@
+%table.mapping_entry
+  %tbody
+    %tr
+      %td.highlight Device/Web Id
+      %td
+        %b= mapping.device_id
+    %tr
+      %td.highlight Push (One Signal)
+      %td= if_blank(mapping.onesignal_id)
+    %tr
+      %td.highlight Chat (Send Bird)
+      %td= if_blank(mapping.sendbird_id)
+    %tr
+      %td.highlight Web (Callback Url)
+      %td= if_blank(mapping.callback_url)
+    %tr
+      %td{ :colspan => 2 }
+        %span.highlight Locale:
+        = if_blank(mapping.locale)
+        %span.highlight Created:
+        = if_blank(mapping.created_at)
+        %span.highlight Updated:
+        = if_blank(mapping.updated_at)
+    %tr
+      %td{ :colspan => 2 }
+        %a{ :href => "/mapping/#{mapping.id}/delete" } Delete
+        = "|"
+        %a{ :href => "/mapping/#{mapping.id}/clone" } Clone
+        = "|"
+        - if mapping.onesignal_id.blank? && mapping.callback_url.blank?
+          Send Notification
+        - else
+          %a{ :href => "/notification/#{URI.escape(mapping.device_id)}", :target => "_blank" } Send Notification
+
+        = "|"
+        %a{ :href => $hosthandler.pushtech_api.url + "/store/offers?owner=#{URI.escape(mapping.device_id)}", :target => "_blank" } View Offers
+        = "|"
+        %a{ :href => $hosthandler.pushtech_api.url + "/store/searches?owner=#{URI.escape(mapping.device_id)}", :target => "_blank" } View Searches

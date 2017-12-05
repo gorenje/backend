@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Matches</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+
+    <a href="/store/offers">All Offers</a> |
+    <a href="/store/searches">All Searches</a> |
+    Create Match
+
+    <h1>Create Match</h1>
+
+    <form method="post" action="/store/matches">
+      <table>
+      <tr>
+        <th>Caveat</th>
+        <td>
+          Not showing all Searches and Offers since some are no longer valid.
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Searches
+        </th>
+        <td>
+          <select name="search_id">
+            <% for (obj of searches){ %>
+              <% if (obj.is_valid()) { %>
+                <option value="<%= obj._id %>">
+                  <%= obj.text %>, <%= obj.owner %>
+                </option>
+              <% } %>
+            <% } %>
+          </select>
+        </td>
+      </tr>
+
+      <tr>
+        <th>
+          Offers
+        </th>
+        <td>
+          <select name="offer_id">
+            <% for (obj of offers){ %>
+              <% if (obj.is_valid()) { %>
+                <option value="<%= obj._id %>">
+                  <%= obj.text %>, <%= obj.owner %>
+                </option>
+              <% } %>
+            <% } %>
+          </select>
+        </td>
+      </tr>
+
+      <tr>
+      <th/>
+        <td>
+          <input type="submit" value="Send Notifications"/>
+        </td>
+      </table>
+    </form>
+  </body>
+</html>

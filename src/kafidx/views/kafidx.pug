@@ -1,0 +1,136 @@
+extends layout.pug
+
+block content
+  .row
+    .col-md-6
+      h1 Live Kafka Events
+    .col-md-6
+      .pull-right
+        a( href = "/w/test?param=params", target = "_blank" ) Test Event
+
+  span= "Current Group Id: "
+  b= session.kafka_group_id
+  br
+  a( href = "/kafidx/getgroupid" ) Reset Group Id
+  span#messageCounterField
+
+  #events-listing
+
+  script(src = "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment-with-locales.min.js")
+  script(src = "//cdnjs.cloudflare.com/ajax/libs/ipaddr.js/1.5.4/ipaddr.min.js")
+  script(src = "//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+  script(src = "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" )
+
+  #handler-listing-template(style = "display: none;")
+    span.kafkaevent
+      br
+      font.kegame(title = "Topic / Partition / Offset" ).
+        {{topic}} / {{_partition_}} / {{_offset_}} &nbsp;
+      font.kedate( onmouseover="setDateTitle(this)" data-ts="{{ts}}") {{ts}} &nbsp;
+      font.kelag [{{klag}}ms] &nbsp;
+      a( onclick = "alert('{{_msgvalue_}}'); return false;" ) R &nbsp;
+      font.keip(onmouseover="setIpTitle(this)" data-ip="{{ip_dot}}") {{ip_dot}} &nbsp;
+      font.ketype {{type}} &nbsp;
+      span {{params}}
+
+block inlinejs
+  script.
+    var messageCounter = 0;
+
+    function setDateTitle(self) {
+      var ts = $(self).data("ts");
+      $(self).attr('title', moment.utc(ts,"x")
+                            .local()
+                            .format(moment.localeData().longDateFormat("lll")));
+    }
+
+    function setIpTitle(self) {
+      var str = [];
+      try {
+        str.push(ipaddr.parse($(self).data("ip")).toString());
+      } catch(e){
+        console.log(e);
+      }
+      $(self).attr('title', str.join(" "));
+    }
+
+    function updateMessageCount() {
+      messageCounter += 1;
+      $('#messageCounterField').html("&nbsp;" + messageCounter);
+    }
+
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if (decodeURIComponent(pair[0]) == variable) {
+                return decodeURIComponent(pair[1]);
+            }
+        }
+        return null;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      _.templateSettings = {
+        interpolate: /\{\{(.+?)\}\}/g
+      };
+
+      var filter = getQueryVariable("filter");
+
+      var scheme   = "#{ws_schema}://";
+      var uri      = scheme + window.document.location.host +
+                     "/kafidx/socket?gid=" + "#{session.kafka_group_id}";
+      var ws       = new WebSocket(uri);
+      var template = _.template($('#handler-listing-template').html());
+
+      $('#handler-listing-template').addClass('hidden');
+
+      ws.onmessage = function(message) {
+        updateMessageCount();
+        if ( filter ) {
+          var eventtype = JSON.parse(message.data)["type"];
+          if ( filter === eventtype ) {
+            $("#events-listing").prepend(template(JSON.parse(message.data)));
+          }
+        } else {
+          try {
+             $("#events-listing").prepend(template(JSON.parse(message.data)));
+          } catch(exception) {
+          }
+        }
+      };
+    });
+
+block inlinecss
+  style.
+    #events-listing {
+      background-color:black;
+      color:yellow;
+      font-size:small;
+    }
+
+    .kafkaevent a {
+      color: orange;
+      text-decoration: none;
+    }
+
+    .kafkaevent .kegame {
+      color: lightblue;
+    }
+
+    .kafkaevent .kedate {
+      color: pink;
+    }
+
+    .kafkaevent .kelag {
+      color: red;
+    }
+
+    .kafkaevent .keip a {
+      color: pink;
+    }
+
+    .kafkaevent .ketype {
+      color: pink;
+    }

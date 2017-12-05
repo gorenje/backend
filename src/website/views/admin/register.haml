@@ -1,0 +1,51 @@
+= haml :"_js_encrypt"
+
+:javascript
+  function encrypt() {
+    var data = JSON.stringify({email: $('#email').val(), name: $('#name').val(), type: 'register', password1: $('#pword').val(), password2: $('#pword2').val()});
+    encrypt_data(data, "#{ENV['RSA_PUBLIC_KEY']}", function(result){
+      document.getElementById("enc_token_field").value = result;
+      document.getElementById("send_data").submit();
+    });
+  }
+
+= haml :"_response_panel"
+- i18n = TranslatorHelper.new("pages.register")
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n })
+  .panel-body
+    .row
+      .col-md-6
+        = render_as_haml(i18n.text.t)
+        %form#send_data{ :method => :post, :action => "/login" }
+          %input#enc_token_field{:type=>:hidden, :name => "creds", :value => "none"}
+        - tmp = i18n.fields.c
+        %form{ :onsubmit => "encrypt(); return false;" }
+          .row.pt-10px
+            .col-md-6= tmp.owner.t
+          .row
+            .col-md-6
+              %input.form-control#name{:type => "text", :value => @name||""}/
+          .row.pt-10px
+            .col-md-6= tmp.email.t
+          .row
+            .col-md-6
+              %input.form-control#email{:type => "text",:value => @email||""}/
+          .row.pt-10px
+            .col-md-6= tmp.password.t
+          .row
+            .col-md-6
+              %input.form-control#pword{:type => "password"}/
+          .row.pt-10px
+            .col-md-6= tmp.password_repeat.t
+          .row
+            .col-md-6
+              %input.form-control#pword2{:type => "password"}/
+          %p
+          .row.pt-10px
+            .col-md-6
+          .row
+            .col-md-6
+              %button.btn{:type => "submit" }
+                = tmp.submit.t

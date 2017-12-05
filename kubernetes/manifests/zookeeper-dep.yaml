@@ -1,0 +1,21 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: zookeeper
+  labels:
+    name: zookeeper
+  namespace: pushtech
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: wurstmeister/zookeeper
+          ports:
+          - name: zookeeper
+            containerPort: 2181

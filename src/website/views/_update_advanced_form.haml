@@ -1,0 +1,43 @@
+- tmp = i18n.fields.c
+- but = i18n.button.c
+%form#dropzoneform.dropzone{ :method => :post, :action => action }
+  %input#latfld{   :type => "hidden", :name => "latitude"}/
+  %input#lngfld{   :type => "hidden", :name => "longitude"}/
+  %input#latDelta{ :type => "hidden", :name => "latDelta"}/
+  %input#lngDelta{ :type => "hidden", :name => "lngDelta"}/
+  %input#crlRadius{:type => "hidden", :name => "radius"}/
+  %input.address{  :type => "hidden", :name => "address"}/
+
+  .row.pt-10px
+    .col-md-12= tmp.text.t
+  .row
+    .col-md-12
+      %input.form-control#text{:type => "text", :name => :text, :value => subject.text }/
+  .row.pt-10px
+    .col-md-12
+      %span#radiusText
+      = tmp.meters_around.t
+  .row
+    .col-md-12
+      %input.form-control.address{:type => "text", :disabled => true}/
+  .row.pt-10px
+    .col-md-4.col-xs-4
+      %button.btn.btn-default{:type => "submit", :title => but.update.t }
+        %span{ "data-icon" => "check4" }
+        %span.hidden-xs.hidden-sm
+          = but.update.t
+    .col-md-4.col-xs-4.text-center#actbuthome
+      = haml(:"_active_button", :locals => {:subject => subject, :i18n => but})
+    .col-md-4.col-xs-4
+      .pull-right
+        %a.btn.btn-default{:href => "#", :onclick => "deleteSubject('#{subject._id}');", :title => but.delete.t }
+          %span{ "data-icon" => "trash-o" }
+          %span.hidden-xs.hidden-sm
+            = but.delete.t
+  .row.pt-10px
+    .dropzone-previews
+    .dz-message{"data-dz-message" => ""}
+      %span.hidden-xs.hidden-sm{"data-icon" => "image-outline", :style => "font-size: 20px"}
+      %span.hidden-xs.hidden-sm
+        = i18n.image_upload.text.t
+      %span.visible-xs.visible-sm{"data-icon" => "image-outline", :style => "font-size: 40px"}

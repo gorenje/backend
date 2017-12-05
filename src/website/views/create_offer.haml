@@ -1,0 +1,24 @@
+:javascript
+  var search_obj = #{@search_raw.to_json};
+
+= haml :"_js_global_variables"
+= haml :"_js_include_files", :locals => {:files => ["code","google","init_create_offer"]}
+
+= haml :"_sendbird_widget"
+= haml :"_notification_websocket"
+- i18n = TranslatorHelper.new("pages.create_offer")
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n, :icon => "tag8" })
+  .panel-body
+    .row
+      .col-md-6
+        = haml :"_addresslist"
+    .row.pt-10px
+      .col-md-6
+        .google-maps
+          #map
+      .col-md-6{ :style => "align: middle;" }
+        = haml :"_create_advanced_form", :locals => { :i18n => i18n, :action => "/offer/create_advanced", :subject => @search }
+
+= haml :"_dropzone_init_js", :locals => { :redirect_to => "/user/offers" }

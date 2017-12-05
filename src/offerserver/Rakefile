@@ -1,0 +1,20 @@
+ENV['RACK_ENV'] ||= 'development'
+
+require 'rubygems'
+require 'bundler'
+require 'bundler/setup'
+
+if File.exists?(".env")
+  require 'dotenv'
+  Dotenv.load
+end
+
+require 'rake'
+require 'yaml'
+
+task :environment do
+  require_relative 'application'
+end
+
+Dir[File.join(File.dirname(__FILE__), 'lib', 'tasks','*.rake')].
+  each { |f| load f }

@@ -1,0 +1,37 @@
+{
+  "name": "offer-api",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": "7.10.0",
+    "npm": "4.2.0"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "client-sessions": "^0.8.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "dotenv": "^4.0.0",
+    "ejs": "~2.5.5",
+    "express": "~4.14.1",
+    "geolib": "^2.0.23",
+    "mongoose": "4.10.8",
+    "morgan": "~1.7.0",
+    "node-rest-client": "^3.1.0",
+    "passport": "^0.3.2",
+    "passport-http": "^0.3.0",
+    "qs": "^6.5.1",
+    "serve-favicon": "~2.3.2",
+    "throng": "^4.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.5.0",
+    "node-fakeweb": "^1.1.0",
+    "sinon": "^3.2.0"
+  }
+}

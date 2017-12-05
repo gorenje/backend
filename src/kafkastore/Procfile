@@ -1,0 +1,2 @@
+web: node throng.js
+worker: node producer.js

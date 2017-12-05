@@ -1,0 +1,15 @@
+:javascript
+  var youmarker, objectmarkers = [], directionsDisplay,
+      last_good_known_lat, last_good_known_lng, current_location = null,
+      circle = null, map = null, dialog;
+
+  var InitialCircleRadiusMeters = #{InitialCircleRadiusMeters};
+
+- if session['latitude'] && session['longitude']
+  :javascript
+    var user_location = { coords: { latitude: #{session['latitude']}, longitude: #{session['longitude']} } };
+    current_location = new google.maps.LatLng( user_location.coords.latitude,
+                                               user_location.coords.longitude);
+- else
+  :javascript
+    var user_location = null;

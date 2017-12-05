@@ -1,0 +1,50 @@
+%li{ :id => "resultslistitem#{ranking_num}", :class => isActive ? "" : "deactivated" }
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-8
+      %h3
+        = "#{ranking_num}. #{text}"
+      %span
+        = i18n.keywords.t
+        = keywords.join(", ")
+
+    .col-md-4
+      - if images && !images.compact.empty?
+        .rounded-image-corners
+          %img{ ImageSize, :src => $hosthandler.assets.url + images.first + "/iconbigger" }
+      - else
+        %span.missing-image-icon{icon("image2") }
+
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-12
+      %span
+        = i18n.created_on.t
+        %span{ :id => "createdat#{ranking_num}" }
+
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-12
+      = "#{radius}m"
+      = i18n.around.t
+      - if address
+        %span= address
+      - else
+        %span{ :id => "addrline#{ranking_num}" } ...
+
+  .row
+    .col-md-12
+      - tmp = i18n.button.c
+      .btn-group.btn-group-sm{:role => :group, :style => "padding-bottom: 2px;"}
+        %a.btn.btn-default{ icon18("trash-o"), :href=> "#", :onclick => "deleteSubject('#{_id}');", :title => tmp.delete.t }
+        %a.btn.btn-default{ icon18("edit2"), :href=> "#", :onclick => "editSubject('#{_id}');", :title => tmp.edit.t }
+        - subject = OpenStruct.new({:_id => _id, :isActive => isActive, :ranking_num => ranking_num, :i18n => i18n.button.c})
+        = haml(:"_active_button_in_listing", :locals => { :obj => subject })
+        - if ENV['RACK_ENV'] == 'development'
+          %a.btn.btn-default{ icon18("eye9"), :href=> "#", :onclick => "checkForMatchingSubject('#{_id}');" }
+          %a.btn.btn-default{ icon18("details"), :href => $hosthandler.pushtech_api.url + "/store/details/#{_id}", :target => "_blank" }
+
+:javascript
+  $(document).ready(function(){
+    $('#createdat#{ranking_num}')
+      .html(moment.utc("#{validfrom}","x")
+                  .local()
+                  .format(moment.localeData().longDateFormat("lll")));
+  })

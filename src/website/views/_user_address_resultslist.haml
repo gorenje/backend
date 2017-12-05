@@ -1,0 +1,20 @@
+- i18n = TranslatorHelper.new("partials.user_address_resultslist")
+
+%li{ :id => "resultslistitem#{ranking_num}" }
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-12
+      %h3= "#{name} (#{ranking_num})"
+
+  .row{:onclick => "highlightMarker(#{ranking_num});"}
+    .col-md-12
+      %span.radius= radius
+      = i18n.metres_around.t
+      %br
+      %span.street_name= street_1
+
+  .row
+    - tmp = i18n.button.c
+    .col-md-12
+      .btn-group.btn-group-sm{:role => :group, :style => "padding-bottom: 2px;"}
+        %a.btn.btn-default{ icon18("write"), :href=> "#", :onclick => "updateAddress('#{id}', '#{ranking_num}');", :title => tmp.update.t }
+        %a.btn.btn-default{ icon18("trash-o"), :href=> "#", :onclick => "deleteAddress('#{id}'); return false;", :title => tmp.delete.t }

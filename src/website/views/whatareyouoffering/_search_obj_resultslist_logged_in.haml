@@ -1,0 +1,44 @@
+- i18n = TranslatorHelper.new("partials.search_obj_resultslist")
+
+%li{ :id => "resultslistitem#{ranking_num}" }
+  .row{:onclick => "createOfferForSearch('#{_id}');"}
+    .col-md-8
+      %h3
+        = text
+      %span
+        = i18n.keywords.t
+        = keywords.join(", ")
+    .col-md-4
+      - if images && !images.empty?
+        .rounded-image-corners
+          %img{ ImageSize, :src => $hosthandler.assets.url + images.first + "/iconbigger" }
+      - else
+        %span.missing-image-icon{icon("image2") }
+
+  .row{:onclick => "createOfferForSearch('#{_id}');"}
+    .col-md-12
+      %span
+        = i18n.created_ago.t
+        %span{ :id => "createdat#{ranking_num}" }
+
+  .row{:onclick => "createOfferForSearch('#{_id}');"}
+    .col-md-12
+      %span
+        - if address
+          %span= address
+          = "(%im %s)" % [distance, i18n.from_you.t]
+        - else
+          = "%im %s" % [distance, i18n.from_you.t]
+
+  .row
+    - tmp = i18n.button.c
+    .col-md-12
+      .btn-group.btn-group-sm{:role => :group, :style => "padding-bottom: 2px;"}
+        %a.btn.btn-default{ icon18(:chat), :href=> "#", :onclick => "startChatWithOwner('#{_id}',null); return false;", :title => tmp.chat.t }
+        %a.btn.btn-default{ icon18("local_offer"), :href=> "#", :onclick => "createOfferForSearch('#{_id}');", :title => tmp.create.t }
+
+:javascript
+  $(document).ready(function(){
+    $('#createdat#{ranking_num}')
+      .html(moment.utc("#{validfrom}","x").local().fromNow());
+  })

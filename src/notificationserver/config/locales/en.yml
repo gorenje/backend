@@ -1,0 +1,10 @@
+en:
+  notification:
+    message:
+      offer_matched_search: "%{search_title}"
+      search_matched_offer: "%{offer_title}"
+      new_chat_message: "%{chat_message}"
+    title:
+      offer_matched_search: Search Found
+      search_matched_offer: Offer Found
+      new_chat_message: Chat Message

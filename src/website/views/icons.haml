@@ -1,0 +1,9 @@
+- File.open("public/stylesheets/icons.css").map { |line| if (line =~ /^\[data-icon="(.+)"\].+ }$/) ; $1; else nil; end}.compact.each_slice(6) do |icons|
+  .row
+    - icons.each do |icon_name|
+      .col-md-2
+        %span{ "data-icon" => icon_name, :style => "font-size: 30px;" }
+  .row
+    - icons.each do |icon_name|
+      .col-md-2
+        = icon_name

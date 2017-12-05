@@ -1,0 +1,8 @@
+:concurrency: 20
+:queues:
+  - default
+  - [geo_consumer, 2]
+  - [chatbot_consumer, 2]
+  - [bulkdata_consumer, 2]
+  - [ebay_consumer, 2]
+  - [notifier_consumer, 2]

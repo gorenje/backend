@@ -1,0 +1,51 @@
+= haml :"_js_encrypt"
+
+:javascript
+  function encrypt() {
+    var data = JSON.stringify({email: $('#user').val(), password: $('#pin').val(), type: 'login'});
+
+    encrypt_data(data, "#{ENV['RSA_PUBLIC_KEY']}", function(result){
+      document.getElementById("enc_token_field").value = result;
+      document.getElementById("send_data").submit();
+    });
+  }
+
+= haml :"_response_panel"
+- i18n = TranslatorHelper.new("pages.login")
+
+- unless session[:user_id]
+  .panel.panel-primary
+    = haml(:"_panel_heading", :locals => { :i18n => i18n })
+    .panel-body
+      .row
+        .col-md-6
+          %form#send_data{ :method => :post, :action => "/login" }
+            %input#enc_token_field{:type=>:hidden, :name => "creds", :value => "none"}
+          - tmp = i18n.fields.c
+          %form{ :onsubmit => "encrypt(); return false;" }
+            .row.pt-10px
+              .col-md-4= tmp.email.t
+            .row
+              .col-md-6
+                %input.form-control#user{:type => "text", :value => @email||"" }/
+            .row.pt-10px
+              .col-md-4= tmp.password.t
+            .row
+              .col-md-6
+                %input.form-control#pin{:type => "password"}/
+            .row.pt-10px
+              .col-md-4
+            .row
+              .col-md-6
+                %input.btn{:type => "submit", :value => i18n.button.login.t }
+            .row.pt-10px
+              .col-md-12
+                Not yet a user?
+                %a{ :href => "/register" } Register!
+
+- else
+  - lgo = i18n.logout.c
+  .panel.panel-primary
+    = haml(:"_panel_heading", :locals => { :i18n => lgo })
+    .panel-body
+      %a{ :href => "/logout" }= lgo.logout_link.t

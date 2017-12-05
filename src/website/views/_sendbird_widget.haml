@@ -1,0 +1,27 @@
+:javascript
+  var sendbird_app_id = "#{ENV['SENDBIRD_API_ID']}";
+
+- ["SendBird.min", "widget.SendBird"].each do |filename|
+  %script{:async => "", :defer => "defer", :src => "/javascript/#{filename}.js"}
+
+- user = @user || User.find(session[:user_id])
+- if user.has_sendbird_id?
+  :javascript
+    $(document).ready(function(){
+      function connectToSendbird() {
+        sbWidget.startWithConnect(sendbird_app_id, '#{user.sendbird_userid}', '#{user.name}', function() {});
+      }
+
+      setTimeout(connectToSendbird, 1500);
+    });
+
+#sb_widget
+
+:css
+  .widget {
+    background-color: #777;
+  }
+  #sb_widget .ic-new-chat, #sb_widget .ic-option, #sb_widget .ic-invite,
+    #sb_widget .ic-leave, #sb_widget .ic-members {
+    display: none !important;
+  }

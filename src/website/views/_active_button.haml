@@ -1,0 +1,12 @@
+- if subject.isActive
+  %a.btn.btn-default{:href => "#", :onclick => "deactivateSubject('#{subject._id}');", :title => i18n.deactivate.t }
+    %span{ "data-icon" => "blocked2" }
+    - unless defined? notext
+      %span.hidden-xs.hidden-sm
+        = i18n.deactivate.t
+- else
+  %a.btn.btn-default{:href => "#", :onclick => "activateSubject('#{subject._id}');", :title => i18n.activate.t }
+    %span{ "data-icon" => "play2" }
+    - unless defined? notext
+      %span.hidden-xs.hidden-sm
+        = i18n.activate.t

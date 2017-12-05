@@ -1,0 +1,27 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: consumer-meta
+  labels:
+    name: consumer-meta
+    role: consumer
+  namespace: pushtech
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: consumer-meta
+        role: consumer
+    spec:
+      containers:
+        - name: consumer-meta
+          image: consumers.nodejs:v1
+          env:
+            - name: KAFKA_HOST
+              value: kafkasrv.pushtech.svc.cluster.local:9092
+            - name: REDIS_CONSUMER
+              value: redis://redisconsumer.pushtech.svc.cluster.local:6379?db=3
+            - name: CONSUMER_NAME
+              value: metadata_counter

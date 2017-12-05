@@ -1,0 +1,16 @@
+.panel.panel-primary
+  .panel-heading
+    %h3.panel-title Register
+  .panel-body
+    .row
+      .col-md-12
+        %form{ :action => "/register", :method => :post }
+          %input{ :type => :hidden, :name => :redirect, :value => true }
+          - (Mapping.columns.map(&:name) - ["id","created_at", "updated_at"]).each do |attr|
+            .row.pt-10px
+              .col-md-2= attr
+              .col-md-10
+                %input{ :type => :text, :size => 60, :name => attr, :value => @mapping.try(attr), :placeholder => "Enter the #{attr}"}
+          .row.pt-10px
+            .col-md-12
+              %input.btn.btn-warning{:type => "submit", :value => "Submit"}

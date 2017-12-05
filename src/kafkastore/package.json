@@ -1,0 +1,39 @@
+{
+  "name": "kafkastore",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": "8.9.0",
+    "npm": "5.5.1"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "client-sessions": "^0.8.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "device-detector": "^1.0.1",
+    "dotenv": "^4.0.0",
+    "ejs": "~2.5.5",
+    "express": "~4.14.1",
+    "geoip-lite": "^1.2.1",
+    "ip-address": "^5.8.8",
+    "kue": "^0.11.6",
+    "morgan": "^1.9.0",
+    "node-rdkafka": "^2.1.1",
+    "node-zookeeper-client": "^0.2.2",
+    "qs": "^6.5.1",
+    "redis": "^2.8.0",
+    "serve-favicon": "~2.3.2",
+    "throng": "^4.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.1",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.5.0",
+    "node-fakeweb": "^1.1.0",
+    "sinon": "^3.2.0"
+  }
+}

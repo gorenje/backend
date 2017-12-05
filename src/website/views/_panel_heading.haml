@@ -1,0 +1,5 @@
+- icon = defined?(icon) ? icon : nil
+.panel-heading{ :class => icon == "search2" ? "search" : (icon == "tag8" ? "offer" : "neither") }
+  %h3.panel-title
+    %span{ "data-icon" => icon }
+      = i18n.title.t
