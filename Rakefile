@@ -89,7 +89,7 @@ namespace :images do
       for n in src/* ; do
         cd $n
         imagename=`basename $n`
-        docker build -t ${imagename}:v1 .
+        docker build -t #{KubernetesNS}.${imagename}:v1 .
         cd ../..
       done
     EOF
