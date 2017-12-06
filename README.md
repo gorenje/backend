@@ -110,14 +110,14 @@ Set up the network and volumes:
 
 Compile all the images
 
-    eval $(cat .env)
+    $(cat .env)
     for n in docker-compose/*.yml ; do
       docker-compose -f $n build
     done
 
 Start up the images (ordering important, each in separate window):
 
-    eval $(cat .env)
+    $(cat .env)
     docker-compose -f docker-compose/kafka-zookeeper.yml up
     docker-compose -f docker-compose/tracker.yml up
     docker-compose -f docker-compose/kafkastore.yml up
@@ -130,17 +130,17 @@ Start up the images (ordering important, each in separate window):
 
 Then browser to:
 
-    eval $(cat .env)
+    $(cat .env)
     open -a Firefox http://localhost:$TRACKER_PORT/event?d=1
 
 and
 
-    eval $(cat .env)
+    $(cat .env)
     open -a Firefox http://localhost:$KAFIDX_PORT/kafidx
 
 To shut things down:
 
-    eval $(cat .env)
+    $(cat .env)
     for n in docker-compose/*.yml ; do
       docker-compose -f $n down
     done
