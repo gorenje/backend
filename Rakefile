@@ -19,14 +19,14 @@ namespace :minikube do
     EOF
   end
 
-  desc "Power up dashboard"
+  desc "Show docker environment variables"
   task :docker_env do
     system <<-EOF
       minikube docker-env
     EOF
   end
 
-  desc "Power up minikube"
+  desc "Power down minikube"
   task :stop do
     system <<-EOF
       minikube stop
@@ -34,51 +34,8 @@ namespace :minikube do
   end
 end
 
-namespace :spin do
-  desc "Setup architecture"
-  task :up do
-    system <<-EOF
-      kubectl create -f kubernetes.two/namespace.yaml
-      kubectl create -f kubernetes.two/manifests
-    EOF
-  end
-
-  desc "Shutdown architecture"
-  task :down do
-    system <<-EOF
-      kubectl delete -f kubernetes.two/manifests
-      kubectl delete -f kubernetes.two/namespace.yaml
-    EOF
-  end
-end
 
 namespace :docker do
-  namespace :prune do
-    desc "Remove unused images"
-    task :images do
-      system <<-EOF
-        eval $(minikube docker-env)
-        docker image prune
-      EOF
-    end
-
-    desc "Remove unused containers"
-    task :containers do
-      system <<-EOF
-        eval $(minikube docker-env)
-        docker container prune
-      EOF
-    end
-  end
-
-  desc "Process list"
-  task :ps do
-    system <<-EOF
-      eval $(minikube docker-env)
-      docker ps
-    EOF
-  end
-
   namespace :compose do
     desc "create all volumes and networks"
     task :create_periphery do
@@ -106,6 +63,16 @@ namespace :docker do
       end
     end
 
+    desc "spin down all"
+    task :spin_down_all do
+      system <<-EOF
+        $(cat .env)
+        for n in docker-compose/*.yml ; do
+          docker-compose -f $n down
+        done
+      EOF
+    end
+
     desc "build all compose images"
     task :build_all do
       system <<-EOF
@@ -118,63 +85,109 @@ namespace :docker do
   end
 end
 
-namespace :images do
-  desc "rebuild docker images"
-  task :rebuild do
+namespace :kubernetes do
+  namespace :spin do
+    desc "Setup architecture"
+    task :up do
+      system <<-EOF
+        kubectl create -f kubernetes.two/namespace.yaml
+        kubectl create -f kubernetes.two/manifests
+      EOF
+    end
+
+    desc "Shutdown architecture"
+    task :down do
+      system <<-EOF
+        kubectl delete -f kubernetes.two/manifests
+        kubectl delete -f kubernetes.two/namespace.yaml
+      EOF
+    end
+  end
+
+  namespace :prune do
+    desc "Remove unused images"
+    task :images do
+      system <<-EOF
+        eval $(minikube docker-env)
+        docker image prune
+      EOF
+    end
+
+    desc "Remove unused containers"
+    task :containers do
+      system <<-EOF
+        eval $(minikube docker-env)
+        docker container prune
+      EOF
+    end
+  end
+
+  desc "Process list"
+  task :ps do
     system <<-EOF
       eval $(minikube docker-env)
+      docker ps
+    EOF
+  end
 
-      for n in src/* ; do
-        cd $n
-        imagename=`basename $n`
-        docker build -t #{KubernetesNS}.${imagename}:v1 .
-        cd ../..
+  namespace :images do
+    desc "rebuild docker images"
+    task :rebuild do
+      system <<-EOF
+        eval $(minikube docker-env)
+
+        for n in src/* ; do
+          cd $n
+          imagename=`basename $n`
+          docker build -t #{KubernetesNS}.${imagename}:v1 .
+          cd ../..
+        done
+      EOF
+    end
+  end
+
+  desc "starting logging containers"
+  task :log, [:podname,:container] do |t,args|
+    system <<-EOF
+      while [ 1 ] ; do
+        echo "#######################################################";
+        for n in `kubectl get pods -n #{KubernetesNS} | grep #{args.podname} | awk '// { print $1 }'`; do
+          echo "======================= $n"
+          kubectl logs -n #{KubernetesNS} $n #{args.container} | tail -50
+        done
       done
     EOF
   end
-end
 
-desc "starting logging containers"
-task :log, [:podname,:container] do |t,args|
-  system <<-EOF
-    while [ 1 ] ; do
-      echo "#######################################################";
-      for n in `kubectl get pods -n #{KubernetesNS} | grep #{args.podname} | awk '// { print $1 }'`; do
-        echo "======================= $n"
-        kubectl logs -n #{KubernetesNS} $n #{args.container} | tail -50
-      done
-    done
-  EOF
-end
+  desc "start shell in container"
+  task :shell, [:podname,:container] do |t,args|
+    contargs = args.container.nil? ? "" : "-c #{args.container}"
+    system <<-EOF
+      podname=`kubectl get pods -n #{KubernetesNS} | grep #{args.podname} | awk '// { print $1 }' | head -1`
+      kubectl exec -it ${podname} #{contargs} -n #{KubernetesNS} -- /bin/bash
+    EOF
+  end
 
-desc "start shell in container"
-task :shell, [:podname,:container] do |t,args|
-  contargs = args.container.nil? ? "" : "-c #{args.container}"
-  system <<-EOF
-    podname=`kubectl get pods -n #{KubernetesNS} | grep #{args.podname} | awk '// { print $1 }' | head -1`
-    kubectl exec -it ${podname} #{contargs} -n #{KubernetesNS} -- /bin/bash
-  EOF
-end
+  desc "Scale something"
+  task :scale, [:podname,:to] do |t,args|
+    system <<-EOF
+      kubectl scale --replicas=#{args.to} -n #{KubernetesNS} deployment/#{args.podname}
+    EOF
+  end
 
-desc "Scale something"
-task :scale, [:podname,:to] do |t,args|
-  system <<-EOF
-    kubectl scale --replicas=#{args.to} -n #{KubernetesNS} deployment/#{args.podname}
-  EOF
-end
+  desc "Show all resources"
+  task :ps do
+    system <<-EOF
+      kubectl get all -n #{KubernetesNS}
+    EOF
+  end
 
-desc "Show all resources"
-task :ps do
-  system <<-EOF
-    kubectl get all -n #{KubernetesNS}
-  EOF
-end
-
-desc "Start a load test on tracking"
-task :loadtest, [:numreq,:concurrent,:event] do |t,args|
-  system <<-EOF
-     ab -n #{args.numreq} -c #{args.concurrent} $(minikube service trackersrv -n #{KubernetesNS} --url)/t/#{args.event}?r=#{rand}
-  EOF
+  desc "Start a load test on tracking"
+  task :loadtest, [:numreq,:concurrent,:event] do |t,args|
+    system <<-EOF
+       ab -n #{args.numreq} -c #{args.concurrent} $(minikube service trackersrv -n #{KubernetesNS} --url)/t/#{args.event}?r=#{rand}
+    EOF
+  end
 end
 
 desc "Start a pry shell"

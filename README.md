@@ -133,11 +133,7 @@ and
 
 To shut things down:
 
-    $(cat .env)
-    for n in docker-compose/*.yml ; do
-      docker-compose -f $n down
-    done
-
+    rake docker:compose:spin_down_all
 
 Events
 ===
