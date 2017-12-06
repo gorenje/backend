@@ -38,16 +38,16 @@ namespace :spin do
   desc "Setup architecture"
   task :up do
     system <<-EOF
-      kubectl create -f kubernetes.scalable/namespace.yaml
-      kubectl create -f kubernetes.scalable/manifests
+      kubectl create -f kubernetes.two/namespace.yaml
+      kubectl create -f kubernetes.two/manifests
     EOF
   end
 
   desc "Shutdown architecture"
   task :down do
     system <<-EOF
-      kubectl delete -f kubernetes.scalable/manifests
-      kubectl delete -f kubernetes.scalable/namespace.yaml
+      kubectl delete -f kubernetes.two/manifests
+      kubectl delete -f kubernetes.two/namespace.yaml
     EOF
   end
 end
@@ -78,10 +78,48 @@ namespace :docker do
       docker ps
     EOF
   end
+
+  namespace :compose do
+    desc "create all volumes and networks"
+    task :create_periphery do
+      require 'yaml'
+      networks, volumes = [[], []]
+      Dir.glob("docker-compose/*").each do |a|
+        if nets = YAML.load_file(a)["networks"]
+          networks << ((nets["default"]||{})["external"]||{})["name"]
+        end
+        if vols = YAML.load_file(a)["volumes"]
+          volumes << vols.keys
+        end
+      end
+
+      puts "Creating networks...."
+      networks.compact.uniq.each do |networkname|
+        print " ... #{networkname}: "
+        system "docker network create #{networkname}"
+      end
+
+      puts "Creating volumes...."
+      volumes.flatten.compact.uniq.each do |volumenname|
+        print " ... #{volumenname}: "
+        system "docker volume create --name=#{volumenname}"
+      end
+    end
+
+    desc "build all compose images"
+    task :build_all do
+      system <<-EOF
+        $(cat .env)
+        for n in docker-compose/*.yml ; do
+          docker-compose -f $n build
+        done
+      EOF
+    end
+  end
 end
 
 namespace :images do
-  desc "starting logging containers"
+  desc "rebuild docker images"
   task :rebuild do
     system <<-EOF
       eval $(minikube docker-env)
@@ -137,4 +175,11 @@ task :loadtest, [:numreq,:concurrent,:event] do |t,args|
   system <<-EOF
      ab -n #{args.numreq} -c #{args.concurrent} $(minikube service trackersrv -n #{KubernetesNS} --url)/t/#{args.event}?r=#{rand}
   EOF
+end
+
+desc "Start a pry shell"
+task :console do
+  require 'pry'
+  Pry.editor = ENV['PRY_EDITOR'] || ENV['EDITOR'] || 'emacs'
+  Pry.start
 end

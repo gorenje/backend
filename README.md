@@ -102,18 +102,11 @@ installed.
 
 Set up the network and volumes:
 
-    docker volume create --name=offerserverdb
-    docker volume create --name=mongostoredb
-    docker volume create --name=websitedb
-    docker volume create --name=websiteenv
-    docker network create thenetwork
+    rake docker:compose:create_periphery
 
 Compile all the images
 
-    $(cat .env)
-    for n in docker-compose/*.yml ; do
-      docker-compose -f $n build
-    done
+    rake docker:compose:build_all
 
 Start up the images (ordering important, each in separate window):
 
