@@ -24,12 +24,6 @@ cron_jobs = [
                'cron'  => '*/1 * * * *',
                'args'  => nil
              },
-             # {
-             #   'name'  => 'ebay_worker_scheduler',
-             #   'class' => 'Scheduler::Ebay',
-             #   'cron'  => '*/1 * * * *',
-             #   'args'  => nil
-             # },
              {
                'name'  => 'notifier_worker_scheduler',
                'class' => 'Scheduler::Notifier',

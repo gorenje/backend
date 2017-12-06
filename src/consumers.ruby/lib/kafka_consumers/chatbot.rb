@@ -1,5 +1,4 @@
 require_relative 'base'
-require_relative 'ebay'
 
 module Consumers
   class Chatbot
@@ -15,7 +14,6 @@ module Consumers
     BerlinDeKinos      = "BerlinDeKinos"
     UrbaniteNet        = "UrbaniteNet"
     DriveNowCarSharing = "DriveNowCarSharing"
-    EbayKleinanzeigen  = Consumers::Ebay::Owner
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
 
@@ -53,8 +51,6 @@ module Consumers
           handle_berlin_de_chat(event)
         when event.is_for?(BerlinDeKinos)
           handle_berlin_de_kinos_chat(event)
-        when event.is_for?(EbayKleinanzeigen)
-          handle_ebay_kleinanzeigen_chat(event)
         when event.is_for?(UrbaniteNet)
           handle_urbanite_chat(event)
         when event.is_for?(DriveNowCarSharing)
@@ -82,21 +78,6 @@ module Consumers
             end
 
       event.post_message(msg, UrbaniteNet)
-    end
-
-    def handle_ebay_kleinanzeigen_chat(event)
-      offer, search = event.offer_and_search
-      msg = case event.message_text
-            when /price/i
-              "Price is #{offer["extdata"]["price"]}"
-            when /url/i
-              offer["extdata"]["url"]
-            else
-              (offer["extdata"].keys.include?(event.message_text.downcase) &&
-               offer["extdata"][event.message_text.downcase]) || UnknownCmd
-            end
-
-      event.post_message(msg, EbayKleinanzeigen)
     end
 
     def handle_berlin_de_kinos_chat(event)

@@ -1,22 +1,22 @@
 module Tracking
   class Event
     DefaultOptions = {
-      :host => $hosthandler.tracking.url
+      :host => $hosthandler.tracker.url
     }
 
     def initialize
     end
 
     def conversion(params, options = {})
-      generate_url("/t/mac", params, options)
+      generate_url("/mac", params, options)
     end
 
     def install(params, options = {})
-      generate_url("/t/ist", params, options)
+      generate_url("/ist", params, options)
     end
 
     def postback(params, options = {})
-      generate_url("/t/pob", params, options)
+      generate_url("/pob", params, options)
     end
 
     private

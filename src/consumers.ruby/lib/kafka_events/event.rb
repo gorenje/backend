@@ -32,7 +32,7 @@ module Consumers
       alias_method :call, :type
 
       def delay_in_seconds
-        Time.now.to_i - ts.to_i
+        ((Time.now.to_f * 1000).to_i - ts.to_i) / 1000
       end
 
       def adid
@@ -62,7 +62,7 @@ module Consumers
       end
 
       def time
-        @time ||= Time.at(ts.to_i)
+        @time ||= Time.at(ts.to_i/1000)
       end
 
       def ip_dot_notation

@@ -42,7 +42,6 @@ gem 'adtekio_adnetworks'
 gem 'haml'
 gem 'rest-client'
 gem 'mechanize'
-gem 'geocoder'
 
 group :development do
   gem 'dotenv'

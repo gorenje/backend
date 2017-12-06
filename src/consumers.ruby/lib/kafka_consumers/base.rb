@@ -5,7 +5,7 @@ module Consumers
     class StopConsuming < Exception ; end
 
     def kafka_topic
-      "#{ENV['CLOUDKARAFKA_TOPIC_PREFIX']}trk"
+      ENV['KAFKA_TOPIC']
     end
 
     def start_kafka_stream(name, group_id, topics)
