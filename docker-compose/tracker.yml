@@ -4,6 +4,9 @@ services:
     image: redis
     ports:
       - "6379"
+    volumes:
+      - trackerdb:/data
+
   tracker:
     build: ../src/tracker
     links:
@@ -18,3 +21,7 @@ networks:
   default:
     external:
       name: thenetwork
+
+volumes:
+  trackerdb:
+    external: true

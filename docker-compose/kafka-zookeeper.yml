@@ -4,6 +4,7 @@ services:
     image: wurstmeister/zookeeper
     ports:
       - "2181"
+    restart: always
   kafka:
     image: "wurstmeister/kafka:0.10.2.0"
     ports:
@@ -16,6 +17,7 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_BROKER_ID=1
+    restart: always
 
 networks:
   default:

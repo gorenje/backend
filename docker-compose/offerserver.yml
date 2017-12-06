@@ -20,6 +20,7 @@ services:
       - ACCESS_DOMAINS=pushtech.de,eccrine.io
       - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
       - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+      - COOKIE_SECRET=x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
       - REDIS_POOL_SIZE=20
     command: "foreman start web"
     restart: always
@@ -38,7 +39,6 @@ services:
       - PUSHTECH_API_PASSWORD=$PUSHTECH_API_PASSWORD
       - PUSHTECH_API_HOST=http://storage:$STORAGE_PORT
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
-      - COOKIE_SECRET=x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
       - IMAGE_HOST=https://assets.pushtech.de
     command: "foreman start worker"
     restart: always
