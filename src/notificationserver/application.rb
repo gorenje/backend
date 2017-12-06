@@ -49,8 +49,3 @@ end
 helpers do
   include ViewHelpers
 end
-
-before do
-  redirect("https://#{request.host}") if redirect_host_to_ssl?
-  # redirect("https://www.#{request.host}") if redirect_host_to_www?
-end
