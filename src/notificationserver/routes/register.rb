@@ -1,4 +1,6 @@
 post '/register' do
+  puts "HELLO WORLD OT REGIAS"
+
   orig_params = params.clone
 
   params = if request.env['CONTENT_TYPE'] =~ /application\/json/
@@ -7,6 +9,12 @@ post '/register' do
            else
              orig_params
            end
+
+  puts "---------------------"
+  puts params
+  puts "---------------------"
+  puts orig_params
+  puts "---------------------"
 
   if params["device_id"]
     details = {}.tap do |h|
