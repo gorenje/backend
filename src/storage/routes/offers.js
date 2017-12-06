@@ -35,8 +35,8 @@ router.route('/')
     if (sw) {
       properties.location = {
         $geoWithin: { $box: [
-          [ sw.longitude, sw.latitude ],
-          [ ne.longitude, ne.latitude ]
+          [ parseFloat(sw.longitude), parseFloat(sw.latitude) ],
+          [ parseFloat(ne.longitude), parseFloat(ne.latitude) ]
         ]}
       }
     }
@@ -54,6 +54,7 @@ router.route('/')
       res.json(sortedOffers)
     })
   })
+
   .post(auth.isAuthenticated, function(req, res, next) {
     Offer.create(req.body, function (err, offer) {
       if (err) return next(err)

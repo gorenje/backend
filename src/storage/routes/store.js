@@ -12,8 +12,8 @@ router
   .route("/offers")
   .get(auth.isAuthenticated, function(req, res, next) {
     var pageOptions = {
-      page: req.query.page || 0,
-      limit: req.query.limit || 200
+      page: parseInt(req.query.page || 0),
+      limit: parseInt(req.query.limit || 200)
     }
 
     var srchQuery = {}
@@ -21,16 +21,17 @@ router
       srchQuery.owner = req.query.owner
     }
 
-    Offer.find(srchQuery)
-    .sort('owner')
-    .skip( pageOptions.page * pageOptions.limit)
-    .limit( pageOptions.limit )
-    .exec( function(err, offers){
-      Offer.count(srchQuery, function(error, count){
-        pageOptions.total = count
-        res.render('offers', { offers: offers, pageOptions: pageOptions  });
+    Offer
+      .find(srchQuery)
+      .sort('owner')
+      .skip( pageOptions.page * pageOptions.limit )
+      .limit( pageOptions.limit )
+      .exec(function(err, offers){
+        Offer.count(srchQuery, function(error, count){
+          pageOptions.total = count
+          res.render('offers', { offers: offers, pageOptions: pageOptions  });
+        });
       });
-    });
   });
 
 router
@@ -52,8 +53,8 @@ router
   .route('/searches')
   .get(auth.isAuthenticated, function(req, res, next) {
     var pageOptions = {
-      page: req.query.page || 0,
-      limit: req.query.limit || 200
+      page: parseInt(req.query.page || 0),
+      limit: parseInt(req.query.limit || 200)
     }
 
     var srchQuery = {}
@@ -61,16 +62,17 @@ router
       srchQuery.owner = req.query.owner
     }
 
-    Search.find(srchQuery)
-    .sort('owner')
-    .skip( pageOptions.page * pageOptions.limit)
-    .limit( pageOptions.limit )
-    .exec( function(err, searches){
-      Search.count(srchQuery, function(error, count){
-        pageOptions.total = count
-        res.render('searches', {searches: searches, pageOptions: pageOptions });
-      })
-    });
+    Search
+      .find(srchQuery)
+      .sort('owner')
+      .skip( pageOptions.page * pageOptions.limit)
+      .limit( pageOptions.limit )
+      .exec( function(err, searches){
+        Search.count(srchQuery, function(error, count){
+          pageOptions.total = count
+          res.render('searches',{searches: searches, pageOptions: pageOptions});
+        })
+      });
   });
 
 router.route('/matches')
