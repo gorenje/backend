@@ -1,14 +1,4 @@
 module ViewHelpers
-  def redirect_host_to_ssl?
-    request.scheme == 'http' &&
-      !ENV['HOSTS_WITH_NO_SSL'].split(",").map(&:strip).include?(request.host)
-  end
-
-  def redirect_host_to_www?
-    !(request.host =~ /^www[.]/) &&
-      !ENV['HOSTS_WITH_NO_SSL'].split(",").map(&:strip).include?(request.host)
-  end
-
   def return_json
     content_type :json
     yield.to_json

@@ -52,6 +52,5 @@ helpers do
 end
 
 before do
-  redirect("https://#{request.host}") if redirect_host_to_ssl?
   must_be_logged_in unless page_can_be_viewed_while_not_logged_in
 end
