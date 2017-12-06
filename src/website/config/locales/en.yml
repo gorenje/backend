@@ -229,6 +229,7 @@ en:
         new_chat_message: New Chat Message
         offer_matched_search: "Your offer '<a class=%{cssclass} href='/offer/%{id}/edit'>%{title}</a>' matched Search"
         search_matched_offer: "Your search '<a class=%{cssclass} href='/search/%{id}/edit'>%{title}</a>' matched Offer"
+        test_notification: This is a test notification
     offer_obj_resultslist:
       around: around
       button:

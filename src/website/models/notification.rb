@@ -13,12 +13,16 @@ class Notification < ActiveRecord::Base
     update(:read_at => DateTime.now)
   end
 
+  def params
+    JSON((payload["params"] || "{}").gsub('=>',':'))
+  end
+
   def offer
-    OpenStruct.new(eval(payload["params"])["offer"]["table"])
+    OpenStruct.new(params["offer"]["table"])
   end
 
   def search
-    OpenStruct.new(eval(payload["params"])["search"]["table"])
+    OpenStruct.new(params["search"]["table"])
   end
 
   def chat
@@ -34,7 +38,7 @@ class Notification < ActiveRecord::Base
   end
 
   def kind
-    eval(payload["params"])["key"]
+    params["key"] || "test_notification"
   end
 
   def is_offer_matched_search?
@@ -54,7 +58,7 @@ class Notification < ActiveRecord::Base
   end
 
   def chat_message
-    eval(payload["params"])["chat_message"]
+    params["chat_message"]
   end
 
   def title
@@ -62,8 +66,10 @@ class Notification < ActiveRecord::Base
       search.title
     elsif is_search_matched_offer?
       offer.title
-    else
+    elsif is_chat_message?
       chat_message
+    else
+      "Test Notification"
     end
   end
 end
