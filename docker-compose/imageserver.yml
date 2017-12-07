@@ -11,7 +11,7 @@ services:
       - imgserverdb:/var/lib/postgresql/data
 
   imageserver:
-    build: ../src/imageserver
+    image: ${IMAGE_NAMESPACE}.imageserver:v1
     ports:
       - "$IMAGE_SERVER_PORT:$IMAGE_SERVER_PORT"
     command: "/bin/bash -c 'rake docker:pause_for_db      && \
@@ -31,7 +31,7 @@ services:
     restart: always
 
   imageserver-migrate-db:
-    build: ../src/imageserver
+    image: ${IMAGE_NAMESPACE}.imageserver:v1
     command: "/bin/bash -c 'rake docker:pause_for_db               && \
                             rake docker:if_db_not_migrated         && \
                             rake db:create                         && \

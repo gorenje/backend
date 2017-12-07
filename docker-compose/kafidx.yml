@@ -1,7 +1,7 @@
 version: '2'
 services:
   kafidx:
-    build: ../src/kafidx
+    image: ${IMAGE_NAMESPACE}.kafidx:v1
     ports:
       - "$KAFIDX_PORT:$KAFIDX_PORT"
     environment:

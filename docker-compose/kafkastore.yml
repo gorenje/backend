@@ -1,7 +1,7 @@
 version: '2'
 services:
   kafkastore:
-    build: ../src/kafkastore
+    image: ${IMAGE_NAMESPACE}.kafkastore:v1
     environment:
       - REDIS_TRACKING=redis://redis-tracker:6379?db=6
       - ZOOKEEPER_HOST=zookeeper:2181

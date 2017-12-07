@@ -8,7 +8,7 @@ services:
       - rubyconsumerdb:/data
 
   consumers-ruby:
-    build: ../src/consumers.ruby
+    image: ${IMAGE_NAMESPACE}.consumers.ruby:v1
     links:
       - ruby-consumers-db
     ports:
@@ -28,7 +28,7 @@ services:
     restart: always
 
   consumers-ruby-worker:
-    build: ../src/consumers.ruby
+    image: ${IMAGE_NAMESPACE}.consumers.ruby:v1
     links:
       - ruby-consumers-db
     environment:

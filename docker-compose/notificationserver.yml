@@ -18,7 +18,7 @@ services:
       - notserverdb:/var/lib/postgresql/data
 
   notificationserver:
-    build: ../src/notificationserver
+    image: ${IMAGE_NAMESPACE}.notificationserver:v1
     ports:
       - "$NOTIFICATION_SERVER_PORT:$NOTIFICATION_SERVER_PORT"
     command: "/bin/bash -c 'rake docker:pause_for_postgres && \
@@ -47,7 +47,7 @@ services:
     restart: always
 
   notserver-migrate-db:
-    build: ../src/notificationserver
+    image: ${IMAGE_NAMESPACE}.notificationserver:v1
     command: "/bin/bash -c 'rake docker:pause_for_postgres         && \
                             rake docker:if_db_not_migrated         && \
                             rake db:create                         && \

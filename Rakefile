@@ -36,6 +36,20 @@ end
 
 
 namespace :docker do
+  namespace :images do
+    desc "Build all images"
+    task :build do
+      system <<-EOF
+        for n in src/* ; do
+          cd $n
+          imagename=`basename $n`
+          docker build -t #{KubernetesNS}.${imagename}:v1 .
+          cd ../..
+        done
+      EOF
+    end
+  end
+
   namespace :compose do
     desc "create all volumes and networks"
     task :create_periphery do
@@ -99,16 +113,6 @@ namespace :docker do
       EOF
 
       puts ">>>> Results can be found in #{dirname}"
-    end
-
-    desc "build all compose images"
-    task :build_all do
-      system <<-EOF
-        $(cat .env)
-        for n in docker-compose/*.yml ; do
-          docker-compose -f $n build
-        done
-      EOF
     end
   end
 end

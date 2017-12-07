@@ -8,7 +8,7 @@ services:
       - trackerdb:/data
 
   tracker:
-    build: ../src/tracker
+    image: ${IMAGE_NAMESPACE}.tracker:v1
     links:
       - redis-tracker
     ports:

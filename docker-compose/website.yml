@@ -11,7 +11,7 @@ services:
       - websitedb:/var/lib/postgresql/data
 
   website:
-    build: ../src/website
+    image: ${IMAGE_NAMESPACE}.website:v1
     ports:
       - "$WEBSITE_PORT:$WEBSITE_PORT"
     command: "/bin/bash -c 'rake docker:pause_for_db      && \
@@ -45,7 +45,7 @@ services:
     restart: always
 
   website-migrate-db:
-    build: ../src/website
+    image: ${IMAGE_NAMESPACE}.website:v1
     command: "/bin/bash -c 'rake docker:pause_for_db               && \
                             rake docker:if_db_not_migrated         && \
                             rake db:create                         && \

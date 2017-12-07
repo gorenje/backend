@@ -147,7 +147,7 @@ Set up the network and volumes:
 
 Compile all the images
 
-    rake docker:compose:build_all
+    rake docker:images:build
 
 Start up the images (best results when docker has 6 cpus and 8 GB ram):
 

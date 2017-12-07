@@ -8,7 +8,7 @@ services:
       - redisconsumerdb:/data
 
   stats-consumer:
-    build: ../src/consumers.nodejs
+    image: ${IMAGE_NAMESPACE}.consumers.nodejs:v1
     links:
       - redis-consumer
     environment:
@@ -17,7 +17,7 @@ services:
       - CONSUMER_NAME=stats_collector
 
   event-counter:
-    build: ../src/consumers.nodejs
+    image: ${IMAGE_NAMESPACE}.consumers.nodejs:v1
     links:
       - redis-consumer
     environment:
@@ -26,7 +26,7 @@ services:
       - CONSUMER_NAME=event_counter
 
   metadata-counter:
-    build: ../src/consumers.nodejs
+    image: ${IMAGE_NAMESPACE}.consumers.nodejs:v1
     links:
       - redis-consumer
     environment:
