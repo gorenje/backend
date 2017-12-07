@@ -149,21 +149,9 @@ Compile all the images
 
     rake docker:compose:build_all
 
-Start up the images (ordering important, each in separate window):
+Start up the images (best results when docker has 6 cpus and 8 GB ram):
 
-    $(cat .env)
-    docker-compose -f docker-compose/kafka-zookeeper.yml up
-    docker-compose -f docker-compose/tracker.yml up
-    docker-compose -f docker-compose/kafkastore.yml up
-    docker-compose -f docker-compose/consumers.nodejs.yml up
-    docker-compose -f docker-compose/consumers.ruby.yml up
-    docker-compose -f docker-compose/kafidx.yml up
-
-    docker-compose -f docker-compose/imageserver.yml up
-    docker-compose -f docker-compose/storage.yml up
-
-    docker-compose -f docker-compose/offerserver.yml up
-    docker-compose -f docker-compose/website.yml up
+    rake docker:compose:spin_up
 
 Then browser to:
 
@@ -177,7 +165,7 @@ and
 
 To shut things down:
 
-    rake docker:compose:spin_down_all
+    rake docker:compose:spin_down
 
 Events
 ===

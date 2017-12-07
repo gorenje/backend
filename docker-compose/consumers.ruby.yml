@@ -1,22 +1,22 @@
 version: '2'
 services:
-  ruby_consumers_db:
+  ruby-consumers-db:
     image: redis
     ports:
       - "6379"
     volumes:
       - rubyconsumerdb:/data
 
-  consumers_ruby:
+  consumers-ruby:
     build: ../src/consumers.ruby
     links:
-      - ruby_consumers_db
+      - ruby-consumers-db
     ports:
       - "$CONSUMERS_RUBY_PORT:$CONSUMERS_RUBY_PORT"
     environment:
       - PORT=$CONSUMERS_RUBY_PORT
       - RACK_ENV=production
-      - REDISTOGO_URL=redis://ruby_consumers_db:6379?db=6
+      - REDISTOGO_URL=redis://ruby-consumers-db:6379?db=6
       - ACCESS_DOMAINS=pushtech.de,eccrine.io
       - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
       - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
@@ -27,14 +27,14 @@ services:
     command: "foreman start web"
     restart: always
 
-  consumers_ruby-worker:
+  consumers-ruby-worker:
     build: ../src/consumers.ruby
     links:
-      - ruby_consumers_db
+      - ruby-consumers-db
     environment:
       - REDIS_POOL_SIZE=25
       - RACK_ENV=production
-      - REDISTOGO_URL=redis://ruby_consumers_db:6379?db=6
+      - REDISTOGO_URL=redis://ruby-consumers-db:6379?db=6
       - PUSHTECH_API_USER=$PUSHTECH_API_USER
       - PUSHTECH_API_PASSWORD=$PUSHTECH_API_PASSWORD
       - PUSHTECH_API_HOST=http://storage:$STORAGE_PORT

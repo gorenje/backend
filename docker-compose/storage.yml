@@ -1,6 +1,6 @@
 version: '2'
 services:
-  mongo_store:
+  mongo-store:
     image: mongo:2.6
     ports:
       - "27017"
@@ -10,7 +10,7 @@ services:
   storage:
     build: ../src/storage
     links:
-      - mongo_store
+      - mongo-store
     ports:
       - "$STORAGE_PORT:$STORAGE_PORT"
     environment:
@@ -18,7 +18,7 @@ services:
       - IMAGE_HOST=http://imageserver:$IMAGE_SERVER_PORT
       - GOOGLE_API_KEY=$GOOGLE_API_KEY
       - NOTIFY_HOST=https://notify.pushtech.de
-      - MONGOHQ_URL=mongodb://mongo_store:27017/store
+      - MONGOHQ_URL=mongodb://mongo-store:27017/store
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
       - WEB_CONCURRENCY=8
       - COOKIE_SECRET=X1n4zsExsKtngfv4HqGGIz6bZoL5YIvo

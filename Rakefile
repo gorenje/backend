@@ -63,14 +63,42 @@ namespace :docker do
       end
     end
 
-    desc "spin down all"
-    task :spin_down_all do
+    desc "spin down everything"
+    task :spin_down do
       system <<-EOF
         $(cat .env)
         for n in docker-compose/*.yml ; do
           docker-compose -f $n down
         done
       EOF
+    end
+
+    desc "spin up everything"
+    task :spin_up do
+      system <<-EOF
+        $(cat .env)
+        for n in docker-compose/*.yml ; do
+          docker-compose -f $n up -d
+        done
+      EOF
+    end
+
+    desc "convert all compose files to kubernetes"
+    task :convert_to_kubernetes do
+      require 'date'
+      dirname = "compose.#{DateTime.now.strftime("%H%m%S%d%m%Y")}"
+      Dir.mkdir(dirname)
+      puts ">>>> Generating files into #{dirname}"
+
+      system <<-EOF
+        $(cat .env)
+        cd #{dirname}
+        for n in ../docker-compose/*.yml ; do
+          kompose convert -f $n
+        done
+      EOF
+
+      puts ">>>> Results can be found in #{dirname}"
     end
 
     desc "build all compose images"
@@ -191,7 +219,7 @@ namespace :kubernetes do
 end
 
 desc "Start a pry shell"
-task :console do
+task :shell do
   require 'pry'
   Pry.editor = ENV['PRY_EDITOR'] || ENV['EDITOR'] || 'emacs'
   Pry.start

@@ -1,6 +1,6 @@
 version: '2'
 services:
-  redis_tracker:
+  redis-tracker:
     image: redis
     ports:
       - "6379"
@@ -10,11 +10,11 @@ services:
   tracker:
     build: ../src/tracker
     links:
-      - redis_tracker
+      - redis-tracker
     ports:
       - "$TRACKER_PORT:$TRACKER_PORT"
     environment:
-      - REDIS_URL=redis://redis_tracker:6379?db=6
+      - REDIS_URL=redis://redis-tracker:6379?db=6
       - PORT=$TRACKER_PORT
 
 networks:

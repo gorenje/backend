@@ -1,37 +1,37 @@
 version: '2'
 services:
-  redis_consumer:
+  redis-consumer:
     image: redis
     ports:
       - "6379"
     volumes:
       - redisconsumerdb:/data
 
-  stats_consumer:
+  stats-consumer:
     build: ../src/consumers.nodejs
     links:
-      - redis_consumer
+      - redis-consumer
     environment:
       - ZOOKEEPER_HOST=zookeeper:2181
-      - REDIS_CONSUMER=redis://redis_consumer:6379?db=11
+      - REDIS_CONSUMER=redis://redis-consumer:6379?db=11
       - CONSUMER_NAME=stats_collector
 
-  event_counter:
+  event-counter:
     build: ../src/consumers.nodejs
     links:
-      - redis_consumer
+      - redis-consumer
     environment:
       - ZOOKEEPER_HOST=zookeeper:2181
-      - REDIS_CONSUMER=redis://redis_consumer:6379?db=12
+      - REDIS_CONSUMER=redis://redis-consumer:6379?db=12
       - CONSUMER_NAME=event_counter
 
-  metadata_counter:
+  metadata-counter:
     build: ../src/consumers.nodejs
     links:
-      - redis_consumer
+      - redis-consumer
     environment:
       - ZOOKEEPER_HOST=zookeeper:2181
-      - REDIS_CONSUMER=redis://redis_consumer:6379?db=10
+      - REDIS_CONSUMER=redis://redis-consumer:6379?db=10
       - CONSUMER_NAME=metadata_counter
 
 networks:
