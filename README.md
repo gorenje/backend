@@ -115,9 +115,12 @@ Start up the images (ordering important, each in separate window):
     docker-compose -f docker-compose/tracker.yml up
     docker-compose -f docker-compose/kafkastore.yml up
     docker-compose -f docker-compose/consumers.nodejs.yml up
+    docker-compose -f docker-compose/consumers.ruby.yml up
     docker-compose -f docker-compose/kafidx.yml up
 
+    docker-compose -f docker-compose/imageserver.yml up
     docker-compose -f docker-compose/storage.yml up
+
     docker-compose -f docker-compose/offerserver.yml up
     docker-compose -f docker-compose/website.yml up
 

@@ -39,7 +39,7 @@ services:
       - PUSHTECH_API_PASSWORD=$PUSHTECH_API_PASSWORD
       - PUSHTECH_API_HOST=http://storage:$STORAGE_PORT
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
-      - IMAGE_HOST=https://assets.pushtech.de
+      - IMAGE_HOST=http://imageserver:$IMAGE_SERVER_PORT
     command: "foreman start worker"
     restart: always
 

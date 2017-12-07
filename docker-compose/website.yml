@@ -25,7 +25,7 @@ services:
       - PORT=$WEBSITE_PORT
       - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
       - DOCKER_ENV_STORE=/var/lib/website/env
-      - ASSETS_HOST=https://assets.pushtech.de
+      - ASSETS_HOST=http://imageserver:$IMAGE_SERVER_PORT
       - PROFILE_HOST=https://profile.pushtech.de
       - LOGIN_HOST=website:$WEBSITE_PORT
       - CDN_HOSTS=localhost:$WEBSITE_PORT,localhost:$WEBSITE_PORT

@@ -15,7 +15,7 @@ services:
       - "$STORAGE_PORT:$STORAGE_PORT"
     environment:
       - PORT=$STORAGE_PORT
-      - IMAGE_HOST=https://assets.pushtech.de
+      - IMAGE_HOST=http://imageserver:$IMAGE_SERVER_PORT
       - GOOGLE_API_KEY=$GOOGLE_API_KEY
       - NOTIFY_HOST=https://notify.pushtech.de
       - MONGOHQ_URL=mongodb://mongo_store:27017/store
