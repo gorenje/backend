@@ -2,10 +2,10 @@ class ImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
   def store_dir
-    'public/images'
+    ENV['DOCKER_FILE_STORE'] + '/public/images'
   end
 
-  storage :fog
+  storage :file
 
   version :thumb do
     process :resize_to_fill => [250,250]

@@ -6,12 +6,14 @@ end
 
 get '/assets/images/:id(/:size)?' do
   begin
-    if params[:size]
-      redirect Image.find(params[:id]).source.send(params[:size]).url
-    else
-      redirect Image.find(params[:id]).source.url
-    end
-  rescue
+    file = if params[:size]
+             Image.find(params[:id]).source.send(params[:size]).file
+           else
+             Image.find(params[:id]).source.file
+           end
+    content_type "image/#{file.extension}"
+    file.read
+  rescue Exception => e
     redirect "/assets/images/#{Image.first.id}"
   end
 end

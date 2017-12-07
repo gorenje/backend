@@ -9,6 +9,10 @@ if File.exists?(".env")
   require 'dotenv'
   Dotenv.load
 end
+
+require_relative 'config/initializers/carrierwave'
+require_relative 'config/initializers/database'
+
 Dir[File.join(File.dirname(__FILE__), 'lib', 'tasks','*.rake')].
   each { |f| load f }
 
