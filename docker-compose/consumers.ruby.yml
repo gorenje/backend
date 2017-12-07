@@ -22,7 +22,7 @@ services:
       - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
       - REDIS_POOL_SIZE=25
       - COOKIE_SECRET=lydbrYEvxBxdUBnGa8TPpVaeBuWez5PG
-      - KAFKA_BROKERS=kafka:9092
+      - ZOOKEEPER_HOST=zookeeper:2181
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
     command: "foreman start web"
     restart: always
@@ -40,8 +40,8 @@ services:
       - PUSHTECH_API_HOST=http://storage:$STORAGE_PORT
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
       - IMAGE_HOST=https://assets.pushtech.de
-      - KAFKA_BROKERS=kafka:9092
       - SENDBIRD_API_TOKEN=$SENDBIRD_API_TOKEN
+      - ZOOKEEPER_HOST=zookeeper:2181
       - KAFKA_TOPIC=test
       - LIBRATO_TOKEN=$LIBRATO_TOKEN
       - LIBRATO_USER=$LIBRATO_USER

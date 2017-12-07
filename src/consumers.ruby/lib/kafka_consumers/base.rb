@@ -57,7 +57,7 @@ module Consumers
     end
 
     def handle_message_type?(message)
-      type = $1 if message =~ /^[^[:space:]]*\/([^[:space:]]+)[[:space:]]/
+      type = $1 if message =~ /^([^[:space:]]+)[[:space:]]/
       @listen_to_these_events.include?(type)
     end
 
