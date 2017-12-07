@@ -22,7 +22,7 @@ namespace :appjson do
                  "MANDRILL_API_KEY", "NOTIFIER_HOST", "PROFILE_HOST",
                  "PUSHTECH_API_HOST", "PUSHTECH_API_PASSWORD",
                  "PUSHTECH_API_USER", "SENDBIRD_API_ID","SENDBIRD_API_TOKEN",
-                 "TRACKING_HOST"].include?(name)
+                 "TRACKER_HOST"].include?(name)
 
         req = (hsh["required"]==false) ? "No" : "Yes"
         hsh['value'] = if hsh['generator'] == "secret"

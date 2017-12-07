@@ -1,14 +1,14 @@
 Pushtech Backend
 ===
 
-Basic setup for doing mobile in-app tracking.
+Complete backend for Push.
 
 Architecture
 ===
 
 *Insert Image Here*
 
-Four main parts to the infrastructure:
+Ten main parts to the infrastructure:
 
 1. Front-facing [tracker](src/tracker) that takes in tracking requests
    and pushes these to redis instance. The intention is to have
@@ -29,6 +29,12 @@ Four main parts to the infrastructure:
    which shows live tracking events as they come in. It is useful for debugging
    consumers and generally ensuring that events are going through the
    system.
+5. [Nodejs consumsers](src/consumers.nodejs)
+6. [Ruby consumsers](src/consumers.ruby)
+7. [Website](src/website)
+8. [Image server](src/imageserver)
+9. [Offer Server](src/offerserver)
+10. [Kafka and Zookeeper](docker-compose/kafka-zookeeper.yml)
 
 Design decisions:
 
@@ -50,6 +56,39 @@ What's missing?
    from the client.
 4. Logging and monitoring.
 
+
+Prerequistes to local testing
+===
+
+rake
+---
+
+The [Rakefile](Rakefile) provides some helper tasks to make life that
+much easier. But to use it, you'll need ruby. Specifically, you will
+need [ruby 2.4.2](.ruby-version) which you can install using
+[rvm](https://en.wikipedia.org/wiki/Ruby_Version_Manager) or
+[rbenv](https://github.com/rbenv/rbenv). After that, it's a matter
+of installer bundler and the gems:
+
+    gem install bundler
+    bundle
+
+Then have a look at all available tasks
+
+    rake -T
+
+Done.
+
+Environment
+---
+
+Some things are secret and therefore there is an ```.env``` file for
+storing those secrets. But these secrets are checked in, so you will have
+to find these from existing heroku installations (or else).
+
+The [template](.env.template) gives an overview of what needs to be defined,
+so copy that to ```.env``` and add the missing secrets.
+
 Deployment
 ===
 
@@ -62,6 +101,8 @@ whether this is respresentable for the production platform is to be seen.
 
 Using MiniKube and Kubectl
 ---
+
+*WIP* This isn't complete yet, this only fors for the tracking infrastructure.
 
 Begin with starting minikube and buiding all the docker containers:
 
@@ -176,24 +217,3 @@ followed by the meta data and finally the parameters of the original request
 are included.
 
 For more details, [see the code](src/kafidx/lib/kafka_streamer.js#L10-L21).
-
-Kubernets.two
-===
-
-A second [kubernetes setup](kubernetes.two) pod'erizes the tracker,
-redis and kafkastore together so that there is a one-to-one connection
-between the webserver recieving tracking calls and the process that
-stores those events into kafka.
-
-This makes scaling easier since the
-[deployment](kubernetes.two/manifests/tracker.yaml) can be
-scaled up without having to scale either the redis nor the kafkastore
-instances separately.
-
-If another kafka broker is added, then a rolling update of the tracker
-deployment would
-[automagically include those brokers](src/kafkastore/kafkastore.js#L51-L54)
-in the kafkastore
-container. Since the tracker deployment is already scaled to
-[three instances](kubernetes.two/manifests/tracker.yaml#L27), it's
-absolutely no issue to bounce each in turn.
