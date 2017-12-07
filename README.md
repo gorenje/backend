@@ -57,7 +57,7 @@ What's missing?
 4. Logging and monitoring.
 
 
-Prerequistes to local testing
+Prerequistes for local testing
 ===
 
 rake
@@ -68,7 +68,7 @@ much easier. But to use it, you'll need ruby. Specifically, you will
 need [ruby 2.4.2](.ruby-version) which you can install using
 [rvm](https://en.wikipedia.org/wiki/Ruby_Version_Manager) or
 [rbenv](https://github.com/rbenv/rbenv). After that, it's a matter
-of installer bundler and the gems:
+of installing bundler and all required gems:
 
     gem install bundler
     bundle
@@ -84,7 +84,7 @@ Environment
 
 Some things are secret and therefore there is an ```.env``` file for
 storing those secrets. But these secrets are checked in, so you will have
-to find these from existing heroku installations (or else).
+to find these from existing heroku installations (or elsewhere).
 
 The [template](.env.template) gives an overview of what needs to be defined,
 so copy that to ```.env``` and add the missing secrets.
@@ -92,8 +92,7 @@ so copy that to ```.env``` and add the missing secrets.
 Docker
 ---
 
-This assumes that [docker](https://www.docker.com/docker-mac) has been
-installed.
+[Docker](https://www.docker.com/docker-mac) needs to be installed.
 
 Deployment
 ===
