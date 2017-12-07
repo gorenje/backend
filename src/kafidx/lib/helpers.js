@@ -1,25 +1,41 @@
-var dns = require('dns')
+var zookeeper = require('node-zookeeper-client');
 
-var getBrokerList = function(kafka_host_and_port) {
-  var kafka_hostname = kafka_host_and_port.split(/:/)[0]
-  var kafka_portnum  = kafka_host_and_port.split(/:/)[1] || '9092'
+var getBrokerList = function() {
+  return new Promise( (resolve,reject) => {
+    var client = zookeeper.createClient(process.env.ZOOKEEPER_HOST);
 
-  return new Promise((resolve, reject) => {
-    dns.lookup(kafka_hostname, { all: true }, function(err,addresses) {
-      if (err) {
-        console.log(err)
-        console.log("Failed to lookup kafka brokers, exiting...")
-        reject(err)
-      }
+    client.on("connected", function() {
+      client.getChildren("/brokers/ids", function(err,data) {
+        if (err) return reject(err)
 
-      var broker_list = []
-      for ( let idx in addresses ) {
-        broker_list.push(addresses[idx].address + ":" + kafka_portnum)
-      }
+        var brokerids = data.toString('utf8').split(/,/)
+        var promises = []
 
-      resolve(broker_list.sort())
+        for ( var idx in brokerids ) {
+          promises.push(new Promise( (rs,rj) => {
+            client.getData("/brokers/ids/" + brokerids[idx], function(err,data){
+              if (err) return rj(err)
+
+              let tmp = JSON.parse(data.toString('utf8'))
+              rs(tmp.host + ":" + tmp.port)
+            })
+          }))
+        }
+
+        Promise
+          .all(promises)
+          .then((broker_list) => {
+            client.close()
+            resolve(broker_list.sort())
+          })
+          .catch( (err) => {
+            reject(err)
+          })
+      })
     })
-  });
+
+    client.connect()
+  })
 }
 
-exports.getBrokerList = getBrokerList;
+exports.getBrokerList = getBrokerList

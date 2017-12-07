@@ -1,8 +1,8 @@
 var zookeeper = require('node-zookeeper-client');
 
-var getBrokerList = function(host_with_port) {
+var getBrokerList = function() {
   return new Promise( (resolve,reject) => {
-    var client = zookeeper.createClient(host_with_port);
+    var client = zookeeper.createClient(process.env.ZOOKEEPER_HOST);
 
     client.on("connected", function() {
       client.getChildren("/brokers/ids", function(err,data) {
@@ -27,6 +27,9 @@ var getBrokerList = function(host_with_port) {
           .then((broker_list) => {
             client.close()
             resolve(broker_list.sort())
+          })
+          .catch( (err) => {
+            reject(err)
           })
       })
     })

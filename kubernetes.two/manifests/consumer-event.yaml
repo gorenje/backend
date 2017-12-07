@@ -19,9 +19,9 @@ spec:
         - name: consumer-event
           image: pushtech.consumers.nodejs:v1
           env:
-            - name: KAFKA_HOST
-              value: kafkasrv.pushtech.svc.cluster.local:9092
             - name: REDIS_CONSUMER
               value: redis://redisconsumer.pushtech.svc.cluster.local:6379?db=1
             - name: CONSUMER_NAME
               value: event_counter
+            - name: ZOOKEEPER_HOST
+              value: zookeeper.pushtech.svc.cluster.local:2181

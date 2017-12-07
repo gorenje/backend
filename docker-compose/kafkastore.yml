@@ -3,10 +3,8 @@ services:
   kafkastore:
     build: ../src/kafkastore
     environment:
-      - REDIS_TRACKING_1=redis://redis_tracker:6379?db=6
-      - KAFKA_HOST=kafka:9092
-      - ZOOKEEPER_SERVICE_HOST=zookeeper
-      - ZOOKEEPER_SERVICE_PORT=2181
+      - REDIS_TRACKING=redis://redis_tracker:6379?db=6
+      - ZOOKEEPER_HOST=zookeeper:2181
 
 networks:
   default:

@@ -23,6 +23,7 @@
     "ip-address": "^5.8.8",
     "morgan": "^1.9.0",
     "node-rdkafka": "^2.1.0",
+    "node-zookeeper-client": "^0.2.2",
     "pug": "^2.0.0-rc.4",
     "qs": "^6.5.1",
     "redis": "^2.8.0",

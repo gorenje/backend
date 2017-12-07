@@ -5,9 +5,9 @@ services:
     ports:
       - "$KAFIDX_PORT:$KAFIDX_PORT"
     environment:
-      - KAFKA_HOST=kafka:9092
       - PORT=$KAFIDX_PORT
       - WEB_CONCURRENCY=3
+      - ZOOKEEPER_HOST=zookeeper:2181
 
 networks:
   default:

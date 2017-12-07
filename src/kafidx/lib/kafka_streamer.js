@@ -22,7 +22,7 @@ function msgToHash(str) {
 
 function streamTo(websocket, groupid) {
   helpers
-    .getBrokerList(process.env.KAFKA_HOST)
+    .getBrokerList()
     .then((broker_list) => {
       streamToGettingFrom(websocket, groupid, broker_list.sort())
     })

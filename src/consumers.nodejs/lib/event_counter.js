@@ -18,7 +18,7 @@ redisClient.on("connect", function () {
 var consumer = null;
 
 var watchDog = function() {
-  console.log("---------- Current Counts " + (new Date()) + " -------------");
+  console.log("---------- Current Events " + (new Date()) + " -------------");
   redisClient.keys("*", function(err, keys) {
     for ( var idx in keys ) {
       let key = keys[idx]

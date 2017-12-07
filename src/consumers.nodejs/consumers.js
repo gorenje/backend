@@ -1,9 +1,9 @@
-var helpers = require('./lib/helpers')
+var zkClient = require('./lib/zookeeper')
 
 console.log( "Starting Consumer: " + process.env.CONSUMER_NAME);
 
-helpers
-  .getBrokerList(process.env.KAFKA_HOST)
+zkClient
+  .getBrokerList()
   .then( (broker_list) => {
     console.log( "Broker list is: " + broker_list);
     switch(process.env.CONSUMER_NAME) {
@@ -21,6 +21,6 @@ helpers
     }
   })
   .catch( (err) => {
-    console.log( "Caught DNS error: " + err);
+    console.log( "Caught Zookeeper error: " + err);
     process.exit(1);
   })

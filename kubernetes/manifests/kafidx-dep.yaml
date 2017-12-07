@@ -21,8 +21,8 @@ spec:
               value: "5321"
             - name: WEB_CONCURRENCY
               value: "3"
-            - name: KAFKA_HOST
-              value: kafkasrv.pushtech.svc.cluster.local:9092
+            - name: ZOOKEEPER_HOST
+              value: zookeeper.pushtech.svc.cluster.local:2181
           ports:
             - name: kafidx
               containerPort: 5321

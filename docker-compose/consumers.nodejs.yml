@@ -4,13 +4,15 @@ services:
     image: redis
     ports:
       - "6379"
+    volumes:
+      - redisconsumerdb:/data
 
   stats_consumer:
     build: ../src/consumers.nodejs
     links:
       - redis_consumer
     environment:
-      - KAFKA_HOST=kafka:9092
+      - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis_consumer:6379?db=11
       - CONSUMER_NAME=stats_collector
 
@@ -19,7 +21,7 @@ services:
     links:
       - redis_consumer
     environment:
-      - KAFKA_HOST=kafka:9092
+      - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis_consumer:6379?db=12
       - CONSUMER_NAME=event_counter
 
@@ -28,7 +30,7 @@ services:
     links:
       - redis_consumer
     environment:
-      - KAFKA_HOST=kafka:9092
+      - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis_consumer:6379?db=10
       - CONSUMER_NAME=metadata_counter
 
@@ -36,3 +38,7 @@ networks:
   default:
     external:
       name: thenetwork
+
+volumes:
+  redisconsumerdb:
+    external: true

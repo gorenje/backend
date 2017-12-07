@@ -48,7 +48,7 @@ spec:
         - name: kafkastore
           image: pushtech.kafkastore:v1
           env:
-            - name: REDIS_TRACKING_1
+            - name: REDIS_TRACKING
               value: redis://localhost:6379?db=6
-            - name: KAFKA_HOST
-              value: kafkasrv.pushtech.svc.cluster.local:9092
+            - name: ZOOKEEPER_HOST
+              value: zookeeper.pushtech.svc.cluster.local:2181

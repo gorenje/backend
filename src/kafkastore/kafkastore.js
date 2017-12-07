@@ -1,7 +1,7 @@
 require('dotenv').config()
 
-console.log( "Connecting to kafka at: " + process.env.KAFKA_HOST)
-console.log( "Connecting to redis at: " + process.env.REDIS_TRACKING_1)
+console.log( "Connecting to zookeeper at: " + process.env.ZOOKEEPER_HOST)
+console.log( "Connecting to redis at: "     + process.env.REDIS_TRACKING)
 
 var redis       = require("redis")
 var redisClient = null
@@ -49,8 +49,7 @@ var producerDisconnectedCB = function() {
 
 var getBrokerListAndSpinUpProducer = function() {
   zkClient
-    .getBrokerList(process.env.ZOOKEEPER_SERVICE_HOST + ":" +
-                   process.env.ZOOKEEPER_SERVICE_PORT)
+    .getBrokerList()
     .then((broker_list) => {
       console.log("Broker list becomes: " + broker_list)
       kafkaConf["metadata.broker.list"] = broker_list
@@ -70,7 +69,7 @@ var createRedisAndSpinUpProducer = function() {
     redisClient.quit()
   }
 
-  redisClient = redis.createClient({url: process.env.REDIS_TRACKING_1 })
+  redisClient = redis.createClient({url: process.env.REDIS_TRACKING})
 
   redisClient.on('error', function (err) {
     console.log("Redis Error: " + err)
