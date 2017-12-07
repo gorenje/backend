@@ -8,7 +8,7 @@ namespace :minikube do
   desc "Power up minikube"
   task :start do
     system <<-EOF
-      minikube --vm-driver=xhyve --cpus=4 --memory=4096 start
+      minikube --vm-driver=xhyve --cpus=6 --memory=8192 start
     EOF
   end
 
@@ -97,6 +97,20 @@ namespace :docker do
       EOF
     end
 
+    desc "Open pages that are relevant"
+    task :open_urls do
+      system <<-EOF
+        $(cat .env)
+        open -a Safari http://localhost:$KAFIDX_PORT/kafidx
+        open -a Safari http://localhost:$TRACKER_PORT/event?d=1
+        open -a Safari http://localhost:$IMAGE_SERVER_PORT/assets
+
+        open -a Firefox http://localhost:$WEBSITE_PORT
+        open -a Firefox http://localhost:$STORAGE_PORT/store/offers
+        open -a Firefox http://localhost:$NOTIFICATION_SERVER_PORT/mappings
+      EOF
+    end
+
     desc "convert all compose files to kubernetes"
     task :convert_to_kubernetes do
       require 'date'
@@ -122,7 +136,7 @@ namespace :kubernetes do
     desc "Setup architecture"
     task :up do
       system <<-EOF
-        kubectl create -f kubernetes.two/namespace.yaml
+        kubectl create namespace #{KubernetesNS}
         kubectl create -f kubernetes.two/manifests
       EOF
     end
@@ -131,7 +145,7 @@ namespace :kubernetes do
     task :down do
       system <<-EOF
         kubectl delete -f kubernetes.two/manifests
-        kubectl delete -f kubernetes.two/namespace.yaml
+        kubectl delete namespace #{KubernetesNS}
       EOF
     end
   end

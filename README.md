@@ -89,6 +89,12 @@ to find these from existing heroku installations (or else).
 The [template](.env.template) gives an overview of what needs to be defined,
 so copy that to ```.env``` and add the missing secrets.
 
+Docker
+---
+
+This assumes that [docker](https://www.docker.com/docker-mac) has been
+installed.
+
 Deployment
 ===
 
@@ -98,6 +104,29 @@ is great for local testing, kubernetes for production.
 [Kubernetes](https://kubernetes.io/) was tested locally using
 [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/),
 whether this is respresentable for the production platform is to be seen.
+
+Using Docker Compose
+---
+
+Set up the network and volumes:
+
+    rake docker:compose:create_periphery
+
+Compile all the images
+
+    rake docker:images:build
+
+Start up the images (best results when docker has 6 cpus and 8 GB ram):
+
+    rake docker:compose:spin_up
+
+Open relevant URLs:
+
+    rake docker:compose:open_urls
+
+To shut things down:
+
+    rake docker:compose:spin_down
 
 Using MiniKube and Kubectl
 ---
@@ -134,38 +163,6 @@ After, tear everything down again:
 
 As alternative and for quicker local testing, you can always use docker
 compose.
-
-Using Docker Compose
----
-
-This assumes that [docker](https://www.docker.com/docker-mac) has been
-installed.
-
-Set up the network and volumes:
-
-    rake docker:compose:create_periphery
-
-Compile all the images
-
-    rake docker:images:build
-
-Start up the images (best results when docker has 6 cpus and 8 GB ram):
-
-    rake docker:compose:spin_up
-
-Then browser to:
-
-    $(cat .env)
-    open -a Firefox http://localhost:$TRACKER_PORT/event?d=1
-
-and
-
-    $(cat .env)
-    open -a Firefox http://localhost:$KAFIDX_PORT/kafidx
-
-To shut things down:
-
-    rake docker:compose:spin_down
 
 Events
 ===
