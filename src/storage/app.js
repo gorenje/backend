@@ -31,6 +31,7 @@ var searches = require('./routes/searches');
 var store    = require('./routes/store');
 var chat     = require('./routes/chat');
 var bulk     = require('./routes/bulk');
+var channels = require('./routes/channels');
 
 var app = express();
 
@@ -64,6 +65,7 @@ app.use('/searches', searches);
 app.use('/store',    store);
 app.use('/chat',     chat);
 app.use('/bulk',     bulk);
+app.use('/channels', channels);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
