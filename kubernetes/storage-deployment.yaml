@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose/storage.yml
+    kompose.version: 1.5.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: storage
+  name: storage
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: storage
+    spec:
+      containers:
+      - env:
+        - name: COOKIE_SECRET
+          value: X1n4zsExsKtngfv4HqGGIz6bZoL5YIvo
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: GOOGLE_API_KEY
+        - name: IMAGE_HOST
+          value: http://imageserver:5061
+        - name: MONGOHQ_URL
+          value: mongodb://mongo-store:27017/store
+        - name: NOTIFY_HOST
+          value: https://notify.pushtech.de
+        - name: PORT
+          value: "5011"
+        - name: TRACKER_HOST
+          value: http://tracker:5222
+        - name: WEB_CONCURRENCY
+          value: "8"
+        image: pushtech.storage:v1
+        name: storage
+        ports:
+        - containerPort: 5011
+        resources: {}
+      restartPolicy: Always
+status: {}

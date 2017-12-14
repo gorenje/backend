@@ -1,0 +1,78 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose/notificationserver.yml
+    kompose.version: 1.5.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: notificationserver
+  name: notificationserver
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: notificationserver
+    spec:
+      containers:
+      - args:
+        - /bin/bash
+        - -c
+        - rake docker:pause_for_postgres && rake docker:pause_for_redis    && rake
+          docker:if_db_is_migrated  && foreman start web
+        env:
+        - name: DATABASE_URL
+          value: postgres://postgres:nicesecret@pgnotserver:5432/notserver
+        - name: DB_POOL_SIZE
+          value: "20"
+        - name: DB_TIMEOUT_MSEC
+          value: "5000"
+        - name: ONESIGNAL_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: ONESIGNAL_API_KEY
+        - name: ONESIGNAL_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: ONESIGNAL_APP_ID
+        - name: ONESIGNAL_USER_AUTH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: ONESIGNAL_USER_AUTH_KEY
+        - name: PORT
+          value: "5041"
+        - name: PUSHTECH_API_HOST
+          value: http://storage:5011
+        - name: RACK_ENV
+          value: production
+        - name: RATE_LIMIT_SECONDS
+          value: "300"
+        - name: REDISTOGO_URL
+          value: redis://redisnotserver:6379/12
+        - name: SENDBIRD_API_ID
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: SENDBIRD_API_ID
+        - name: SENDBIRD_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: SENDBIRD_API_TOKEN
+        - name: TRACKER_HOST
+          value: http://tracker:5222
+        - name: WEB_TIMEOUT
+          value: "30"
+        image: pushtech.notificationserver:v1
+        name: notificationserver
+        ports:
+        - containerPort: 5041
+        resources: {}
+      restartPolicy: Always
+status: {}

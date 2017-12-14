@@ -114,7 +114,7 @@ namespace :docker do
     desc "convert all compose files to kubernetes"
     task :convert_to_kubernetes do
       require 'date'
-      dirname = "compose.#{DateTime.now.strftime("%H%m%S%d%m%Y")}"
+      dirname = "compose.#{DateTime.now.strftime("%Y%m%d.%H%M%S")}"
       Dir.mkdir(dirname)
       puts ">>>> Generating files into #{dirname}"
 
@@ -132,20 +132,85 @@ namespace :docker do
 end
 
 namespace :kubernetes do
+  namespace :namespace do
+    desc "Create namespace"
+    task :create do
+      system <<-EOF
+        kubectl create namespace #{KubernetesNS}
+      EOF
+    end
+
+    desc "Delete namespace"
+    task :delete do
+      system <<-EOF
+        kubectl delete namespace #{KubernetesNS}
+      EOF
+    end
+  end
+
+  namespace :secrets do
+    desc "Show the current secrets"
+    task :show do
+      system <<-EOF
+        kubectl get secret envsecrets -o yaml -n #{KubernetesNS}
+      EOF
+    end
+
+    desc "Load secrets into minikube"
+    task :load do
+      if File.exists?(".env")
+        require 'dotenv'
+        require 'base64'
+        Dotenv.load
+
+        file = File.open("secrets.yaml", "w+")
+
+        file << ("apiVersion: v1\n"     +
+                 "kind: Secret\n"       +
+                 "metadata:\n"          +
+                 "  name: envsecrets\n" +
+                 "type: Opaque\n"       +
+                 "data:\n")
+
+        File.read(".env").split(/\n/).each do |lne|
+          next if lne.empty?
+          varname = lne.split(/ /).last.split(/=/).first
+          content = Base64.encode64(ENV[varname]).delete("\n")
+          file << "  #{varname}: #{content}\n"
+        end
+        file.close
+        file_name = File.dirname(__FILE__) + "/secrets.yaml"
+
+        system <<-EOF
+          kubectl create -n #{KubernetesNS} -f #{file_name}
+        EOF
+        File.unlink(file)
+      else
+        puts "ERROR: no .env file to convert"
+        Kernel.exit(1)
+      end
+    end
+
+    desc "Remove all secrets from minikube"
+    task :delete do
+      system <<-EOF
+        kubectl delete secret envsecrets -n #{KubernetesNS}
+      EOF
+    end
+  end
+
   namespace :spin do
     desc "Setup architecture"
     task :up do
       system <<-EOF
-        kubectl create namespace #{KubernetesNS}
-        kubectl create -f kubernetes.two/manifests
+        kubectl create -n #{KubernetesNS} -f kubernetes
       EOF
     end
 
     desc "Shutdown architecture"
     task :down do
       system <<-EOF
-        kubectl delete -f kubernetes.two/manifests
-        kubectl delete namespace #{KubernetesNS}
+        kubectl delete -n #{KubernetesNS} -f kubernetes
       EOF
     end
   end
@@ -174,22 +239,6 @@ namespace :kubernetes do
       eval $(minikube docker-env)
       docker ps
     EOF
-  end
-
-  namespace :images do
-    desc "rebuild docker images"
-    task :rebuild do
-      system <<-EOF
-        eval $(minikube docker-env)
-
-        for n in src/* ; do
-          cd $n
-          imagename=`basename $n`
-          docker build -t #{KubernetesNS}.${imagename}:v1 .
-          cd ../..
-        done
-      EOF
-    end
   end
 
   desc "starting logging containers"
@@ -241,4 +290,28 @@ task :shell do
   require 'pry'
   Pry.editor = ENV['PRY_EDITOR'] || ENV['EDITOR'] || 'emacs'
   Pry.start
+end
+
+### ignore this stuff.
+task :check_env do
+  require 'yaml'
+  Dir.glob("kubernetes/*deployment*").each do |file_name|
+    hsh = YAML.load_file( file_name )
+    values = []
+
+    hsh["spec"]["template"]["spec"]["containers"].each do |container|
+      (container["env"]||[]).each do |varn|
+        next if varn["valueFrom"]
+        next if varn["name"] =~ /_HOST$/
+        next if ["PORT","COOKIE_SECRET","RACK_ENV"].include?(varn["name"])
+        next if varn["name"] == "POSTGRES_PASSWORD" && varn["value"] == "nicesecret"
+        values << varn
+      end
+    end
+
+    unless values.empty?
+      puts "==========> #{file_name}"
+      values.each {|a| puts a }
+    end
+  end
 end

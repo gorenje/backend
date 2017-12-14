@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: notserver-migrate-db
+  name: notserver-migrate-db
+spec:
+  containers:
+  - args:
+    - /bin/bash
+    - -c
+    - rake docker:pause_for_postgres         && rake docker:if_db_not_migrated         &&
+      rake db:create                         && rake docker:create_postgres_extensions
+      && rake db:migrate
+    env:
+    - name: DATABASE_URL
+      value: postgres://postgres:nicesecret@pgnotserver:5432/notserver
+    - name: RACK_ENV
+      value: production
+    image: pushtech.notificationserver:v1
+    name: notserver-migrate-db
+    resources: {}
+  restartPolicy: Never
+status: {}

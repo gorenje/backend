@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose/consumers.ruby.yml
+    kompose.version: 1.5.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: ruby-consumers-db
+  name: ruby-consumers-db
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: ruby-consumers-db
+    spec:
+      containers:
+      - image: redis
+        name: ruby-consumers-db
+        ports:
+        - containerPort: 6379
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: rubyconsumerdb
+      restartPolicy: Always
+      volumes:
+      - name: rubyconsumerdb
+        persistentVolumeClaim:
+          claimName: rubyconsumerdb
+status: {}

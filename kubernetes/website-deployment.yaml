@@ -1,0 +1,97 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose/website.yml
+    kompose.version: 1.5.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: website
+  name: website
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: website
+    spec:
+      containers:
+      - args:
+        - /bin/bash
+        - -c
+        - rake docker:pause_for_db      && rake docker:if_db_is_migrated && rake appjson:to_dotenv        &&
+          foreman start web
+        env:
+        - name: ASSETS_HOST
+          value: http://imageserver:5061
+        - name: CDN_HOSTS
+          value: localhost:5123,localhost:5123
+        - name: DATABASE_URL
+          value: postgres://postgres:nicesecret@pgwebsite:5432/webs
+        - name: DB_POOL_SIZE
+          value: "20"
+        - name: DB_TIMEOUT_MSEC
+          value: "5000"
+        - name: DOCKER_ENV_STORE
+          value: /var/lib/website/env
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: GOOGLE_API_KEY
+        - name: LOGIN_HOST
+          value: website:5123
+        - name: MANDRILL_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: MANDRILL_API_KEY
+        - name: NOTIFIER_HOST
+          value: http://notificationserver:5041
+        - name: PORT
+          value: "5123"
+        - name: PROFILE_HOST
+          value: https://profile.pushtech.de
+        - name: PUSHTECH_API_HOST
+          value: http://storage:5011
+        - name: PUSHTECH_API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: PUSHTECH_API_PASSWORD
+        - name: PUSHTECH_API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: PUSHTECH_API_USER
+        - name: RACK_ENV
+          value: development
+        - name: SENDBIRD_API_ID
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: SENDBIRD_API_ID
+        - name: SENDBIRD_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: SENDBIRD_API_TOKEN
+        - name: TRACKER_HOST
+          value: http://tracker:5222
+        image: pushtech.website:v1
+        name: website
+        ports:
+        - containerPort: 5123
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/website/env
+          name: websiteenv
+      restartPolicy: Always
+      volumes:
+      - name: websiteenv
+        persistentVolumeClaim:
+          claimName: websiteenv
+status: {}
