@@ -88,4 +88,4 @@ spec:
           - name: REDIS_TRACKING
             value: redis://localhost:6379?db=6
           - name: ZOOKEEPER_HOST
-            value: zookeeper:2181
+            value: zookeeper.pushtech.svc.cluster.local:2181
