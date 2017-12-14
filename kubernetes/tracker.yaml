@@ -53,7 +53,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: redis-tracker
+        io.kompose.service: tracker
     spec:
       restartPolicy: Always
       volumes:
