@@ -185,6 +185,10 @@ namespace :kubernetes do
           network    = "pushtech.svc.cluster.local"
 
           {
+            "NOTIFSERVER_REDIS_URL" => "redis://notifserver-redis.#{network}:6379/12",
+            "NOTIFSERVER_PG_PASSWORD" => pgpassword,
+            "NOTIFSERVER_DB_URL" => "postgres://postgres:#{pgpassword}@notifserver-db.#{network}:5432/notserver",
+
             "IMGSERVER_PG_PASSWORD" => pgpassword,
             "IMGSERVER_DB_URL" => "postgres://postgres:#{pgpassword}@imgserver-db.#{network}:5432/imgserver",
 

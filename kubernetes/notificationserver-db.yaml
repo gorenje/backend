@@ -1,3 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: pgnotserver
+  name: notifserver-db
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    io.kompose.service: pgnotserver
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -18,21 +33,22 @@ spec:
       labels:
         io.kompose.service: pgnotserver
     spec:
-      containers:
-      - env:
-        - name: POSTGRES_PASSWORD
-          value: nicesecret
-        image: postgres:9.6.6
-        name: pgnotserver
-        ports:
-        - containerPort: 5432
-        resources: {}
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: notserverdb
       restartPolicy: Always
       volumes:
       - name: notserverdb
         persistentVolumeClaim:
           claimName: notserverdb
-status: {}
+      containers:
+      - env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: NOTIFSERVER_PG_PASSWORD
+        image: postgres:9.6.6
+        name: pgnotserver
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: notserverdb
