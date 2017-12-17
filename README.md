@@ -94,6 +94,11 @@ Docker
 
 [Docker](https://www.docker.com/docker-mac) needs to be installed.
 
+Kompose
+---
+
+To convert docker compose files to kubernetes, [kompose](https://kompose.io)
+was used. This could also be [installed](http://kompose.io/setup/).
 Deployment
 ===
 

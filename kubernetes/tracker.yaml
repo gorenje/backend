@@ -12,28 +12,11 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - name: "5222"
-    port: 5222
+  - port: 5222
     targetPort: 5222
     nodePort: 30222
   selector:
     io.kompose.service: tracker
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: trackerdb
-  name: trackerdb
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
-status: {}
 
 ---
 apiVersion: extensions/v1beta1
@@ -66,9 +49,9 @@ spec:
         ports:
         - containerPort: 6379
         resources: {}
-        volumeMounts:
-        - mountPath: /data
-          name: trackerdb
+        # volumeMounts:
+        # - mountPath: /data
+        #   name: trackerdb
       - image: pushtech.tracker:v1
         name: tracker
         env:

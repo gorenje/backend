@@ -1,12 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5123
+    targetPort: 5123
+    nodePort: 30223
+  selector:
+    provide.service: website
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/website.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
-  labels:
-    io.kompose.service: website
   name: website
 spec:
   replicas: 1
@@ -14,15 +23,37 @@ spec:
     type: Recreate
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: website
+        provide.service: website
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: websiteenv
+        persistentVolumeClaim:
+          claimName: websiteenv
+      initContainers:
+      - args:
+        - /bin/bash
+        - -c
+        - (rake docker:pause_for_db               &&
+           rake docker:if_db_not_migrated         &&
+           rake db:create                         &&
+           rake docker:create_postgres_extensions &&
+           rake db:migrate) ; exit 0
+        env:
+        - name: DATABASE_URL
+          value: postgres://postgres:nicesecret@website-db.pushtech.svc.cluster.local:5432/webs
+        - name: RACK_ENV
+          value: production
+        image: pushtech.website:v1
+        name: website-migrate-db
       containers:
       - args:
         - /bin/bash
         - -c
-        - rake docker:pause_for_db      && rake docker:if_db_is_migrated && rake appjson:to_dotenv        &&
+        - rake docker:pause_for_db      &&
+          rake docker:if_db_is_migrated &&
+          rake appjson:to_dotenv        &&
           foreman start web
         env:
         - name: ASSETS_HOST
@@ -30,7 +61,7 @@ spec:
         - name: CDN_HOSTS
           value: localhost:5123,localhost:5123
         - name: DATABASE_URL
-          value: postgres://postgres:nicesecret@pgwebsite:5432/webs
+          value: postgres://postgres:nicesecret@website-db.pushtech.svc.cluster.local:5432/webs
         - name: DB_POOL_SIZE
           value: "20"
         - name: DB_TIMEOUT_MSEC
@@ -89,9 +120,3 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/website/env
           name: websiteenv
-      restartPolicy: Always
-      volumes:
-      - name: websiteenv
-        persistentVolumeClaim:
-          claimName: websiteenv
-status: {}

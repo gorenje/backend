@@ -1,13 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website-db
+spec:
+  ports:
+  - name: "5432"
+    port: 5432
+    targetPort: 5432
+  selector:
+    io.kompose.service: pgwebsite
+status:
+  loadBalancer: {}
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/website.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
-  labels:
-    io.kompose.service: pgwebsite
-  name: pgwebsite
+  name: website-db
 spec:
   replicas: 1
   strategy:
@@ -18,6 +28,11 @@ spec:
       labels:
         io.kompose.service: pgwebsite
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: websitedb
+        persistentVolumeClaim:
+          claimName: websitedb
       containers:
       - env:
         - name: POSTGRES_PASSWORD
@@ -30,9 +45,3 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: websitedb
-      restartPolicy: Always
-      volumes:
-      - name: websitedb
-        persistentVolumeClaim:
-          claimName: websitedb
-status: {}
