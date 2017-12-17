@@ -1,10 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: pgimgserver
+  name: imgserver-db
+spec:
+  ports:
+  - name: "5432"
+    port: 5432
+    targetPort: 5432
+  selector:
+    io.kompose.service: pgimgserver
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/imageserver.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
     io.kompose.service: pgimgserver
   name: pgimgserver
@@ -18,10 +30,18 @@ spec:
       labels:
         io.kompose.service: pgimgserver
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: imgserverdb
+        persistentVolumeClaim:
+          claimName: imgserverdb
       containers:
       - env:
         - name: POSTGRES_PASSWORD
-          value: nicesecret
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: IMGSERVER_PG_PASSWORD
         image: postgres:9.6.6
         name: pgimgserver
         ports:
@@ -30,9 +50,3 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: imgserverdb
-      restartPolicy: Always
-      volumes:
-      - name: imgserverdb
-        persistentVolumeClaim:
-          claimName: imgserverdb
-status: {}

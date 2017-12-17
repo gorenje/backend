@@ -1,0 +1,97 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: imageserver
+  name: imageserver
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5061
+    targetPort: 5061
+    nodePort: 30361
+  selector:
+    io.kompose.service: imageserver
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose/imageserver.yml
+    kompose.version: 1.5.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: imageserver
+  name: imageserver
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: imageserver
+    spec:
+      restartPolicy: Always
+      volumes:
+      - name: imgserverstore
+        persistentVolumeClaim:
+          claimName: imgserverstore
+
+      initContainers:
+      - args:
+        - /bin/bash
+        - -c
+        - (rake docker:pause_for_db               &&
+           rake docker:if_db_not_migrated         &&
+           rake db:create                         &&
+           rake docker:create_postgres_extensions &&
+           rake db:migrate) ; exit 0
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: IMGSERVER_DB_URL
+        - name: RACK_ENV
+          value: production
+        image: pushtech.imageserver:v1
+        name: imageserver-migrate-db
+
+      containers:
+      - args:
+        - /bin/bash
+        - -c
+        - rake docker:pause_for_db      &&
+          rake docker:if_db_is_migrated &&
+          foreman start web
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: IMGSERVER_DB_URL
+        - name: DB_POOL_SIZE
+          value: "20"
+        - name: DB_TIMEOUT_MSEC
+          value: "5000"
+        - name: DOCKER_FILE_STORE
+          value: /var/lib/imagesrv/store
+        - name: PORT
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGE_SERVER_PORT
+        - name: RACK_ENV
+          value: production
+        image: pushtech.imageserver:v1
+        name: imageserver
+        ports:
+        - containerPort: 5061
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/imagesrv/store
+          name: imgserverstore

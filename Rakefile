@@ -185,6 +185,9 @@ namespace :kubernetes do
           network    = "pushtech.svc.cluster.local"
 
           {
+            "IMGSERVER_PG_PASSWORD" => pgpassword,
+            "IMGSERVER_DB_URL" => "postgres://postgres:#{pgpassword}@imgserver-db.#{network}:5432/imgserver",
+
             "WEBSITE_PG_PASSWORD" => pgpassword,
             "WEBSITE_DB_URL" => "postgres://postgres:#{pgpassword}@website-db.#{network}:5432/webs",
             "WEBSITE_CDN_HOSTS" => "#{nodeip}:30223",
