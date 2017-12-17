@@ -63,7 +63,10 @@ spec:
         - name: TRACKER_HOST
           value: http://tracker:5222
         - name: ZOOKEEPER_HOST
-          value: zookeeper:2181
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: ZOOKEEPER_ENDPOINT
         image: pushtech.consumers.ruby:v1
         name: consumers-ruby-worker
         resources: {}

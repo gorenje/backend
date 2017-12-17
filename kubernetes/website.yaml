@@ -42,7 +42,10 @@ spec:
            rake db:migrate) ; exit 0
         env:
         - name: DATABASE_URL
-          value: postgres://postgres:nicesecret@website-db.pushtech.svc.cluster.local:5432/webs
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: WEBSITE_DB_URL
         - name: RACK_ENV
           value: production
         image: pushtech.website:v1
@@ -59,9 +62,15 @@ spec:
         - name: ASSETS_HOST
           value: http://imageserver:5061
         - name: CDN_HOSTS
-          value: localhost:5123,localhost:5123
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: WEBSITE_CDN_HOSTS
         - name: DATABASE_URL
-          value: postgres://postgres:nicesecret@website-db.pushtech.svc.cluster.local:5432/webs
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: WEBSITE_DB_URL
         - name: DB_POOL_SIZE
           value: "20"
         - name: DB_TIMEOUT_MSEC
@@ -83,7 +92,10 @@ spec:
         - name: NOTIFIER_HOST
           value: http://notificationserver:5041
         - name: PORT
-          value: "5123"
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_PORT
         - name: PROFILE_HOST
           value: https://profile.pushtech.de
         - name: PUSHTECH_API_HOST

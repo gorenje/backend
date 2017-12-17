@@ -36,7 +36,10 @@ spec:
       containers:
       - env:
         - name: POSTGRES_PASSWORD
-          value: nicesecret
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: WEBSITE_PG_PASSWORD
         image: postgres:9.6.6
         name: pgwebsite
         ports:

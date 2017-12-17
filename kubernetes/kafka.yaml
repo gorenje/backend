@@ -16,8 +16,6 @@ spec:
     targetPort: 9092
   selector:
     io.kompose.service: kafka
-status:
-  loadBalancer: {}
 
 ---
 apiVersion: extensions/v1beta1
@@ -58,7 +56,10 @@ spec:
             - name: KAFKA_ADVERTISED_PORT
               value: "9092"
             - name: KAFKA_ZOOKEEPER_CONNECT
-              value: zookeeper.pushtech.svc.cluster.local:2181
+              valueFrom:
+                secretKeyRef:
+                  name: k8scfg
+                  key: ZOOKEEPER_ENDPOINT
               # Can't use BROKER_ID_COMMAND since we're using 0.10.0 branch
               # see --> https://github.com/wurstmeister/kafka-docker/blob/0.10.0/start-kafka.sh
             - name: CUSTOM_INIT_SCRIPT

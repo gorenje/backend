@@ -24,7 +24,10 @@ spec:
         - name: WEB_CONCURRENCY
           value: "3"
         - name: ZOOKEEPER_HOST
-          value: zookeeper:2181
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: ZOOKEEPER_ENDPOINT
         image: pushtech.kafidx:v1
         name: kafidx
         ports:

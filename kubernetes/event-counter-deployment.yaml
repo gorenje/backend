@@ -24,7 +24,10 @@ spec:
         - name: REDIS_CONSUMER
           value: redis://redis-consumer:6379?db=12
         - name: ZOOKEEPER_HOST
-          value: zookeeper:2181
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: ZOOKEEPER_ENDPOINT
         image: pushtech.consumers.nodejs:v1
         name: event-counter
         resources: {}

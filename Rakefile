@@ -153,6 +153,7 @@ namespace :kubernetes do
     task :show do
       system <<-EOF
         kubectl get secret envsecrets -o yaml -n #{KubernetesNS}
+        kubectl get secret k8scfg -o yaml -n #{KubernetesNS}
       EOF
     end
 
@@ -161,30 +162,39 @@ namespace :kubernetes do
       if File.exists?(".env")
         require 'dotenv'
         require 'base64'
+
+        # create envsecrets which contains api tokens etc
         Dotenv.load
+        File.open("secrets.yaml", "w+").tap do |file|
+          Helpers::Secrets.header(file, "envsecrets")
+          File.read(".env").split(/\n/).each do |lne|
+            next if lne.empty?
+            varname = lne.split(/ /).last.split(/=/).first
+            Helpers::Secrets.push(file, varname, ENV[varname])
+          end
+        end.close
 
-        file = File.open("secrets.yaml", "w+")
+        Helpers::Secrets.sendoff
 
-        file << ("apiVersion: v1\n"     +
-                 "kind: Secret\n"       +
-                 "metadata:\n"          +
-                 "  name: envsecrets\n" +
-                 "type: Opaque\n"       +
-                 "data:\n")
+        # create k8scfg which contains the configuration stuff for kubernetes
+        File.open("secrets.yaml", "w+").tap do |file|
+          Helpers::Secrets.header(file, "k8scfg")
 
-        File.read(".env").split(/\n/).each do |lne|
-          next if lne.empty?
-          varname = lne.split(/ /).last.split(/=/).first
-          content = Base64.encode64(ENV[varname]).delete("\n")
-          file << "  #{varname}: #{content}\n"
-        end
-        file.close
-        file_name = File.dirname(__FILE__) + "/secrets.yaml"
+          nodeip     = `minikube ip`.strip
+          pgpassword = "nicesecret"
+          network    = "pushtech.svc.cluster.local"
 
-        system <<-EOF
-          kubectl create -n #{KubernetesNS} -f #{file_name}
-        EOF
-        File.unlink(file)
+          {
+            "WEBSITE_PG_PASSWORD" => pgpassword,
+            "WEBSITE_DB_URL" => "postgres://postgres:#{pgpassword}@website-db.#{network}:5432/webs",
+            "WEBSITE_CDN_HOSTS" => "#{nodeip}:30223",
+            "ZOOKEEPER_ENDPOINT" => "zookeeper.#{network}:2181",
+          }.to_a.each do |key, value|
+            Helpers::Secrets.push(file, key, value)
+          end
+        end.close
+
+        Helpers::Secrets.sendoff
       else
         puts "ERROR: no .env file to convert"
         Kernel.exit(1)
@@ -195,6 +205,7 @@ namespace :kubernetes do
     task :delete do
       system <<-EOF
         kubectl delete secret envsecrets -n #{KubernetesNS}
+        kubectl delete secret k8scfg -n #{KubernetesNS}
       EOF
     end
   end
@@ -312,6 +323,32 @@ task :check_env do
     unless values.empty?
       puts "==========> #{file_name}"
       values.each {|a| puts a }
+    end
+  end
+end
+
+module Helpers
+  module Secrets
+    extend self
+
+    def push(file, key, value)
+      content = Base64.encode64(value).delete("\n")
+      file << "  #{key}: #{content}\n"
+    end
+
+    def sendoff
+      file_name = File.dirname(__FILE__) + "/secrets.yaml"
+      system "kubectl create -n #{KubernetesNS} -f #{file_name}"
+      File.unlink(file_name)
+    end
+
+    def header(file,name)
+      file << ("apiVersion: v1\n"     +
+               "kind: Secret\n"       +
+               "metadata:\n"          +
+               "  name: #{name}\n" +
+               "type: Opaque\n"       +
+               "data:\n")
     end
   end
 end
