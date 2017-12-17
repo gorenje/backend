@@ -221,14 +221,19 @@ namespace :kubernetes do
     desc "Setup architecture"
     task :up do
       system <<-EOF
-        kubectl create -n #{KubernetesNS} -f kubernetes
+        kubectl create -n #{KubernetesNS} -f kubernetes/persistentvolumes.yaml
+        kubectl create -n #{KubernetesNS} -f kubernetes/dbs/*.yaml
+        kubectl create -n #{KubernetesNS} -f kubernetes/workers/*.yaml
+        kubectl create -n #{KubernetesNS} -f kubernetes/servers/*.yaml
       EOF
     end
 
     desc "Shutdown architecture"
     task :down do
       system <<-EOF
-        kubectl delete -n #{KubernetesNS} -f kubernetes
+        kubectl delete -n #{KubernetesNS} -f kubernetes/servers/*.yaml
+        kubectl delete -n #{KubernetesNS} -f kubernetes/workers/*.yaml
+        kubectl delete -n #{KubernetesNS} -f kubernetes/dbs/*.yaml
       EOF
     end
   end

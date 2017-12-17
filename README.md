@@ -135,7 +135,7 @@ To shut things down:
 Using MiniKube and Kubectl
 ---
 
-*WIP* This isn't complete yet, this only fors for the tracking infrastructure.
+*WIP* This isn't complete yet .....
 
 Begin with starting minikube and buiding all the docker containers:
 
