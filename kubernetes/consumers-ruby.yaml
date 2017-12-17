@@ -1,10 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: consumers-ruby
+  name: consumers-ruby
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5051
+    targetPort: 5051
+    nodePort: 30351
+  selector:
+    io.kompose.service: consumers-ruby
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/consumers.ruby.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
     io.kompose.service: consumers-ruby
   name: consumers-ruby
@@ -13,36 +26,27 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: consumers-ruby
     spec:
+      restartPolicy: Always
       containers:
       - args:
         - foreman
         - start
         - web
         env:
-        - name: ACCESS_DOMAINS
-          value: pushtech.de,eccrine.io
         - name: COOKIE_SECRET
           value: lydbrYEvxBxdUBnGa8TPpVaeBuWez5PG
-        - name: GOOGLE_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: GOOGLE_CLIENT_ID
-        - name: GOOGLE_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: GOOGLE_CLIENT_SECRET
         - name: PORT
-          value: "5051"
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: CONSUMERS_RUBY_PORT
         - name: RACK_ENV
           value: production
         - name: REDISTOGO_URL
-          value: redis://ruby-consumers-db:6379?db=6
+          value: redis://consumers-ruby-redis:6379?db=6
         - name: REDIS_POOL_SIZE
           value: "25"
         - name: TRACKER_HOST
@@ -57,5 +61,3 @@ spec:
         ports:
         - containerPort: 5051
         resources: {}
-      restartPolicy: Always
-status: {}

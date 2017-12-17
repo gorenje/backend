@@ -1,35 +1,29 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/consumers.nodejs.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
-    io.kompose.service: stats-consumer
-  name: stats-consumer
+    io.kompose.service: metadata-counter
+  name: consumers-nodejs-metadata-counter
 spec:
   replicas: 1
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: stats-consumer
+        io.kompose.service: metadata-counter
     spec:
       containers:
       - env:
         - name: CONSUMER_NAME
-          value: stats_collector
+          value: metadata_counter
         - name: REDIS_CONSUMER
-          value: redis://redis-consumer:6379?db=11
+          value: redis://consumers-nodejs-redis:6379?db=10
         - name: ZOOKEEPER_HOST
           valueFrom:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_ENDPOINT
         image: pushtech.consumers.nodejs:v1
-        name: stats-consumer
+        name: metadata-counter
         resources: {}
       restartPolicy: Always
-status: {}

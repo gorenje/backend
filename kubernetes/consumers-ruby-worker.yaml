@@ -1,10 +1,6 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/consumers.ruby.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
     io.kompose.service: consumers-ruby-worker
   name: consumers-ruby-worker
@@ -13,10 +9,10 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: consumers-ruby-worker
     spec:
+      restartPolicy: Always
       containers:
       - args:
         - foreman
@@ -52,7 +48,7 @@ spec:
         - name: RACK_ENV
           value: production
         - name: REDISTOGO_URL
-          value: redis://ruby-consumers-db:6379?db=6
+          value: redis://consumers-ruby-redis:6379?db=6
         - name: REDIS_POOL_SIZE
           value: "25"
         - name: SENDBIRD_API_TOKEN
@@ -70,5 +66,3 @@ spec:
         image: pushtech.consumers.ruby:v1
         name: consumers-ruby-worker
         resources: {}
-      restartPolicy: Always
-status: {}

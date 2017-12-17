@@ -1,10 +1,25 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: offerserver
+  name: offerserver
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+    targetPort: 5000
+    nodePort: 30341
+  selector:
+    io.kompose.service: offerserver
+status:
+  loadBalancer: {}
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/offerserver.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
     io.kompose.service: offerserver
   name: offerserver
@@ -17,32 +32,24 @@ spec:
       labels:
         io.kompose.service: offerserver
     spec:
+      restartPolicy: Always
       containers:
       - args:
         - foreman
         - start
         - web
         env:
-        - name: ACCESS_DOMAINS
-          value: pushtech.de,eccrine.io
         - name: COOKIE_SECRET
           value: x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
-        - name: GOOGLE_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: GOOGLE_CLIENT_ID
-        - name: GOOGLE_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: GOOGLE_CLIENT_SECRET
         - name: PORT
-          value: "5000"
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: OFFERSERVER_PORT
         - name: RACK_ENV
           value: production
         - name: REDISTOGO_URL
-          value: redis://redis-offerserver:6379?db=6
+          value: redis://offerserver-redis:6379?db=6
         - name: REDIS_POOL_SIZE
           value: "20"
         image: pushtech.offerserver:v1
@@ -50,5 +57,3 @@ spec:
         ports:
         - containerPort: 5000
         resources: {}
-      restartPolicy: Always
-status: {}

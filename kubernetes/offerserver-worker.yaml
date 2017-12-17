@@ -50,7 +50,7 @@ spec:
         - name: RACK_ENV
           value: production
         - name: REDISTOGO_URL
-          value: redis://redis-offerserver:6379?db=6
+          value: redis://offerserver-redis:6379?db=6
         - name: REDIS_POOL_SIZE
           value: "20"
         - name: TRACKER_HOST
@@ -59,4 +59,3 @@ spec:
         name: offerserver-worker
         resources: {}
       restartPolicy: Always
-status: {}
