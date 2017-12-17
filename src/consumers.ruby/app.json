@@ -9,20 +9,6 @@
   "repository": "https://github.com/adtekio/consumers",
   "logo": "https://avatars2.githubusercontent.com/u/17549165",
   "env": {
-    "ACCESS_DOMAINS": {
-      "description": "Comma separator list of domains that should have access",
-      "value": "eccrine.io"
-    },
-    "ACCESS_EMAILS": {
-      "description": "Comma separated list of external emails that should have access",
-      "required": false
-    },
-    "GOOGLE_CLIENT_ID": {
-      "description": "Key for OAuth2 authentication"
-    },
-    "GOOGLE_CLIENT_SECRET": {
-      "description": "Secret for OAuth2 authentication"
-    },
     "REDIS_POOL_SIZE": {
       "description": "How many parallel connections to redis",
       "value": "4"

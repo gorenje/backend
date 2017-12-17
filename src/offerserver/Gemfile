@@ -9,9 +9,6 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'unicorn'
 
-gem 'omniauth'
-gem "omniauth-google-oauth2"
-
 gem 'pry'
 gem 'addressable'
 gem 'foreman'

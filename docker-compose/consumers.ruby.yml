@@ -17,9 +17,6 @@ services:
       - PORT=$CONSUMERS_RUBY_PORT
       - RACK_ENV=production
       - REDISTOGO_URL=redis://ruby-consumers-db:6379?db=6
-      - ACCESS_DOMAINS=pushtech.de,eccrine.io
-      - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-      - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
       - REDIS_POOL_SIZE=25
       - COOKIE_SECRET=lydbrYEvxBxdUBnGa8TPpVaeBuWez5PG
       - ZOOKEEPER_HOST=zookeeper:2181

@@ -4,8 +4,6 @@ require 'oj_mimic_json'
 require 'rack'
 require 'sinatra'
 require 'sinatra/json'
-require 'omniauth'
-require 'omniauth-google-oauth2'
 require 'net/http/persistent'
 
 require 'erb'

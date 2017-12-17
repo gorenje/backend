@@ -17,9 +17,6 @@ services:
       - RACK_ENV=production
       - REDISTOGO_URL=redis://redis-offerserver:6379?db=6
       - PORT=$OFFERSERVER_PORT
-      - ACCESS_DOMAINS=pushtech.de,eccrine.io
-      - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-      - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
       - COOKIE_SECRET=x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
       - REDIS_POOL_SIZE=20
     command: "foreman start web"

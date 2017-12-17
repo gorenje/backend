@@ -2,8 +2,6 @@ require 'oj_mimic_json'
 
 require 'rack'
 require 'sinatra'
-require 'omniauth'
-require 'omniauth-google-oauth2'
 
 require 'timeout'
 require 'ipaddr'
