@@ -2,17 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/kafka-zookeeper.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
     io.kompose.service: kafka
   name: kafkasrv
 spec:
   ports:
-  - name: "9092"
-    port: 9092
+  - port: 9092
     targetPort: 9092
   selector:
     io.kompose.service: kafka
@@ -21,10 +16,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose/kafka-zookeeper.yml
-    kompose.version: 1.5.0 ()
-  creationTimestamp: null
   labels:
     io.kompose.service: kafka
   name: kafka
@@ -32,7 +23,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: kafka
     spec:
@@ -59,7 +49,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: k8scfg
-                  key: ZOOKEEPER_ENDPOINT
+                  key: ZOOKEEPER_HOST
               # Can't use BROKER_ID_COMMAND since we're using 0.10.0 branch
               # see --> https://github.com/wurstmeister/kafka-docker/blob/0.10.0/start-kafka.sh
             - name: CUSTOM_INIT_SCRIPT

@@ -135,9 +135,7 @@ To shut things down:
 Using MiniKube and Kubectl
 ---
 
-*WIP* This isn't complete yet .....
-
-Begin with starting minikube and buiding all the docker containers:
+Begin by starting minikube and buiding all the docker containers:
 
     rake minikube:start
 
@@ -163,16 +161,20 @@ Update minikube with the kubernetes yamls:
 
 Then after a few moments (to let things start up), test it:
 
-    open -a Firefox $(minikube service trackersrv -n pushtech --url)/t/w?wor=king
+    open -a Firefox $(minikube service tracker -n pushtech --url)/t/w?wor=king
     open -a Firefox $(minikube service kafidx -n pushtech --url)/kafidx
+    open -a Firefox $(minikube service website -n pushtech --url)
 
 After, tear everything down again:
 
-    rake kubernetes:secrets:delete
     rake kubernetes:spin:down
+
+That will maintain the persistent storage, if you want to get rid of
+absolutely everthing, then do the following:
+
+    rake kubernetes:secrets:delete
     rake kubernetes:namespace:delete
 
-    minikube stop
+After that, shut down minikube
 
-As alternative and for quicker local testing, you can always use docker
-compose.
+    minikube stop

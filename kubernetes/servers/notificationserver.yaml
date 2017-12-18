@@ -34,7 +34,9 @@ spec:
     spec:
       restartPolicy: Always
       initContainers:
-      - args:
+      - name: notserver-migrate-db
+        image: pushtech.notificationserver:v1
+        args:
         - /bin/bash
         - -c
         - (rake docker:pause_for_postgres         &&
@@ -50,11 +52,11 @@ spec:
               key: NOTIFSERVER_DB_URL
         - name: RACK_ENV
           value: production
-        image: pushtech.notificationserver:v1
-        name: notserver-migrate-db
 
       containers:
-      - args:
+      - name: notificationserver
+        image: pushtech.notificationserver:v1
+        args:
         - /bin/bash
         - -c
         - rake docker:pause_for_postgres &&
@@ -92,7 +94,10 @@ spec:
               name: envsecrets
               key: NOTIFICATION_SERVER_PORT
         - name: PUSHTECH_API_HOST
-          value: http://storage:5011
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: PUSHTECH_API_HOST
         - name: RACK_ENV
           value: production
         - name: RATE_LIMIT_SECONDS
@@ -113,11 +118,12 @@ spec:
               name: envsecrets
               key: SENDBIRD_API_TOKEN
         - name: TRACKER_HOST
-          value: http://tracker:5222
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: TRACKER_HOST
         - name: WEB_TIMEOUT
           value: "30"
-        image: pushtech.notificationserver:v1
-        name: notificationserver
         ports:
         - containerPort: 5041
         resources: {}

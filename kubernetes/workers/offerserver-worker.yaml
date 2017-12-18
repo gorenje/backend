@@ -34,9 +34,15 @@ spec:
               name: envsecrets
               key: CARJUMP_SECRET
         - name: IMAGE_HOST
-          value: http://imageserver:5061
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: IMAGE_HOST
         - name: PUSHTECH_API_HOST
-          value: http://storage:5011
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: PUSHTECH_API_HOST
         - name: PUSHTECH_API_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -54,7 +60,10 @@ spec:
         - name: REDIS_POOL_SIZE
           value: "20"
         - name: TRACKER_HOST
-          value: http://tracker:5222
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: TRACKER_HOST
         image: pushtech.offerserver:v1
         name: offerserver-worker
         resources: {}

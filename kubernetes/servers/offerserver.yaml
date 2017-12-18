@@ -34,7 +34,9 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-      - args:
+      - name: offerserver
+        image: pushtech.offerserver:v1
+        args:
         - foreman
         - start
         - web
@@ -52,8 +54,6 @@ spec:
           value: redis://offerserver-redis:6379?db=6
         - name: REDIS_POOL_SIZE
           value: "20"
-        image: pushtech.offerserver:v1
-        name: offerserver
         ports:
         - containerPort: 5000
         resources: {}

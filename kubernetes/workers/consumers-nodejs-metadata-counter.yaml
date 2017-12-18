@@ -22,7 +22,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: k8scfg
-              key: ZOOKEEPER_ENDPOINT
+              key: ZOOKEEPER_HOST
         image: pushtech.consumers.nodejs:v1
         name: metadata-counter
         resources: {}

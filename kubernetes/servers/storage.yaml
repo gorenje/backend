@@ -34,7 +34,9 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-      - env:
+      - name: storage
+        image: pushtech.storage:v1
+        env:
         - name: COOKIE_SECRET
           value: X1n4zsExsKtngfv4HqGGIz6bZoL5YIvo
         - name: GOOGLE_API_KEY
@@ -47,18 +49,22 @@ spec:
         - name: MONGOHQ_URL
           value: mongodb://storage-db:27017/store
         - name: NOTIFY_HOST
-          value: https://notify.pushtech.de
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: NOTIFY_HOST
         - name: PORT
           valueFrom:
             secretKeyRef:
               name: envsecrets
               key: STORAGE_PORT
         - name: TRACKER_HOST
-          value: http://tracker:5222
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: TRACKER_HOST
         - name: WEB_CONCURRENCY
           value: "8"
-        image: pushtech.storage:v1
-        name: storage
         ports:
         - containerPort: 5011
         resources: {}

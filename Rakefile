@@ -185,17 +185,30 @@ namespace :kubernetes do
           network    = "pushtech.svc.cluster.local"
 
           {
-            "NOTIFSERVER_REDIS_URL" => "redis://notifserver-redis.#{network}:6379/12",
+            "NOTIFSERVER_REDIS_URL" =>
+              "redis://notifserver-redis.#{network}:6379/12",
             "NOTIFSERVER_PG_PASSWORD" => pgpassword,
-            "NOTIFSERVER_DB_URL" => "postgres://postgres:#{pgpassword}@notifserver-db.#{network}:5432/notserver",
+            "NOTIFSERVER_DB_URL" =>
+              "postgres://postgres:#{pgpassword}@notifserver-db.#{network}:5432/notserver",
 
             "IMGSERVER_PG_PASSWORD" => pgpassword,
-            "IMGSERVER_DB_URL" => "postgres://postgres:#{pgpassword}@imgserver-db.#{network}:5432/imgserver",
+            "IMGSERVER_DB_URL" =>
+              "postgres://postgres:#{pgpassword}@imgserver-db.#{network}:5432/imgserver",
 
             "WEBSITE_PG_PASSWORD" => pgpassword,
             "WEBSITE_DB_URL" => "postgres://postgres:#{pgpassword}@website-db.#{network}:5432/webs",
             "WEBSITE_CDN_HOSTS" => "#{nodeip}:30223",
-            "ZOOKEEPER_ENDPOINT" => "zookeeper.#{network}:2181",
+
+            "ZOOKEEPER_HOST"    =>
+              "zookeeper.#{network}:2181",
+            "TRACKER_HOST"      =>
+              "http://tracker.#{network}:#{ENV['TRACKER_PORT']}",
+            "IMAGE_HOST"        =>
+              "http://imageserver.#{network}:#{ENV['IMAGE_SERVER_PORT']}",
+            "PUSHTECH_API_HOST" =>
+              "http://storage.#{network}:#{ENV['STORAGE_PORT']}",
+            "NOTIFY_HOST"        =>
+              "http://notificationserver.#{network}:#{ENV['NOTIFICATION_SERVER_PORT']}",
           }.to_a.each do |key, value|
             Helpers::Secrets.push(file, key, value)
           end
@@ -222,18 +235,18 @@ namespace :kubernetes do
     task :up do
       system <<-EOF
         kubectl create -n #{KubernetesNS} -f kubernetes/persistentvolumes.yaml
-        kubectl create -n #{KubernetesNS} -f kubernetes/dbs/*.yaml
-        kubectl create -n #{KubernetesNS} -f kubernetes/workers/*.yaml
-        kubectl create -n #{KubernetesNS} -f kubernetes/servers/*.yaml
+        kubectl create -n #{KubernetesNS} -f kubernetes/dbs
+        kubectl create -n #{KubernetesNS} -f kubernetes/workers
+        kubectl create -n #{KubernetesNS} -f kubernetes/servers
       EOF
     end
 
     desc "Shutdown architecture"
     task :down do
       system <<-EOF
-        kubectl delete -n #{KubernetesNS} -f kubernetes/servers/*.yaml
-        kubectl delete -n #{KubernetesNS} -f kubernetes/workers/*.yaml
-        kubectl delete -n #{KubernetesNS} -f kubernetes/dbs/*.yaml
+        kubectl delete -n #{KubernetesNS} -f kubernetes/servers
+        kubectl delete -n #{KubernetesNS} -f kubernetes/workers
+        kubectl delete -n #{KubernetesNS} -f kubernetes/dbs
       EOF
     end
   end

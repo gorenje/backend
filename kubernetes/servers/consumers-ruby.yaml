@@ -50,12 +50,15 @@ spec:
         - name: REDIS_POOL_SIZE
           value: "25"
         - name: TRACKER_HOST
-          value: http://tracker:5222
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: TRACKER_HOST
         - name: ZOOKEEPER_HOST
           valueFrom:
             secretKeyRef:
               name: k8scfg
-              key: ZOOKEEPER_ENDPOINT
+              key: ZOOKEEPER_HOST
         image: pushtech.consumers.ruby:v1
         name: consumers-ruby
         ports:

@@ -46,7 +46,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: k8scfg
-              key: ZOOKEEPER_ENDPOINT
+              key: ZOOKEEPER_HOST
         image: pushtech.kafidx:v1
         name: kafidx
         ports:

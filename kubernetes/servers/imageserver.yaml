@@ -42,7 +42,9 @@ spec:
           claimName: imgserverstore
 
       initContainers:
-      - args:
+      - name: imageserver-migrate-db
+        image: pushtech.imageserver:v1
+        args:
         - /bin/bash
         - -c
         - (rake docker:pause_for_db               &&
@@ -58,11 +60,11 @@ spec:
               key: IMGSERVER_DB_URL
         - name: RACK_ENV
           value: production
-        image: pushtech.imageserver:v1
-        name: imageserver-migrate-db
 
       containers:
-      - args:
+      - name: imageserver
+        image: pushtech.imageserver:v1
+        args:
         - /bin/bash
         - -c
         - rake docker:pause_for_db      &&
@@ -87,8 +89,6 @@ spec:
               key: IMAGE_SERVER_PORT
         - name: RACK_ENV
           value: production
-        image: pushtech.imageserver:v1
-        name: imageserver
         ports:
         - containerPort: 5061
         resources: {}
