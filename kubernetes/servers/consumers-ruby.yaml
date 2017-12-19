@@ -29,9 +29,13 @@ spec:
       labels:
         io.kompose.service: consumers-ruby
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       containers:
-      - args:
+      - image: pushtech.consumers.ruby:v1
+        name: consumers-ruby
+        args:
         - foreman
         - start
         - web
@@ -59,8 +63,6 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
-        image: pushtech.consumers.ruby:v1
-        name: consumers-ruby
         ports:
         - containerPort: 5051
         resources: {}

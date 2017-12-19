@@ -31,6 +31,11 @@ spec:
       labels:
         io.kompose.service: redisnotserver
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: notserverredisdb
+        persistentVolumeClaim:
+          claimName: notserverredisdb
       containers:
       - image: redis
         name: redisnotserver
@@ -40,8 +45,3 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: notserverredisdb
-      restartPolicy: Always
-      volumes:
-      - name: notserverredisdb
-        persistentVolumeClaim:
-          claimName: notserverredisdb

@@ -35,14 +35,14 @@ spec:
         persistentVolumeClaim:
           claimName: notserverdb
       containers:
-      - env:
+      - image: postgres:9.6.6
+        name: pgnotserver
+        env:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: k8scfg
               key: NOTIFSERVER_PG_PASSWORD
-        image: postgres:9.6.6
-        name: pgnotserver
         ports:
         - containerPort: 5432
         volumeMounts:

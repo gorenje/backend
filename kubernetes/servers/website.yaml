@@ -26,6 +26,8 @@ spec:
       labels:
         provide.service: website
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       volumes:
       - name: websiteenv

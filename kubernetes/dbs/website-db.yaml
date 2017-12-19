@@ -33,17 +33,16 @@ spec:
         persistentVolumeClaim:
           claimName: websitedb
       containers:
-      - env:
+      - image: postgres:9.6.6
+        name: pgwebsite
+        env:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: k8scfg
               key: WEBSITE_PG_PASSWORD
-        image: postgres:9.6.6
-        name: pgwebsite
         ports:
         - containerPort: 5432
-        resources: {}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: websitedb

@@ -34,6 +34,11 @@ spec:
       labels:
         io.kompose.service: mongo-store
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: mongostoredb
+        persistentVolumeClaim:
+          claimName: mongostoredb
       containers:
       - image: mongo:2.6
         name: mongo-store
@@ -43,8 +48,3 @@ spec:
         volumeMounts:
         - mountPath: /data/db
           name: mongostoredb
-      restartPolicy: Always
-      volumes:
-      - name: mongostoredb
-        persistentVolumeClaim:
-          claimName: mongostoredb

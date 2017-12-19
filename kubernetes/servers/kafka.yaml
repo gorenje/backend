@@ -26,11 +26,22 @@ spec:
       labels:
         io.kompose.service: kafka
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       initContainers:
         - name: wait-on-zookeeper-service
           image: busybox
-          command: ['sh', '-c', 'until nslookup zookeeper.pushtech.svc.cluster.local; do echo waiting for zookeeper; sleep 2; done;']
+          env:
+            - name: ZK_HOST_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: k8scfg
+                  key: ZOOKEEPER_HOST
+          command:
+            - /bin/sh
+            - -c
+            - ZKHOST=${ZK_HOST_PORT/:2181/} ; until nslookup $ZKHOST; do echo waiting for zookeeper - $ZKHOST; sleep 2; done;
       containers:
         - image: wurstmeister/kafka:0.10.2.0
           name: kafka

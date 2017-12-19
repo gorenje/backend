@@ -32,6 +32,8 @@ spec:
       labels:
         io.kompose.service: storage
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       containers:
       - name: storage

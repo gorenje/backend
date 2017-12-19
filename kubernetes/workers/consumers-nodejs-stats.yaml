@@ -13,8 +13,13 @@ spec:
       labels:
         io.kompose.service: stats-consumer
     spec:
+      imagePullSecrets:
+      - name: meatdocker
+      restartPolicy: Always
       containers:
-      - env:
+      - image: pushtech.consumers.nodejs:v1
+        name: stats-consumer
+        env:
         - name: CONSUMER_NAME
           value: stats_collector
         - name: REDIS_CONSUMER
@@ -24,7 +29,3 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
-        image: pushtech.consumers.nodejs:v1
-        name: stats-consumer
-        resources: {}
-      restartPolicy: Always

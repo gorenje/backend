@@ -12,8 +12,13 @@ spec:
       labels:
         io.kompose.service: metadata-counter
     spec:
+      imagePullSecrets:
+      - name: meatdocker
+      restartPolicy: Always
       containers:
-      - env:
+      - image: pushtech.consumers.nodejs:v1
+        name: metadata-counter
+        env:
         - name: CONSUMER_NAME
           value: metadata_counter
         - name: REDIS_CONSUMER
@@ -23,7 +28,3 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
-        image: pushtech.consumers.nodejs:v1
-        name: metadata-counter
-        resources: {}
-      restartPolicy: Always

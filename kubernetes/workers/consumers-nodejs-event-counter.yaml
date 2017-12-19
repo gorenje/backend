@@ -13,8 +13,13 @@ spec:
       labels:
         io.kompose.service: event-counter
     spec:
+      imagePullSecrets:
+      - name: meatdocker
+      restartPolicy: Always
       containers:
-      - env:
+      - image: pushtech.consumers.nodejs:v1
+        name: event-counter
+        env:
         - name: CONSUMER_NAME
           value: event_counter
         - name: REDIS_CONSUMER
@@ -24,7 +29,3 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
-        image: pushtech.consumers.nodejs:v1
-        name: event-counter
-        resources: {}
-      restartPolicy: Always

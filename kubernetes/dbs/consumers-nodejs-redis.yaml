@@ -28,6 +28,11 @@ spec:
       labels:
         io.kompose.service: redis-consumer
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: redisconsumerdb
+        persistentVolumeClaim:
+          claimName: redisconsumerdb
       containers:
       - image: redis
         name: redis-consumer
@@ -37,8 +42,3 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: redisconsumerdb
-      restartPolicy: Always
-      volumes:
-      - name: redisconsumerdb
-        persistentVolumeClaim:
-          claimName: redisconsumerdb

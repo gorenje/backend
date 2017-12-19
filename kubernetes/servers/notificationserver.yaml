@@ -32,6 +32,8 @@ spec:
       labels:
         io.kompose.service: notificationserver
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       initContainers:
       - name: notserver-migrate-db

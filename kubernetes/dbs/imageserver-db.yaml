@@ -36,14 +36,14 @@ spec:
         persistentVolumeClaim:
           claimName: imgserverdb
       containers:
-      - env:
+      - image: postgres:9.6.6
+        name: pgimgserver
+        env:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: k8scfg
               key: IMGSERVER_PG_PASSWORD
-        image: postgres:9.6.6
-        name: pgimgserver
         ports:
         - containerPort: 5432
         resources: {}

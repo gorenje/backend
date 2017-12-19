@@ -17,8 +17,13 @@ spec:
       labels:
         io.kompose.service: offerserver-worker
     spec:
+      imagePullSecrets:
+      - name: meatdocker
+      restartPolicy: Always
       containers:
-      - args:
+      - image: pushtech.offerserver:v1
+        name: offerserver-worker
+        args:
         - foreman
         - start
         - worker
@@ -64,7 +69,3 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: TRACKER_HOST
-        image: pushtech.offerserver:v1
-        name: offerserver-worker
-        resources: {}
-      restartPolicy: Always

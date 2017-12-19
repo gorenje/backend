@@ -32,9 +32,13 @@ spec:
       labels:
         io.kompose.service: kafidx
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       containers:
-      - env:
+      - image: pushtech.kafidx:v1
+        name: kafidx
+        env:
         - name: PORT
           valueFrom:
             secretKeyRef:
@@ -47,8 +51,6 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
-        image: pushtech.kafidx:v1
-        name: kafidx
         ports:
         - containerPort: 5031
         resources: {}

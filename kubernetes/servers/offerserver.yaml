@@ -32,6 +32,8 @@ spec:
       labels:
         io.kompose.service: offerserver
     spec:
+      imagePullSecrets:
+      - name: meatdocker
       restartPolicy: Always
       containers:
       - name: offerserver

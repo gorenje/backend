@@ -30,6 +30,11 @@ spec:
       labels:
         io.kompose.service: redis-offerserver
     spec:
+      restartPolicy: Always
+      volumes:
+      - name: offerserverdb
+        persistentVolumeClaim:
+          claimName: offerserverdb
       containers:
       - image: redis
         name: redis-offerserver
@@ -39,8 +44,3 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: offerserverdb
-      restartPolicy: Always
-      volumes:
-      - name: offerserverdb
-        persistentVolumeClaim:
-          claimName: offerserverdb

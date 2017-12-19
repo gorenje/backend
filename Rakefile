@@ -8,7 +8,7 @@ namespace :minikube do
   desc "Power up minikube"
   task :start do
     system <<-EOF
-      minikube --vm-driver=xhyve --cpus=6 --memory=8192 start
+      minikube --vm-driver=xhyve --cpus=6 --memory=8192 --disk-size 100g start
     EOF
   end
 
@@ -321,7 +321,8 @@ namespace :kubernetes do
     contargs = args.container.nil? ? "" : "-c #{args.container}"
     system <<-EOF
       podname=`kubectl get pods -n #{KubernetesNS} | grep #{args.podname} | awk '// { print $1 }' | head -1`
-      kubectl exec -it ${podname} #{contargs} -n #{KubernetesNS} -- /bin/bash
+      kubectl exec -it ${podname} #{contargs} -n #{KubernetesNS} -- /bin/bash ||
+        kubectl exec -it ${podname} #{contargs} -n #{KubernetesNS} -- /bin/sh
     EOF
   end
 
