@@ -48,6 +48,17 @@ namespace :docker do
         done
       EOF
     end
+
+    desc "Push to hub.docker.com into private repo"
+    task :push do
+      system <<-EOF
+        for n in src/* ; do
+          imagename=`basename $n`
+          docker tag #{KubernetesNS}.${imagename}:v1 gorenje/pushtech:${imagename}
+          docker push gorenje/pushtech:${imagename}
+        done
+      EOF
+    end
   end
 
   namespace :compose do
@@ -154,6 +165,7 @@ namespace :kubernetes do
       system <<-EOF
         kubectl get secret envsecrets -o yaml -n #{KubernetesNS}
         kubectl get secret k8scfg -o yaml -n #{KubernetesNS}
+        kubectl get secret meatdocker -o yaml -n #{KubernetesNS}
       EOF
     end
 
@@ -162,6 +174,7 @@ namespace :kubernetes do
       if File.exists?(".env")
         require 'dotenv'
         require 'base64'
+        require 'json'
 
         # create envsecrets which contains api tokens etc
         Dotenv.load
@@ -215,6 +228,18 @@ namespace :kubernetes do
         end.close
 
         Helpers::Secrets.sendoff
+
+        # create the login for docker hub to obtain private images.
+        File.open("secrets.yaml", "w+").tap do |file|
+          Helpers::Secrets.header(file, "meatdocker",
+                                  "kubernetes.io/dockerconfigjson")
+          hsh = JSON(File.read("#{ENV['HOME']}/.docker/config.json"))
+          docker_keys = hsh["auths"].keys.select { |a| a =~ /docker.io/ }
+          content = { "auths" =>
+                      hsh["auths"].select { |k,v| docker_keys.include?(k) } }
+          Helpers::Secrets.push(file, ".dockerconfigjson", content.to_json)
+        end.close
+        Helpers::Secrets.sendoff
       else
         puts "ERROR: no .env file to convert"
         Kernel.exit(1)
@@ -226,6 +251,7 @@ namespace :kubernetes do
       system <<-EOF
         kubectl delete secret envsecrets -n #{KubernetesNS}
         kubectl delete secret k8scfg -n #{KubernetesNS}
+        kubectl delete secret meatdocker -n #{KubernetesNS}
       EOF
     end
   end
@@ -367,12 +393,12 @@ module Helpers
       File.unlink(file_name)
     end
 
-    def header(file,name)
+    def header(file, name, type = "Opaque")
       file << ("apiVersion: v1\n"     +
                "kind: Secret\n"       +
                "metadata:\n"          +
-               "  name: #{name}\n" +
-               "type: Opaque\n"       +
+               "  name: #{name}\n"    +
+               "type: #{type}\n"      +
                "data:\n")
     end
   end
