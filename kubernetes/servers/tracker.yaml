@@ -37,10 +37,10 @@ spec:
       imagePullSecrets:
       - name: meatdocker
       restartPolicy: Always
-      volumes:
-      - name: trackerdb
-        persistentVolumeClaim:
-          claimName: trackerdb
+      # volumes:
+      # - name: trackerdb
+      #   persistentVolumeClaim:
+      #     claimName: trackerdb
       containers:
       - image: redis
         name: redis-tracker
