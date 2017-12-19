@@ -163,6 +163,9 @@ Then after a few moments (to let things start up), test it:
 
     open -a Firefox $(minikube service tracker -n pushtech --url)/t/w?wor=king
     open -a Firefox $(minikube service kafidx -n pushtech --url)/kafidx
+    open -a Firefox $(minikube service storage -n pushtech --url)/store/offers
+    open -a Firefox $(minikube service notificationserver -n pushtech --url)/mappings
+    open -a Firefox $(minikube service imageserver -n pushtech --url)/assets
     open -a Firefox $(minikube service website -n pushtech --url)
 
 After, tear everything down again:
