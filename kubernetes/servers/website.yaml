@@ -34,7 +34,9 @@ spec:
         persistentVolumeClaim:
           claimName: websiteenv
       initContainers:
-      - args:
+      - image: pushtech.website:v1
+        name: website-migrate-db
+        args:
         - /bin/bash
         - -c
         - (rake docker:pause_for_db               &&
@@ -50,10 +52,10 @@ spec:
               key: WEBSITE_DB_URL
         - name: RACK_ENV
           value: production
-        image: pushtech.website:v1
-        name: website-migrate-db
       containers:
-      - args:
+      - image: pushtech.website:v1
+        name: website
+        args:
         - /bin/bash
         - -c
         - rake docker:pause_for_db      &&
@@ -138,11 +140,8 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: TRACKER_HOST
-        image: pushtech.website:v1
-        name: website
         ports:
         - containerPort: 5123
-        resources: {}
         volumeMounts:
         - mountPath: /var/lib/website/env
           name: websiteenv
