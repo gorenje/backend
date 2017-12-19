@@ -8,7 +8,7 @@ namespace :minikube do
   desc "Power up minikube"
   task :start do
     system <<-EOF
-      minikube --vm-driver=xhyve --cpus=6 --memory=8192 --disk-size 100g start
+      minikube --vm-driver=hyperkit --cpus=6 --memory=8192 --disk-size 100g start
     EOF
   end
 
