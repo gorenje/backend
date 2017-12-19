@@ -37,19 +37,12 @@ spec:
       imagePullSecrets:
       - name: meatdocker
       restartPolicy: Always
-      # volumes:
-      # - name: trackerdb
-      #   persistentVolumeClaim:
-      #     claimName: trackerdb
       containers:
       - image: redis
         name: redis-tracker
         ports:
         - containerPort: 6379
         resources: {}
-        # volumeMounts:
-        # - mountPath: /data
-        #   name: trackerdb
       - image: pushtech.tracker:v1
         name: tracker
         env:

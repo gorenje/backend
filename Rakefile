@@ -343,7 +343,7 @@ namespace :kubernetes do
   desc "Start a load test on tracking"
   task :loadtest, [:numreq,:concurrent,:event] do |t,args|
     system <<-EOF
-       ab -n #{args.numreq} -c #{args.concurrent} $(minikube service trackersrv -n #{KubernetesNS} --url)/t/#{args.event}?r=#{rand}
+       ab -n #{args.numreq} -c #{args.concurrent} $(minikube service tracker -n #{KubernetesNS} --url)/t/#{args.event}?r=#{rand}
     EOF
   end
 end

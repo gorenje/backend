@@ -64,4 +64,4 @@ spec:
               # Can't use BROKER_ID_COMMAND since we're using 0.10.0 branch
               # see --> https://github.com/wurstmeister/kafka-docker/blob/0.10.0/start-kafka.sh
             - name: CUSTOM_INIT_SCRIPT
-              value: "KAFKA_BROKER_ID=$(ifconfig | grep \"inet addr\" | grep -v 127.0.0.1 | awk '// {sub(\"addr:\",\"\",$2); gsub(\"[.]\",\"\",$2); print substr($2,5,3);}') ; echo \"broker.id=$KAFKA_BROKER_ID\" >> $KAFKA_HOME/config/server.properties"
+              value: "KAFKA_BROKER_ID=$(ifconfig | grep \"inet addr\" | grep -v 127.0.0.1 | awk '// {sub(\"addr:\",\"\",$2); split($2,ary,\"[.]\"); sum=0; for(idx=1;idx<5;idx++){sum+=ary[idx]}; print (sum % 1000);}') ; echo \"broker.id=$KAFKA_BROKER_ID\" >> $KAFKA_HOME/config/server.properties"
