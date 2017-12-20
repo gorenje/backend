@@ -68,11 +68,6 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: IMAGE_HOST
-        - name: CDN_HOSTS
-          valueFrom:
-            secretKeyRef:
-              name: k8scfg
-              key: WEBSITE_CDN_HOSTS
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:

@@ -28,7 +28,6 @@ services:
       - ASSETS_HOST=http://imageserver:$IMAGE_SERVER_PORT
       - PROFILE_HOST=https://profile.pushtech.de
       - LOGIN_HOST=website:$WEBSITE_PORT
-      - CDN_HOSTS=localhost:$WEBSITE_PORT,localhost:$WEBSITE_PORT
       - NOTIFIER_HOST=http://notificationserver:$NOTIFICATION_SERVER_PORT
       - GOOGLE_API_KEY=$GOOGLE_API_KEY
       - MANDRILL_API_KEY=$MANDRILL_API_KEY

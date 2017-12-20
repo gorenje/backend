@@ -193,7 +193,6 @@ namespace :kubernetes do
         File.open("secrets.yaml", "w+").tap do |file|
           Helpers::Secrets.header(file, "k8scfg")
 
-          nodeip     = `minikube ip`.strip
           pgpassword = "nicesecret"
           network    = "pushtech.svc.cluster.local"
 
@@ -210,7 +209,6 @@ namespace :kubernetes do
 
             "WEBSITE_PG_PASSWORD" => pgpassword,
             "WEBSITE_DB_URL" => "postgres://postgres:#{pgpassword}@website-db.#{network}:5432/webs",
-            "WEBSITE_CDN_HOSTS" => "#{nodeip}:30223",
 
             "ZOOKEEPER_HOST"    =>
               "zookeeper.#{network}:2181",
