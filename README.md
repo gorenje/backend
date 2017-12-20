@@ -181,3 +181,52 @@ absolutely everthing, then do the following:
 After that, shut down minikube
 
     minikube stop
+
+
+Local Development
+---
+
+1. Start services (e.g. redis or postgres) locally with with docker-compose
+2. Run service locally against the resources started via docker-compose
+3. Once happy, build docker images to minikube
+4. Test in minikube
+5. Rebuild images locally against the local docker and then push them to
+   docker hub.
+6. Redeploy production.
+
+
+Working with StackPoint.io
+---
+
+Provision and then download the kubeconfig and do:
+
+    export KUBECONFIG=/some/directory/kubeconfig
+
+test that it worked
+
+    kubectl get pods
+
+That should respond with none found.
+
+Setup the namespace and load the secrets:
+
+    rake kubernetes:namespace:create
+    rake kubernetes:secrets:load
+
+Then build the persistent volumes:
+
+    kubectl create -n pushtech -f kubernetes/persistentvolumes.yaml
+
+Wait until there all up and running.
+
+Now build the databases:
+
+    kubectl create -n pushtech -f kubernetes/dbs/
+
+Again, wait until they are all up and runnning.
+
+    kubectl create -n pushtech -f kubernetes/servers/zookeeper.yaml
+    kubectl create -n pushtech -f kubernetes/servers/kafka.yaml
+
+    kubectl create -n pushtech -f kubernetes/servers/
+    kubectl create -n pushtech -f kubernetes/workers/
