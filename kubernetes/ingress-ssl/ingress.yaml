@@ -1,0 +1,47 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: testtracker
+  namespace: pushtech
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - trktest.pushtech.de
+    secretName: testtracker-tls
+  rules:
+  - host: trktest.pushtech.de
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: tracker
+          servicePort: 80
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kafidx
+  namespace: pushtech
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - kafidx.trktest.pushtech.de
+    secretName: kafidx-testtracker-tls
+  rules:
+  - host: kafidx.trktest.pushtech.de
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kafidx
+          servicePort: 80
