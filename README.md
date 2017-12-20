@@ -198,7 +198,7 @@ Local Development
 Working with StackPoint.io
 ---
 
-Provision and then download the kubeconfig and do:
+Provision and then download the kubeconfig from stackpoint and do:
 
     export KUBECONFIG=/some/directory/kubeconfig
 
@@ -213,20 +213,18 @@ Setup the namespace and load the secrets:
     rake kubernetes:namespace:create
     rake kubernetes:secrets:load
 
-Then build the persistent volumes:
+Then build single YAML for orchestration:
 
-    kubectl create -n pushtech -f kubernetes/persistentvolumes.yaml
+    rake stackpoint:generate:yaml
 
-Wait until there all up and running.
+And then deploy it:
 
-Now build the databases:
+    kubectl create -n pushtech -f stackpoint.persistentvolumeclaim.yaml
+    kubectl create -n pushtech -f stackpoint.service.yaml
 
-    kubectl create -n pushtech -f kubernetes/dbs/
+    sleep 5 * 60
+    # wait until the persistent volumes are available, this can can
+    # a moment, depending on cloud provider
+    kubectl create -n pushtech -f stackpoint.deployment.yaml
 
-Again, wait until they are all up and runnning.
-
-    kubectl create -n pushtech -f kubernetes/servers/zookeeper.yaml
-    kubectl create -n pushtech -f kubernetes/servers/kafka.yaml
-
-    kubectl create -n pushtech -f kubernetes/servers/
-    kubectl create -n pushtech -f kubernetes/workers/
+Done.

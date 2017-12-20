@@ -8,7 +8,7 @@ module Helpers
     end
 
     def sendoff
-      file_name = File.dirname(__FILE__) + "/secrets.yaml"
+      file_name = File.dirname(__FILE__) + "/../secrets.yaml"
       system "kubectl create -n #{KubernetesNS} -f #{file_name}"
       File.unlink(file_name)
     end
