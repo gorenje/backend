@@ -10,9 +10,11 @@ function md5(str) {
   return hash.digest("hex");
 }
 
-
 router.get('/', function(req, res, next) {
-  res.render('kafidx', { session: req.session, ws_schema: 'ws' });
+  res.render('kafidx', {
+    session: req.session,
+    ws_schema: process.env.WEB_SOCKET_SCHEMA || 'ws'
+  });
 });
 
 router.get('/getgroupid', function(req, res, next){
