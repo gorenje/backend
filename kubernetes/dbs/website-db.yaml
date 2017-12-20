@@ -36,6 +36,8 @@ spec:
       - image: postgres:9.6.6
         name: pgwebsite
         env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
