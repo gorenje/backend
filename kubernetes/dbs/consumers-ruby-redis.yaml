@@ -18,7 +18,7 @@ kind: Deployment
 metadata:
   labels:
     io.kompose.service: ruby-consumers-db
-  name: ruby-consumers-db
+  name: consumers-ruby-db
 spec:
   replicas: 1
   strategy:

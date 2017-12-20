@@ -19,7 +19,7 @@ kind: Deployment
 metadata:
   labels:
     io.kompose.service: pgimgserver
-  name: pgimgserver
+  name: imgserver-db
 spec:
   replicas: 1
   strategy:

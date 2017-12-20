@@ -20,7 +20,7 @@ kind: Deployment
 metadata:
   labels:
     io.kompose.service: redisnotserver
-  name: redisnotserver
+  name: notifserver-db-redis
 spec:
   replicas: 1
   strategy:

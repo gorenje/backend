@@ -20,7 +20,7 @@ kind: Deployment
 metadata:
   labels:
     io.kompose.service: redis-offerserver
-  name: redis-offerserver
+  name: offerserver-db
 spec:
   replicas: 1
   strategy:
