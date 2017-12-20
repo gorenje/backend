@@ -19,8 +19,9 @@ var toKafkaMsg = function(redisStr) {
   var query        = stuff.shift()
   var userAgent    = stuff.join(" ")
 
-  var eventType    = path.split("/")
-                         .filter( function(w) { return w.length > 0 } ).pop()
+  var eventType    =
+    path.split("/").filter( function(w) { return w.length > 0 } ).pop() || "/"
+
   var geoLU        = geoip.lookup(ipStr) || DefaultGeo
   var nowTstamp    = (new Date()).getTime()
   var metaData     = DeviceDetector.parse(userAgent)
