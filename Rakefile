@@ -305,6 +305,9 @@ namespace :kubernetes do
 
   desc "starting logging containers"
   task :log, [:podname,:container] do |t,args|
+    # Much better with watch:
+    #    watch "kubectl logs -n pushtech consumers-nodejs-stats-consumer-57d7477c8d-zdw6s | tail -30"
+    # but the following code handles several pods with the same prefix
     system <<-EOF
       while [ 1 ] ; do
         echo "#######################################################";
