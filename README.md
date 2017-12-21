@@ -260,41 +260,6 @@ the ingress that are going to be created:
 
     emacs stackpoint.ingress.yaml
 
-The ingress defines the mapping from a subdomain to a service. The form is
-always the same:
-
-    apiVersion: extensions/v1beta1
-    kind: Ingress
-    metadata:
-      name: kafidx
-      namespace: pushtech
-      annotations:
-        ingress.kubernetes.io/rewrite-target: "/"
-        kubernetes.io/tls-acme: 'true'               <--- create ssl certificate
-        kubernetes.io/ingress.class: nginx           <--- use nginx as LB
-    spec:
-      tls:                                           <--- SSL setup
-      - hosts:
-        - kafidx.trktest.pushtech.de                 <--- which domain
-        secretName: kafidx-testtracker-tls           <--- ssl secret name(1)
-      rules:                                         <--- loadbalancer setup(2)
-      - host: kafidx.trktest.pushtech.de
-        http:
-          paths:
-          - path: "/"
-            backend:
-              serviceName: kafidx                    <--- Service name
-              servicePort: 80                        <--- Always 80 (3)
-
-
-Notes to the above:
-
-     1. Unique to each domain, becomes the name that is used for the secret
-        in kubernetes. This is where the certificates are stored.
-     2. LB setup is basically only a mapping from sub-domain to service name
-     3. All services that are intended to be accessible from outside have
-        port 80 defined.
-
 The services that we currently have (at time of writing):
 
     store.staging.pushtech.de  --> service: storage

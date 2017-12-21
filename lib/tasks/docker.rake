@@ -6,6 +6,7 @@ namespace :docker do
         for n in src/* ; do
           cd $n
           imagename=`basename $n`
+          echo "!!! Building ====> ${imagename}"
           docker build -t #{KubernetesNS}.${imagename}:v1 .
           cd ../..
         done
@@ -17,6 +18,7 @@ namespace :docker do
       system <<-EOF
         for n in src/* ; do
           imagename=`basename $n`
+          echo "!!! Pushing ====> ${imagename}"
           docker tag #{KubernetesNS}.${imagename}:v1 gorenje/pushtech:${imagename}
           docker push gorenje/pushtech:${imagename}
         done

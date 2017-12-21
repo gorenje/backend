@@ -72,6 +72,8 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: IMAGE_HOST
+        - name: EXTERNAL_ASSETS_HOST
+          value: https://assets.pushtech.de
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:

@@ -166,7 +166,7 @@ namespace :kubernetes do
       while [ 1 ] ; do
         echo "#######################################################";
         for n in `kubectl get pods -n #{KubernetesNS} | grep #{args.podname} | awk '// { print $1 }'`; do
-          echo "======================= $n"
+          echo "======================= kubectl logs -n #{KubernetesNS} $n #{args.container} \| tail -50"
           kubectl logs -n #{KubernetesNS} $n #{args.container} | tail -50
         done
       done

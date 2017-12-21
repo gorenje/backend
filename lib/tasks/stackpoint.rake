@@ -31,6 +31,9 @@ namespace :stackpoint do
         end
       end
 
+      # need to have the address of the asset server and website
+      assets_host, website_host = "",""
+
       # remove the loadbalancer type from our services since we don't
       # want them to have external IPs, we've got a load balancer
       # (nginx doing ssl termination) for that.
@@ -39,26 +42,53 @@ namespace :stackpoint do
 
         if serv["spec"]["type"] == "LoadBalancer"
           serv["spec"].delete("type")
-          serv["spec"]["ports"].first["port"] = 80
           serv["spec"]["ports"].first.delete("nodePort")
-          external_services << [ serv["metadata"]["name"],
-                       serv["metadata"]["annotations"]["subdomain.name"]]
+          external_services << [
+            serv["metadata"]["name"],
+            serv["metadata"]["annotations"]["subdomain.name"],
+            serv["spec"]["ports"].first["port"]
+          ]
+
+          case external_services.last.first
+          when "website"
+            website_host = "https://%s.%s" % [external_services.last[1],
+                                              external_domain]
+          when "imageserver"
+            assets_host = "https://%s.%s" % [external_services.last[1],
+                                            external_domain]
+          end
         end
       end
 
       docs["Deployment"].each do |depl|
         spec = depl["spec"]["template"]["spec"]
 
-        # websocker schema needs to be ssl compatiable
-        # not - easily - possible to detect ssl or not since the service
-        # sits behind a load balancer doing ssl termination.
-        if depl["metadata"]["name"] == "kafidx"
+        case depl["metadata"]["name"]
+        when "kafidx"
+          # websocket schema needs to be ssl compatiable
+          # not - easily - possible to detect ssl or not since the service
+          # sits behind a load balancer doing ssl termination.
           spec["containers"].each do |container|
             if container["name"] == "kafidx"
               container["env"] << {
                 "name"  => "WEB_SOCKET_SCHEMA",
                 "value" => "wss"
               }
+            end
+          end
+        when "storage"
+          spec["containers"].each do |container|
+            container["env"].each do |env|
+              env["value"] = assets_host if env["name"] == "IMAGE_HOST"
+            end
+          end
+        when "website"
+          spec["containers"].each do |container|
+            container["env"].each do |env|
+              case env["name"]
+              when "EXTERNAL_ASSETS_HOST" then env["value"] = assets_host
+              when "LOGIN_HOST", "PROFILE_HOST" then env["value"] = website_host
+              end
             end
           end
         end
@@ -69,6 +99,7 @@ namespace :stackpoint do
             container["image"] = "index.docker.io/gorenje/pushtech:#{$1}"
           end
         end
+
         (spec["initContainers"] || []).each do |container|
           if container["image"] =~ /pushtech.(.+):v1/
             container["image"] = "index.docker.io/gorenje/pushtech:#{$1}"
@@ -79,7 +110,7 @@ namespace :stackpoint do
       # replace the existing Ingress, with our generated ones.
       template = docs["Ingress"].first
       docs["Ingress"] = []
-      external_services.each do |servname, subdomain|
+      external_services.each do |servname, subdomain, port|
         ingress = YAML.load(template.to_yaml) # deep clone
         domain  = (subdomain || servname) + "." + external_domain
 
@@ -91,7 +122,10 @@ namespace :stackpoint do
 
         rule = ingress["spec"]["rules"].first
         rule["host"] = domain
-        rule["http"]["paths"].first["backend"]["serviceName"] = servname
+        rule["http"]["paths"].first["backend"] = {
+          "serviceName" => servname,
+          "servicePort" => port
+        }
 
         docs["Ingress"] << ingress
       end
