@@ -27,10 +27,13 @@ var toKafkaMsg = function(redisStr) {
   var metaData     = DeviceDetector.parse(userAgent)
   delete metaData["userAgent"]
 
+  var ipNum = (new ip.Address4(ipStr)).bigInteger() ||
+                           (new ip.Address6(ipStr)).bigInteger()
+
   metaData.host    = hostName
   metaData.pod     = podIp
   metaData.ts      = entryTStamp
-  metaData.ip      = (new ip.Address6(ipStr)).bigInteger().toRadix(16)
+  metaData.ip      = ipNum.toRadix(16)
   metaData.klag    = nowTstamp - parseInt(entryTStamp)
   metaData.country = geoLU.country
   metaData.city    = geoLU.city

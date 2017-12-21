@@ -39,6 +39,8 @@ var drainRedis = function() {
         try {
           producer.produce(appConfig.topics[0], -1, helpers.toKafkaMsg(result))
         } catch ( e ) {
+          console.log("Exception, shutting down")
+          console.log(e)
           producer.emit('shutdown-producer')
           redisClient.rpush(appConfig.RedisListName, result)
         }
