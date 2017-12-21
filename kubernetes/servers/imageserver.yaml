@@ -2,6 +2,8 @@
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    subdomain.name: assets
   labels:
     io.kompose.service: imageserver
   name: imageserver

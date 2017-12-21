@@ -233,7 +233,7 @@ that they get created, if they don't: rinse and repeat the provisioning.
 In the meantime, create the domain you want to use by getting the load balancer
 IP and setting that your domain:
 
-    kubectl describe svc nginx --namespace nginx-ingress | grep LoadBalancer
+    kubectl describe svc nginx --namespace nginx-ingress | grep "LoadBalancer Ingress"
 
     ...
     LoadBalancer Ingress:     1.2.3.4
@@ -246,6 +246,10 @@ we'll take ```staging.pushtech.de```):
     *.staging.pushtech.de --> 1.2.3.4
 
 Include the wildcard since we are going to create a number subdomains.
+
+Check on the persistent volumes, once all are live then continue:
+
+    kubectl get pvc -n pushtech
 
 Once the persistentvolumes have been create, do the rest of the orchestration:
 
@@ -305,6 +309,9 @@ world:
     kafidx.staging.pushtech.de    --> service: kafidx
     offers.staging.pushtech.de    --> service: offerserver
     consumers.staging.pushtech.de --> service: consumers-ruby
+
+The subdomain is set in the annotations field of the service, so there
+is no need to do this by hand.
 
 Ideally, you'll not have to change anything in the ingress can just deploy
 them as is:

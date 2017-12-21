@@ -6,20 +6,9 @@ namespace :stackpoint do
     task :yaml do
       require 'yaml'
 
-      docs              = Hash.new{|h,k| h[k] = [] }
-      external_services = []
       external_domain   = ENV['DOMAIN'] || 'staging.pushtech.de'
-      # should really get rid of this by mapping our service names to
-      # our subdomains. but that would require fixing the readme.
-      ServiceMapping = {
-        "storage"            => "store",
-        "tracker"            => "trk",
-        "notificationserver" => "notify",
-        "website"            => "www",
-        "imageserver"        => "assets",
-        "offerserver"        => "offers",
-        "consumers-ruby"     => "consumers",
-      }
+      external_services = []
+      docs              = Hash.new{|h,k| h[k] = [] }
 
       Dir.glob("kubernetes/**/*.yaml").each do |file_name|
         YAML.load_documents( File.read(file_name) ).each do |hsh|
@@ -51,7 +40,8 @@ namespace :stackpoint do
           serv["spec"].delete("type")
           serv["spec"]["ports"].first["port"] = 80
           serv["spec"]["ports"].first.delete("nodePort")
-          external_services << serv["metadata"]["name"]
+          external_services << [ serv["metadata"]["name"],
+                       serv["metadata"]["annotations"]["subdomain.name"]]
         end
       end
 
@@ -88,9 +78,9 @@ namespace :stackpoint do
       # replace the existing Ingress, with our generated ones.
       template = docs["Ingress"].first
       docs["Ingress"] = []
-      external_services.each do |servname|
+      external_services.each do |servname, subdomain|
         ingress = YAML.load(template.to_yaml) # deep clone
-        domain = (ServiceMapping[servname] || servname) + "." + external_domain
+        domain = (subdomain || servname) + "." + external_domain
 
         ingress["metadata"]["name"] = servname
 
