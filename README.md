@@ -204,18 +204,20 @@ Provision and then download the kubeconfig from stackpoint and do:
 
 test that it worked
 
-    kubectl get pods
+    kubectl get nodes
 
-That should respond with none found.
+That should respond with the provisioned nodes at the respect cloud provider.
 
 Setup the namespace and load the secrets:
 
     rake kubernetes:namespace:create
     rake kubernetes:secrets:load
 
-Then build single YAML for orchestration:
+Then build the stackpoint specific YAMLs for orchestration, also incuding
+the subdomain to be used for the later access. Do not create this domain
+yet, the IP for the domain comes later:
 
-    rake stackpoint:generate:yaml
+    DOMAIN=staging.pushtech.de rake stackpoint:generate:yaml
 
 And then deploy it:
 
@@ -225,7 +227,8 @@ And then deploy it:
     done
 
 This creates the basic configuration landscape, you'll need to wait until the
-persistentvolumes have been created (this might take a few minutes).
+persistentvolumes have been created (this might take a few minutes). Ensure
+that they get created, if they don't: rinse and repeat the provisioning.
 
 In the meantime, create the domain you want to use by getting the load balancer
 IP and setting that your domain:
@@ -236,22 +239,77 @@ IP and setting that your domain:
     LoadBalancer Ingress:     1.2.3.4
     ...
 
-Take the IP and set that to whatever domain you want to use:
+Take the IP and set that to whatever domain you want to use (as an example,
+we'll take ```staging.pushtech.de```):
 
     staging.pushtech.de   --> 1.2.3.4
     *.staging.pushtech.de --> 1.2.3.4
 
-Include the wildcard since we are going to create subdomains of that.
+Include the wildcard since we are going to create a number subdomains.
 
 Once the persistentvolumes have been create, do the rest of the orchestration:
 
     kubectl create -f stackpoint.deployment.yaml
 
-While waiting for all the servers to spin up, and before creating the
-ingresses, edit them to include the new domain.
+While waiting for all the servers to spin up, you can have a quick look at
+the ingress that are going to be created:
 
     emacs stackpoint.ingress.yaml
+
+The ingress defines the mapping from a subdomain to a service. The form is
+always the same:
+
+    apiVersion: extensions/v1beta1
+    kind: Ingress
+    metadata:
+      name: kafidx
+      namespace: pushtech
+      annotations:
+        ingress.kubernetes.io/rewrite-target: "/"
+        kubernetes.io/tls-acme: 'true'               <--- create ssl certificate
+        kubernetes.io/ingress.class: nginx           <--- use nginx as LB
+    spec:
+      tls:                                           <--- SSL setup
+      - hosts:
+        - kafidx.trktest.pushtech.de                 <--- which domain
+        secretName: kafidx-testtracker-tls           <--- ssl secret name(1)
+      rules:                                         <--- loadbalancer setup(2)
+      - host: kafidx.trktest.pushtech.de
+        http:
+          paths:
+          - path: "/"
+            backend:
+              serviceName: kafidx                    <--- Service name
+              servicePort: 80                        <--- Always 80 (3)
+
+
+Notes to the above:
+
+     1. Unique to each domain, becomes the name that is used for the secret
+        in kubernetes. This is where the certificates are stored.
+     2. LB setup is basically only a mapping from sub-domain to service name
+     3. All services that are intended to be accessible from outside have
+        port 80 defined.
+
+The services that we currently have (at time of writing):
+
+    store.staging.pushtech.de  --> service: storage
+    trk.staging.pushtech.de    --> service: tracker
+    notify.staging.pushtech.de --> service: notificationserver
+    www.staging.pushtech.de    --> service: website
+    assets.staging.pushtech.de --> service: imageserver
+
+And administration services, not required to be accessible from the outside
+world:
+
+    kafidx.staging.pushtech.de    --> service: kafidx
+    offers.staging.pushtech.de    --> service: offerserver
+    consumers.staging.pushtech.de --> service: consumers-ruby
+
+Ideally, you'll not have to change anything in the ingress can just deploy
+them as is:
+
     kubectl create -f stackpoint.ingress.yaml
 
 And that should be it. Now the entire cluster should be up and running with
-SSL (automagically).
+SSL (automagically). The SSL certificates will be generated automagically.
