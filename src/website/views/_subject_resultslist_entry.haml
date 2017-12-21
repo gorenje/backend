@@ -10,7 +10,7 @@
     .col-md-4
       - if images && !images.compact.empty?
         .rounded-image-corners
-          %img{ ImageSize, :src => $hosthandler.assets.url + images.first + "/iconbigger" }
+          %img{ ImageSize, :src => $hosthandler.external_assets.url + images.first + "/iconbigger" }
       - else
         %span.missing-image-icon{icon("image2") }
 
