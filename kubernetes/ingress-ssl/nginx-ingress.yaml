@@ -1,4 +1,36 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: nginx-ingress
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    name: http
+    protocol: TCP
+  - port: 443
+    name: https
+    protocol: TCP
+  selector:
+    app: nginx
+
+---
+apiVersion: v1
+data:
+  proxy-connect-timeout: "15"
+  proxy-read-timeout: "3800"
+  proxy-send-timeout: "3800"
+  hsts-include-subdomains: "false"
+  body-size: "64m"
+  server-name-hash-bucket-size: "256"
+kind: ConfigMap
+metadata:
+  namespace: nginx-ingress
+  name: nginx
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -37,19 +69,3 @@ spec:
         - /nginx-ingress-controller
         - --default-backend-service=nginx-ingress/default-http-backend
         - --nginx-configmap=nginx-ingress/nginx
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx
-  namespace: nginx-ingress
-spec:
-  type: LoadBalancer
-  ports:
-  - port: 80
-    name: http
-  - port: 443
-    name: https
-  selector:
-    app: nginx

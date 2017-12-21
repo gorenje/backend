@@ -9,27 +9,23 @@ namespace :stackpoint do
 
       Dir.glob("kubernetes/**/*.yaml").each do |file_name|
         YAML.load_documents( File.read(file_name) ).each do |hsh|
+          unless hsh["metadata"]["namespace"] ||
+                 (hsh["kind"] == "Namespace" || hsh["kind"] == "ClusterRole" ||
+                  hsh["kind"] == "ClusterRoleBinding")
+            hsh["metadata"]["namespace"] = KubernetesNS
+          end
           docs[hsh["kind"]] << hsh
         end
       end
 
       docs["PersistentVolumeClaim"].each do |volc|
-        unless volc["metadata"]["namespace"]
-          volc["metadata"]["namespace"] = KubernetesNS
-        end
-
         if volc["spec"]["resources"]["requests"]["storage"] == "100Mi"
           volc["spec"]["resources"]["requests"]["storage"] = "1Gi"
         end
       end
 
       docs["Service"].each do |serv|
-        next if (serv["metadata"]["namespace"] &&
-                 serv["metadata"]["namespace"] != KubernetesNS)
-
-        unless serv["metadata"]["namespace"]
-          serv["metadata"]["namespace"] = KubernetesNS
-        end
+        next if serv["metadata"]["namespace"] != KubernetesNS
 
         if serv["spec"]["type"] == "LoadBalancer"
           serv["spec"].delete("type")
@@ -40,10 +36,6 @@ namespace :stackpoint do
 
       docs["Deployment"].each do |depl|
         spec = depl["spec"]["template"]["spec"]
-
-        unless depl["metadata"]["namespace"]
-          depl["metadata"]["namespace"] = KubernetesNS
-        end
 
         if depl["metadata"]["name"] == "kafidx"
           spec["containers"].each do |container|
@@ -76,7 +68,9 @@ namespace :stackpoint do
         end
 
         File.open(outfile_name,"w+").tap do |out|
-          docs[kind].each { |hsh| out << (hsh.to_yaml + "\n") }
+          docs[kind].each do |hsh|
+            out << (hsh.to_yaml + "\n")
+          end
         end.close
       end
     end

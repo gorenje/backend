@@ -219,12 +219,39 @@ Then build single YAML for orchestration:
 
 And then deploy it:
 
-    kubectl create -n pushtech -f stackpoint.persistentvolumeclaim.yaml
-    kubectl create -n pushtech -f stackpoint.service.yaml
+    for n in namespace configmap clusterrole clusterrolebinding service \
+             persistentvolumeclaim ; do
+      kubectl create -f stackpoint.${n}.yaml
+    done
 
-    sleep 5 * 60
-    # wait until the persistent volumes are available, this can can
-    # a moment, depending on cloud provider
-    kubectl create -n pushtech -f stackpoint.deployment.yaml
+This creates the basic configuration landscape, you'll need to wait until the
+persistentvolumes have been created (this might take a few minutes).
 
-Done.
+In the meantime, create the domain you want to use by getting the load balancer
+IP and setting that your domain:
+
+    kubectl describe svc nginx --namespace nginx-ingress | grep LoadBalancer
+
+    ...
+    LoadBalancer Ingress:     1.2.3.4
+    ...
+
+Take the IP and set that to whatever domain you want to use:
+
+    staging.pushtech.de   --> 1.2.3.4
+    *.staging.pushtech.de --> 1.2.3.4
+
+Include the wildcard since we are going to create subdomains of that.
+
+Once the persistentvolumes have been create, do the rest of the orchestration:
+
+    kubectl create -f stackpoint.deployment.yaml
+
+While waiting for all the servers to spin up, and before creating the
+ingresses, edit them to include the new domain.
+
+    emacs stackpoint.ingress.yaml
+    kubectl create -f stackpoint.ingress.yaml
+
+And that should be it. Now the entire cluster should be up and running with
+SSL (automagically).
