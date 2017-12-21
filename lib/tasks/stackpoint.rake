@@ -12,10 +12,11 @@ namespace :stackpoint do
 
       Dir.glob("kubernetes/**/*.yaml").each do |file_name|
         YAML.load_documents( File.read(file_name) ).each do |hsh|
-          # name space all the yamls, this is makes it easier to miss in
+          # name space all the yamls, this is makes it easier to mixin
           # other namespaces (e.g. kube-lego).
           unless hsh["metadata"]["namespace"] ||
-                 (hsh["kind"] == "Namespace" || hsh["kind"] == "ClusterRole" ||
+                 (hsh["kind"] == "Namespace"   ||
+                  hsh["kind"] == "ClusterRole" ||
                   hsh["kind"] == "ClusterRoleBinding")
             hsh["metadata"]["namespace"] = KubernetesNS
           end
@@ -55,7 +56,7 @@ namespace :stackpoint do
           spec["containers"].each do |container|
             if container["name"] == "kafidx"
               container["env"] << {
-                "name" => "WEB_SOCKET_SCHEMA",
+                "name"  => "WEB_SOCKET_SCHEMA",
                 "value" => "wss"
               }
             end
@@ -80,7 +81,7 @@ namespace :stackpoint do
       docs["Ingress"] = []
       external_services.each do |servname, subdomain|
         ingress = YAML.load(template.to_yaml) # deep clone
-        domain = (subdomain || servname) + "." + external_domain
+        domain  = (subdomain || servname) + "." + external_domain
 
         ingress["metadata"]["name"] = servname
 
