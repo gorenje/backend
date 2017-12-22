@@ -5,6 +5,9 @@ namespace :stackpoint do
     EOF
     task :yaml do
       require 'yaml'
+      require 'dotenv'
+      require 'base64'
+      require 'json'
 
       external_domain   = ENV['DOMAIN'] || 'staging.pushtech.de'
       external_services = []
@@ -60,38 +63,35 @@ namespace :stackpoint do
         end
       end
 
+      (docs["Namespace"] ||= []).tap do |ns|
+        ns << {
+          "apiVersion" => "v1",
+          "kind" => "Namespace",
+          "metadata" => {
+            "name" => KubernetesNS
+          }
+        }
+      end
+
+      (docs["Secret"] ||= []).tap do |secrets|
+        externals = {
+          "WEB_SOCKET_SCHEMA"    => "wss",
+          "EXTERNAL_ASSETS_HOST" => assets_host,
+          "LOGIN_HOST"           => website_host,
+          "PROFILE_HOST"         => website_host,
+        }
+
+        [Helpers::Secrets.for_env(KubernetesNS),
+         Helpers::Secrets.for_docker(KubernetesNS),
+         Helpers::Secrets.for_external_cfg(KubernetesNS, externals),
+         Helpers::Secrets.for_internal_cfg(KubernetesNS),
+        ].each do |hsh|
+          secrets << YAML.load(hsh.values.first.join("\n"))
+        end
+      end
+
       docs["Deployment"].each do |depl|
         spec = depl["spec"]["template"]["spec"]
-
-        case depl["metadata"]["name"]
-        when "kafidx"
-          # websocket schema needs to be ssl compatiable
-          # not - easily - possible to detect ssl or not since the service
-          # sits behind a load balancer doing ssl termination.
-          spec["containers"].each do |container|
-            if container["name"] == "kafidx"
-              container["env"] << {
-                "name"  => "WEB_SOCKET_SCHEMA",
-                "value" => "wss"
-              }
-            end
-          end
-        when "storage"
-          spec["containers"].each do |container|
-            container["env"].each do |env|
-              env["value"] = assets_host if env["name"] == "IMAGE_HOST"
-            end
-          end
-        when "website"
-          spec["containers"].each do |container|
-            container["env"].each do |env|
-              case env["name"]
-              when "EXTERNAL_ASSETS_HOST" then env["value"] = assets_host
-              when "LOGIN_HOST", "PROFILE_HOST" then env["value"] = website_host
-              end
-            end
-          end
-        end
 
         # replace docker image names with external accessible ones
         spec["containers"].each do |container|

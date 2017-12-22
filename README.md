@@ -208,12 +208,7 @@ test that it worked
 
 That should respond with the provisioned nodes at the respect cloud provider.
 
-Setup the namespace and load the secrets:
-
-    rake kubernetes:namespace:create
-    rake kubernetes:secrets:load
-
-Then build the stackpoint specific YAMLs for orchestration, also incuding
+Then build the stackpoint specific YAMLs for orchestration, also including
 the subdomain to be used for the later access. Do not create this domain
 yet, the IP for the domain comes later:
 
@@ -221,8 +216,8 @@ yet, the IP for the domain comes later:
 
 And then deploy it:
 
-    for n in namespace configmap clusterrole clusterrolebinding service \
-             persistentvolumeclaim ; do
+    for n in namespace configmap secret clusterrole clusterrolebinding \
+             service persistentvolumeclaim ; do
       kubectl create -f stackpoint.${n}.yaml
     done
 
@@ -255,6 +250,10 @@ Once the persistentvolumes have been create, do the rest of the orchestration:
 
     kubectl create -f stackpoint.deployment.yaml
 
+To check whether stuff is up and running:
+
+    kubectl get deployments --all-namespaces=true
+
 While waiting for all the servers to spin up, you can have a quick look at
 the ingress that are going to be created:
 
@@ -284,4 +283,4 @@ them as is:
     kubectl create -f stackpoint.ingress.yaml
 
 And that should be it. Now the entire cluster should be up and running with
-SSL (automagically). The SSL certificates will be generated automagically.
+SSL certificates being automagically generated.
