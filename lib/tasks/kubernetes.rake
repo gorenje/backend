@@ -22,6 +22,7 @@ namespace :kubernetes do
         kubectl get secret envsecrets -o yaml -n #{KubernetesNS}
         kubectl get secret k8scfg -o yaml -n #{KubernetesNS}
         kubectl get secret meatdocker -o yaml -n #{KubernetesNS}
+        kubectl get secret extcfg -o yaml -n #{KubernetesNS}
       EOF
     end
 
@@ -94,6 +95,23 @@ namespace :kubernetes do
           Helpers::Secrets.push(file, ".dockerconfigjson", content.to_json)
         end.close
         Helpers::Secrets.sendoff
+
+        # create external configuration for urls that need to know the
+        # domain or ip of the node or cluster. The port numbers are the
+        # nodePorts on the respective services.
+        nodeip = `minikube ip`.strip
+        File.open("secrets.yaml", "w+").tap do |file|
+          Helpers::Secrets.header(file, "extcfg")
+          {
+            "WEB_SOCKET_SCHEMA"    => "ws",
+            "EXTERNAL_ASSETS_HOST" => "http://#{nodeip}:30361",
+            "LOGIN_HOST"           => "http://#{nodeip}:30223",
+            "PROFILE_HOST"         => "http://#{nodeip}:30223",
+          }.to_a.each do |key,value|
+            Helpers::Secrets.push(file, key, value)
+          end
+        end.close
+        Helpers::Secrets.sendoff
       else
         puts "ERROR: no .env file to convert"
         Kernel.exit(1)
@@ -106,6 +124,7 @@ namespace :kubernetes do
         kubectl delete secret envsecrets -n #{KubernetesNS}
         kubectl delete secret k8scfg -n #{KubernetesNS}
         kubectl delete secret meatdocker -n #{KubernetesNS}
+        kubectl delete secret extcfg -n #{KubernetesNS}
       EOF
     end
   end

@@ -73,7 +73,10 @@ spec:
               name: k8scfg
               key: IMAGE_HOST
         - name: EXTERNAL_ASSETS_HOST
-          value: https://assets.pushtech.de
+          valueFrom:
+            secretKeyRef:
+              name: extcfg
+              key: EXTERNAL_ASSETS_HOST
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
@@ -91,7 +94,10 @@ spec:
               name: envsecrets
               key: GOOGLE_API_KEY
         - name: LOGIN_HOST
-          value: website:5123
+          valueFrom:
+            secretKeyRef:
+              name: extcfg
+              key: LOGIN_HOST
         - name: MANDRILL_API_KEY
           valueFrom:
             secretKeyRef:
@@ -108,7 +114,10 @@ spec:
               name: envsecrets
               key: WEBSITE_PORT
         - name: PROFILE_HOST
-          value: https://profile.pushtech.de
+          valueFrom:
+            secretKeyRef:
+              name: extcfg
+              key: PROFILE_HOST
         - name: PUSHTECH_API_HOST
           valueFrom:
             secretKeyRef:

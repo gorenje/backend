@@ -48,6 +48,11 @@ spec:
               key: KAFIDX_PORT
         - name: WEB_CONCURRENCY
           value: "3"
+        - name: WEB_SOCKET_SCHEMA
+          valueFrom:
+            secretKeyRef:
+              name: extcfg
+              key: WEB_SOCKET_SCHEMA
         - name: ZOOKEEPER_HOST
           valueFrom:
             secretKeyRef:

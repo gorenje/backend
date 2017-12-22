@@ -49,7 +49,10 @@ spec:
               name: envsecrets
               key: GOOGLE_API_KEY
         - name: IMAGE_HOST
-          value: http://imageserver:5061
+          valueFrom:
+            secretKeyRef:
+              name: extcfg
+              key: EXTERNAL_ASSETS_HOST
         - name: MONGOHQ_URL
           value: mongodb://storage-db:27017/store
         - name: NOTIFY_HOST
