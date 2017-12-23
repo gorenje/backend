@@ -89,6 +89,16 @@ spec:
               key: IMAGE_SERVER_PORT
         - name: RACK_ENV
           value: production
+        - name: API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_API_USER
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_API_PASSWORD
         ports:
         - containerPort: 5061
         resources: {}
