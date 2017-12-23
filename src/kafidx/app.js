@@ -9,6 +9,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var WebSocket    = require('ws');
 var url          = require('url');
+var passport     = require('passport');
 
 var index  = require('./routes/index');
 var kafidx = require('./routes/kafidx');
@@ -54,6 +55,8 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+
 app.use(session({
   cookieName: 'session',
   secret: process.env.COOKIE_SECRET || 'nogreatsecret',
