@@ -71,3 +71,8 @@ Sidekiq.default_worker_options = { 'backtrace' => true }
 class SidekiqWebNoSessions < Sidekiq::Web
   disable :sessions
 end
+
+Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
+  [user, password] == [ENV['API_USER'] || "offer",
+                       ENV['API_PASSWORD'] || "user"]
+end
