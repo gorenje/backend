@@ -72,6 +72,16 @@ spec:
               key: TRACKER_HOST
         - name: WEB_CONCURRENCY
           value: "8"
+        - name: API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: PUSHTECH_API_USER
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: PUSHTECH_API_PASSWORD
         ports:
         - containerPort: 5011
         resources: {}

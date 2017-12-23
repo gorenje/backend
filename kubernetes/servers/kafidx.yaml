@@ -58,6 +58,16 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
+        - name: API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: KAFIDX_USER
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: KAFIDX_PASSWORD
         ports:
         - containerPort: 5031
         resources: {}
