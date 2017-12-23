@@ -1,6 +1,4 @@
 post '/register' do
-  puts "HELLO WORLD OT REGIAS"
-
   orig_params = params.clone
 
   params = if request.env['CONTENT_TYPE'] =~ /application\/json/
@@ -39,5 +37,6 @@ post '/register' do
 end
 
 get '/register' do
+  protected!
   haml :register
 end

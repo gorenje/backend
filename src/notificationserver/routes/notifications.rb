@@ -1,9 +1,11 @@
 get '/notification/:deviceid' do
+  protected!
   @deviceid = params[:deviceid]
   haml :create_notification
 end
 
 post '/notification' do
+  protected!
   notification = case params[:type]
             when "freeform"
               if params[:url] && params[:msg]
