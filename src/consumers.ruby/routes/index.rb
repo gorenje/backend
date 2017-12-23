@@ -1,5 +1,5 @@
 get '/' do
-  redirect '/sidekiq'
+  erb ''
 end
 
 get "/pingdom" do
