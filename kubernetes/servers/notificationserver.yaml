@@ -128,6 +128,16 @@ spec:
               key: TRACKER_HOST
         - name: WEB_TIMEOUT
           value: "30"
+        - name: API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: NOTIFICATION_API_USER
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: NOTIFICATION_API_PASSWORD
         ports:
         - containerPort: 5041
         resources: {}
