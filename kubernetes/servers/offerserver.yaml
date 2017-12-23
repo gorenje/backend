@@ -58,6 +58,16 @@ spec:
           value: redis://offerserver-redis:6379?db=6
         - name: REDIS_POOL_SIZE
           value: "20"
+        - name: API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: OFFERSERVER_API_USER
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: OFFERSERVER_API_PASSWORD
         ports:
         - containerPort: 5000
         resources: {}
