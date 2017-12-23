@@ -65,6 +65,16 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: ZOOKEEPER_HOST
+        - name: API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: CONSUMER_API_USER
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: CONSUMER_API_PASSWORD
         ports:
         - containerPort: 5051
         resources: {}

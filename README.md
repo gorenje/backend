@@ -168,6 +168,7 @@ Then after a few moments (to let things start up), test it:
     open -a Firefox $(minikube service imageserver -n pushtech --url)/assets
     open -a Firefox $(minikube service website -n pushtech --url)
     open -a Firefox $(minikube service offerserver -n pushtech --url)/sidekiq
+    open -a Firefox $(minikube service consumers-ruby -n pushtech --url)/sidekiq
 
 After, tear everything down again:
 
