@@ -76,7 +76,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: extcfg
-              key: EXTERNAL_ASSETS_HOST
+              key: ASSETS_HOST
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:

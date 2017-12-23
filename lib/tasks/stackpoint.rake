@@ -75,10 +75,10 @@ namespace :stackpoint do
 
       (docs["Secret"] ||= []).tap do |secrets|
         externals = {
-          "WEB_SOCKET_SCHEMA"    => "wss",
-          "EXTERNAL_ASSETS_HOST" => assets_host,
-          "LOGIN_HOST"           => website_host,
-          "PROFILE_HOST"         => website_host,
+          "WEB_SOCKET_SCHEMA" => "wss",
+          "ASSETS_HOST"       => assets_host,
+          "LOGIN_HOST"        => website_host,
+          "PROFILE_HOST"      => website_host,
         }
 
         [Helpers::Secrets.for_env(KubernetesNS),

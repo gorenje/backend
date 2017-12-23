@@ -52,7 +52,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: extcfg
-              key: EXTERNAL_ASSETS_HOST
+              key: ASSETS_HOST
         - name: MONGOHQ_URL
           value: mongodb://storage-db:27017/store
         - name: NOTIFY_HOST
