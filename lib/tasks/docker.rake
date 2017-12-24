@@ -6,8 +6,11 @@ namespace :docker do
         for n in src/* ; do
           cd $n
           imagename=`basename $n`
+          tagname="#{KubernetesNS}.${imagename}"
+          prevversion=`docker images -a | grep ${tagname} | grep v1 | awk 'BEGIN { yes=0 } // { print $3; yes=1; } END { if (yes==0) { print "- unknown -" }}'`
           echo "!!! Building ====> ${imagename}"
-          docker build -t #{KubernetesNS}.${imagename}:v1 .
+          docker build -t ${tagname}:v1 .
+          echo "===> Prev version: ${prevversion} of ${tagname}"
           cd ../..
         done
       EOF
