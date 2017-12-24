@@ -8,6 +8,9 @@ services:
       - PORT=$KAFIDX_PORT
       - WEB_CONCURRENCY=3
       - ZOOKEEPER_HOST=zookeeper:2181
+      - API_USER=$KAFIDX_USER
+      - API_PASSWORD=$KAFIDX_PASSWORD
+      - REDIS_URL=redis://redis-consumer:6379?db=
 
 networks:
   default:

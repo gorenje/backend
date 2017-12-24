@@ -26,6 +26,8 @@ services:
       - DOCKER_FILE_STORE=/var/lib/imagesrv/store
       - DB_POOL_SIZE=20
       - DB_TIMEOUT_MSEC=5000
+      - API_USER=$IMAGESERVER_API_USER
+      - API_PASSWORD=$IMAGESERVER_API_PASSWORD
     volumes:
       - imgserverstore:/var/lib/imagesrv/store
     restart: always

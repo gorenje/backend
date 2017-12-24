@@ -19,6 +19,8 @@ services:
       - PORT=$OFFERSERVER_PORT
       - COOKIE_SECRET=x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
       - REDIS_POOL_SIZE=20
+      - API_USER=$OFFERSERVER_API_USER
+      - API_PASSWORD=$OFFERSERVER_API_PASSWORD
     command: "foreman start web"
     restart: always
 

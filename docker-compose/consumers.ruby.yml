@@ -21,6 +21,8 @@ services:
       - COOKIE_SECRET=lydbrYEvxBxdUBnGa8TPpVaeBuWez5PG
       - ZOOKEEPER_HOST=zookeeper:2181
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
+      - API_USER=$CONSUMER_API_USER
+      - API_PASSWORD=$CONSUMER_API_PASSWORD
     command: "foreman start web"
     restart: always
 

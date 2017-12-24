@@ -44,6 +44,8 @@ services:
       - DB_TIMEOUT_MSEC=5000
       - WEB_TIMEOUT=30
       - RATE_LIMIT_SECONDS=300
+      - API_USER=$NOTIFICATION_API_USER
+      - API_PASSWORD=$NOTIFICATION_API_PASSWORD
     restart: always
 
   notserver-migrate-db:
