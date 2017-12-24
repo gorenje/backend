@@ -41,6 +41,8 @@ spec:
       - image: pushtech.kafidx:v1
         name: kafidx
         env:
+        - name: REDIS_URL
+          value: redis://consumers-nodejs-redis:6379?db=
         - name: PORT
           valueFrom:
             secretKeyRef:
