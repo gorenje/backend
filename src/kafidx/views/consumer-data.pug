@@ -1,0 +1,31 @@
+extends layout.pug
+
+block content
+  .row
+    .col-md-6
+      h1= name
+      h2= desc
+  .row
+    .col-md-6
+      table
+        - for ( var idx in data )
+          tr
+            td= data[idx][0]
+            td= data[idx][1]
+
+block inlinejs
+  script.
+    function reload() {
+      window.location.reload()
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(reload, 2000);
+    })
+
+block inlinecss
+  style.
+    #events-listing {
+      background-color:black;
+      color:yellow;
+      font-size:small;
+    }

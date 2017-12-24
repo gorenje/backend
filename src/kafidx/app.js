@@ -11,8 +11,9 @@ var WebSocket    = require('ws');
 var url          = require('url');
 var passport     = require('passport');
 
-var index  = require('./routes/index');
-var kafidx = require('./routes/kafidx');
+var index     = require('./routes/index');
+var kafidx    = require('./routes/kafidx');
+var consumers = require('./routes/consumers');
 
 var http = require('http');
 var app = express();
@@ -64,8 +65,9 @@ app.use(session({
   activeDuration: 1000 * 60 * 5
 }));
 
-app.use('/',  index);
-app.use('/kafidx', kafidx);
+app.use('/',          index);
+app.use('/kafidx',    kafidx);
+app.use('/consumers', consumers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
