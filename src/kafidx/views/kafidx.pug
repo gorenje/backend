@@ -42,13 +42,13 @@ block inlinejs
     }
 
     function setIpTitle(self) {
-      var str = [];
+      var byteArray = [];
       try {
-        str.push(ipaddr.parse($(self).data("ip")).toString());
+        byteArray = ipaddr.parse($(self).data("ip")).toByteArray();
       } catch(e){
         console.log(e);
       }
-      $(self).attr('title', str.join(" "));
+      $(self).attr('title', byteArray.join(":"));
     }
 
     function updateMessageCount() {
