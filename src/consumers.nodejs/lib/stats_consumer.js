@@ -14,6 +14,8 @@ redisClient.on('error', function (err) {
 
 redisClient.on("connect", function () {
   console.log("Redis Successfully Connected");
+  redisClient.hset("_description", "name", "stats data consumer")
+  redisClient.hset("_description", "desc", "collecting stats on events")
 });
 
 var klagBucket    = []

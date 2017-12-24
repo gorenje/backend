@@ -13,6 +13,8 @@ redisClient.on('error', function (err) {
 
 redisClient.on("connect", function () {
   console.log("Redis Successfully Connected");
+  redisClient.hset("_description", "name", "event counter consumer")
+  redisClient.hset("_description", "desc", "counting events")
 });
 
 var consumer = null;

@@ -14,6 +14,8 @@ redisClient.on('error', function (err) {
 
 redisClient.on("connect", function () {
   console.log("Redis Successfully Connected");
+  redisClient.hset("_description", "name", "metadata consumer")
+  redisClient.hset("_description", "desc", "collect data on the metadata")
 });
 
 var consumer = null;
@@ -83,6 +85,7 @@ function start(broker_list) {
 
       redisClient.incr("p"+metaData.pod, function(err, response){});
       redisClient.incr("c"+metaData.ip, function(err, response){});
+      redisClient.incr("l"+metaData.country, function(err, response){});
     })
 
     .on('disconnected', function(arg) {
