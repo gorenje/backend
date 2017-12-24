@@ -70,33 +70,52 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: ingress-secret-admin-config-maps
 rules:
-- apiGroups: [""]
-  resources: ["secrets", "configmaps", "services", "endpoints"]
+- apiGroups:
+  - ""
+  - "extensions"
+  resources:
+  - configmaps
+  - secrets
+  - endpoints
+  - ingresses
+  - nodes
+  - pods
   verbs:
-    - get
-    - watch
-    - list
-    - proxy
-    - use
-    - redirect
-- apiGroups: [""]
-  resources: ["events"]
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
   verbs:
-    - redirect
-    - patch
-    - post
-    - create
-- apiGroups: ["extensions"]
-  resources: ["ingresses"]
+  - list
+  - watch
+  - get
+  - update
+- apiGroups:
+  - "extensions"
+  resources:
+  - ingresses
   verbs:
-    - create
-    - update
-    - get
-    - watch
-    - list
-    - proxy
-    - use
-    - redirect
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+- apiGroups:
+  - "extensions"
+  resources:
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
 
 ---
 kind: ClusterRoleBinding
