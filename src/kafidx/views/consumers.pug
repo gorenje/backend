@@ -1,9 +1,8 @@
 extends layout.pug
 
 block content
-  .row
-    .col-md-6
-      h1 Consumers
+  center
+    h1 Consumers
 
   #events-listing
 
@@ -12,25 +11,48 @@ block content
   script(src = "//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
   script(src = "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" )
 
-  table#results
+  center
+    table(border=0)
+      thead
+        tr
+          th Id
+          th Consumer
+      tbody#results
 
 block inlinejs
   script.
     document.addEventListener("DOMContentLoaded", function() {
       for ( var idx = 1; idx < 13; idx++ ) {
+          $("tbody#results").append("<tr><td>"+idx+"</td><td id='row"+
+                             idx+"'><img src='/images/loader.svg'/></td></tr>");
           $.ajax({
              url: "/consumers/" +idx+"/json",
              method: 'get',
              dataType: 'json'
           }).done(function(data){
-             $("table#results").append(data.tablerow);
+             $("td#"+data.id).html(data.html);
           });
     }});
 
 block inlinecss
   style.
-    #events-listing {
-      background-color:black;
-      color:yellow;
-      font-size:small;
+    table {
+      width: 50%;
+      padding: 10px;
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+    }
+    thead tr {
+      border-bottom: 1px solid #aaa;
+      background: #888;
+      color: #fff;
+    }
+    tbody tr {
+      border-bottom: 1px solid #aaa;
+    }
+    td {
+      text-align: center;
+    }
+    a {
+      text-decoration: none;
     }

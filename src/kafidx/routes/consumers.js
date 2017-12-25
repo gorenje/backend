@@ -3,6 +3,12 @@ var router  = express.Router();
 var auth    = require('./auth')
 var redis   = require('redis')
 
+function sortData(a,b) {
+  if ( a[0] < b[0] ) return -1;
+  if ( a[0] > b[0] ) return 1;
+  return 0;
+}
+
 function getData(redisClient, keys) {
   return new Promise( (resolve,reject) => {
     promises = []
@@ -22,7 +28,7 @@ function getData(redisClient, keys) {
       .all(promises)
       .then((data) => {
         redisClient.quit()
-        resolve(data);
+        resolve(data.sort(sortData));
       })
       .catch((err) => {
         reject(err);
@@ -44,7 +50,8 @@ router
                                                req.params.db})
     redisClient.on('error', function (err) {
       res.json({
-        tablerow: "<tr><td>" + req.params.db + "</td><td>Nothing</td></tr>"
+        html: "Error: "+err,
+        id: "row" + req.params.db
       });
     })
 
@@ -54,11 +61,13 @@ router
           var link = "<a target='_blank' href='/consumers/" + req.params.db +
                      "/page'>" + result + "</a>"
           res.json({
-            tablerow: "<tr><td>" + req.params.db +"</td><td>"+link+"</td></tr>"
+            html: link,
+            id: "row" + req.params.db
           });
         } else {
           res.json({
-            tablerow: "<tr><td>" + req.params.db +"</td><td>-</td></tr>"
+            html: "-",
+            id: "row" + req.params.db
           });
         }
         redisClient.quit()
@@ -82,23 +91,58 @@ router
           desc = result[1]
 
           redisClient.keys("*", (err, keys) => {
-            getData(redisClient,keys)
-              .then( (data) => {
-                res.render('consumer-data', {
-                  name:        name,
-                  description: desc,
-                  data:        data
+            if ( err ) {
+              res.render('consumer-error', { error: err });
+            } else {
+              getData(redisClient,keys)
+                .then( (data) => {
+                  res.render('consumer-data', {
+                    name:        name,
+                    description: desc,
+                    data:        data,
+                    redisdb:     req.params.db,
+                    lastupdate:  new Date().toString()
+                  })
                 })
-              })
-              .catch( (err) => {
-                res.render('consumer-error', { error: err });
-              })
-            })
+                .catch( (err) => {
+                  res.render('consumer-error', { error: err });
+                })
+            }
+          })
         } else {
           res.render('consumer-error',{ error: 'nothing found' });
         }
       })
     });
+  })
+
+router
+  .route("/:db/data")
+  .get(auth.isAuthenticated, function(req, res, next) {
+    var redisClient = redis.createClient({url: process.env.REDIS_URL +
+                                               req.params.db})
+    redisClient.on('error', function (err) {
+      res.json({ data: [], lastupdate: err });
+    })
+
+    redisClient.on("connect", function () {
+      redisClient.keys("*", (err, keys) => {
+        if ( err ) {
+          res.json({ data: [], lastupdate: err });
+        } else {
+          getData(redisClient,keys)
+            .then( (data) => {
+              res.json({
+                data:        data,
+                lastupdate:  new Date().toString()
+              })
+            })
+            .catch( (err) => {
+              res.json({ data: [], lastupdate: err });
+            })
+        }
+      })
+    })
   })
 
 module.exports = router;

@@ -1,22 +1,47 @@
 extends layout.pug
 
 block content
-  .row
-    .col-md-6
-      h1= name
-      h2= desc
-  .row
-    .col-md-6
-      table
+  script(src = "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment-with-locales.min.js")
+  script(src = "//cdnjs.cloudflare.com/ajax/libs/ipaddr.js/1.5.4/ipaddr.min.js")
+  script(src = "//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+  script(src = "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" )
+
+  center
+    h1= name
+    h5= desc
+
+    span= "Last Updtae: "
+    span#lastupdate= lastupdate
+
+    table
+      thead
+        tr
+          th Key
+          th Count
+      tbody#results
         - for ( var idx in data )
           tr
             td= data[idx][0]
             td= data[idx][1]
 
 block inlinejs
+  script= "var DataUrl = '/consumers/" + redisdb + "/data';"
   script.
     function reload() {
-      window.location.reload()
+      $.ajax({
+        url: DataUrl,
+        method: 'get',
+        dataType: 'json'
+      }).done( function(data){
+        $("tbody#results").html("");
+        $("span#lastupdate").html(data.lastupdate);
+        for ( var idx in data.data) {
+          var row = data.data[idx];
+          $("tbody#results").append("<tr><td>" + row[0] + "</td><td>" +
+                                    row[1] + "</td></tr>")
+        }
+        setTimeout(reload, 2000);
+      })
     }
     document.addEventListener("DOMContentLoaded", function() {
       setTimeout(reload, 2000);
@@ -24,8 +49,23 @@ block inlinejs
 
 block inlinecss
   style.
-    #events-listing {
-      background-color:black;
-      color:yellow;
-      font-size:small;
+    table {
+      width: 50%;
+      padding: 10px;
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+    }
+    thead tr {
+      border-bottom: 1px solid #aaa;
+      background: #888;
+      color: #fff;
+    }
+    tbody tr {
+      border-bottom: 1px solid #aaa;
+    }
+    td {
+      text-align: center;
+    }
+    a {
+      text-decoration: none;
     }
