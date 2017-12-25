@@ -16,22 +16,12 @@ redisClient.on("connect", function () {
   console.log("Redis Successfully Connected");
   redisClient.hset("_description", "name", "metadata consumer")
   redisClient.hset("_description", "desc", "collect data on the metadata")
+  redisClient.hset("_description", "column", "Metadata")
+  redisClient.hset("_description", "legend",
+                   "(p) = PodIp. (c) = ClientIp. (l) = Location (country).")
 });
 
 var consumer = null;
-
-var watchDog = function() {
-  console.log("---------- Current Metadata " + (new Date()) + " -------------");
-  redisClient.keys("*", function(err, keys) {
-    for ( var idx in keys ) {
-      let key = keys[idx]
-      redisClient.get(key, function(err, cnt) {
-        console.log("[Meta] " + key + ": " + cnt );
-      })
-    }
-  })
-}
-var watchDogInterval = null;
 
 var connectionTimeout = function() {
   console.log("Triggering a shutdown, took too long to connect to kafka");
@@ -71,7 +61,6 @@ function start(broker_list) {
 
       consumer.subscribe(topics);
       consumer.consume();
-      watchDogInterval = setInterval(watchDog, 2000);
     })
 
     .on('error', function(err) {

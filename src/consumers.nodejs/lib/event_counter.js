@@ -15,22 +15,10 @@ redisClient.on("connect", function () {
   console.log("Redis Successfully Connected");
   redisClient.hset("_description", "name", "event counter consumer")
   redisClient.hset("_description", "desc", "counting events")
+  redisClient.hset("_description", "column", "Event Name")
 });
 
 var consumer = null;
-
-var watchDog = function() {
-  console.log("---------- Current Events " + (new Date()) + " -------------");
-  redisClient.keys("*", function(err, keys) {
-    for ( var idx in keys ) {
-      let key = keys[idx]
-      redisClient.get(key, function(err, cnt) {
-        console.log("[Event] " + key + ": " + cnt );
-      })
-    }
-  })
-}
-var watchDogInterval = null;
 
 var connectionTimeout = function() {
   console.log("Triggering a shutdown, took too long to connect to kafka");
@@ -70,7 +58,6 @@ function start(broker_list) {
 
       consumer.subscribe(topics);
       consumer.consume();
-      watchDogInterval = setInterval(watchDog, 2000);
     })
 
     .on('error', function(err) {

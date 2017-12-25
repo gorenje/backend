@@ -16,6 +16,11 @@ redisClient.on("connect", function () {
   console.log("Redis Successfully Connected");
   redisClient.hset("_description", "name", "stats data consumer")
   redisClient.hset("_description", "desc", "collecting stats on events")
+  redisClient.hset("_description", "column", "Statistics")
+  redisClient.hset("_description", "legend",
+                   "(tsavg) = Average time (msec) from start to finish. "+
+                   "(klag) = Average kafka lag (msec), that is, time spent "+
+                   "in redis.")
 });
 
 var klagBucket    = []
@@ -28,19 +33,6 @@ var avg = function(store) {
   for (var x in store) { calc += store[x]; }
   return (calc / store.length);
 }
-
-var watchDog = function() {
-  console.log("---------- Current Stats " + (new Date()) + " -------------");
-  redisClient.keys("*", function(err, keys) {
-    for ( var idx in keys ) {
-      let key = keys[idx]
-      redisClient.get(key, function(err, cnt) {
-        console.log("[Stats] " + key + ": " + cnt );
-      })
-    }
-  })
-}
-var watchDogInterval = null;
 
 var connectionTimeout = function() {
   console.log("Triggering a shutdown, took too long to connect to kafka");
@@ -110,7 +102,6 @@ function start(broker_list) {
 
       consumer.subscribe(topics);
       consumer.consume();
-      watchDogInterval = setInterval(watchDog, 2000);
       computeStatsInterval = setInterval(computeStats, 5000);
     })
 
