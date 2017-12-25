@@ -8,21 +8,37 @@ block content
 
   center
     h1= name
-    h5= desc
+    h5= description
 
-    span= "Last Updtae: "
-    span#lastupdate= lastupdate
+    span= "Last Update: "
+    span#lastupdate
 
     table
       thead
         tr
-          th Key
-          th Count
+          th= column || "Key"
+          th Value
       tbody#results
-        - for ( var idx in data )
+        tr
+          td(colspan=2)
+            img(src="/images/loader.svg")
+
+    if legend
+      h4 Legend
+      table
+        thead
           tr
-            td= data[idx][0]
-            td= data[idx][1]
+            th Key
+            th Description
+        tbody
+          - var ary = legend.split(".")
+          - var patt = /\((.+)\) = (.+)$/
+          - for ( var idx in ary )
+            - var result = patt.exec(ary[idx])
+            - if ( result )
+              tr
+                td= result[1]
+                td= result[2]
 
 block inlinejs
   script= "var DataUrl = '/consumers/" + redisdb + "/data';"

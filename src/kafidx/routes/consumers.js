@@ -85,29 +85,15 @@ router
     })
 
     redisClient.on("connect", function () {
-      redisClient.hmget("_description", ["name","desc"], function(err,result){
+      redisClient.hmget("_description", ["name","desc","column","legend"],
+                        function(err,result){
         if ( result ) {
-          name = result[0]
-          desc = result[1]
-
-          redisClient.keys("*", (err, keys) => {
-            if ( err ) {
-              res.render('consumer-error', { error: err });
-            } else {
-              getData(redisClient,keys)
-                .then( (data) => {
-                  res.render('consumer-data', {
-                    name:        name,
-                    description: desc,
-                    data:        data,
-                    redisdb:     req.params.db,
-                    lastupdate:  new Date().toString()
-                  })
-                })
-                .catch( (err) => {
-                  res.render('consumer-error', { error: err });
-                })
-            }
+          res.render('consumer-data', {
+            name:        result[0],
+            description: result[1],
+            redisdb:     req.params.db,
+            column:      result[2],
+            legend:      result[3]
           })
         } else {
           res.render('consumer-error',{ error: 'nothing found' });
