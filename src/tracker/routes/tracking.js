@@ -8,9 +8,23 @@ var redis = require("redis"),
 router.get('*', function(req, res, next) {
   res.json({status: 'ok'})
 
+  console.log(req.headers)
+
   var msg = [];
 
-  msg.push(req.clientIp || '0.0.0.0');
+  var remoteip = null;
+
+  if ( req.headers['x-push-ip'] ) {
+    remoteip = req.headers['x-push-ip']
+  }
+  if ( req.headers['x-forwarded-for'] && !remoteip) {
+    remoteip = req.headers['x-forwarded-for'].split(",")[0].trim()
+  }
+  if ( req.headers['x-real-ip'] && !remoteip) {
+    remoteip = req.headers['x-real-ip']
+  }
+
+  msg.push(remoteip || req.connection.remoteAddress || req.clientIp||'0.0.0.0');
   msg.push((new Date).getTime());
   msg.push(req.hostname || req.socket.server.address().address || "nohost")
   msg.push(process.env.POD_IP || "nopod")
