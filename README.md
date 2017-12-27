@@ -1,10 +1,8 @@
-Pushtech Backend
-===
+# Pushtech Backend
 
 Complete backend for Push.
 
-Architecture
-===
+## Architecture
 
 *Insert Image Here*
 
@@ -57,11 +55,9 @@ What's missing?
 4. Logging and monitoring.
 
 
-Prerequistes for local testing
-===
+## Prerequistes for local testing
 
-rake
----
+### rake
 
 The [Rakefile](Rakefile) provides some helper tasks to make life that
 much easier. But to use it, you'll need ruby. Specifically, you will
@@ -79,8 +75,8 @@ Then have a look at all available tasks
 
 Done.
 
-Environment
----
+### Environment
+
 
 Some things are secret and therefore there is an ```.env``` file for
 storing those secrets. But these secrets are checked in, so you will have
@@ -89,18 +85,19 @@ to find these from existing heroku installations (or elsewhere).
 The [template](.env.template) gives an overview of what needs to be defined,
 so copy that to ```.env``` and add the missing secrets.
 
-Docker
----
+### Docker
+
 
 [Docker](https://www.docker.com/docker-mac) needs to be installed.
 
-Kompose
----
+### Kompose
+
 
 To convert docker compose files to kubernetes, [kompose](https://kompose.io)
 was used. This could also be [installed](http://kompose.io/setup/).
-Deployment
-===
+
+## Deployment
+
 
 Currently the project can be deployed via docker and kubernetes. Docker
 is great for local testing, kubernetes for production.
@@ -109,8 +106,7 @@ is great for local testing, kubernetes for production.
 [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/),
 whether this is respresentable for the production platform is to be seen.
 
-Using Docker Compose
----
+### Using Docker Compose
 
 Set up the network and volumes:
 
@@ -132,8 +128,8 @@ To shut things down:
 
     rake docker:compose:spin_down
 
-Using MiniKube and Kubectl
----
+### Using MiniKube and Kubectl
+
 
 Begin by starting minikube and buiding all the docker containers:
 
@@ -185,8 +181,8 @@ After that, shut down minikube
     minikube stop
 
 
-Local Development
----
+### Local Development
+
 
 1. Start services (e.g. redis or postgres) locally with with docker-compose
 2. Run service locally against the resources started via docker-compose
@@ -197,8 +193,7 @@ Local Development
 6. Redeploy production.
 
 
-Working with StackPoint.io
----
+### Working with StackPoint.io
 
 Provision and then download the kubeconfig from stackpoint and do:
 
@@ -292,3 +287,20 @@ SSL certificates are available when the following matches the number of ingress
 hosts created:
 
     kubectl get secrets -n pushtech | grep tls
+
+#### Known Issues with Stackpoint
+
+1. Notification server does not start
+
+This happens when waiting for all deployments to come up. If the notification
+server (or another server) does not seem to come, delete the associated
+pod (not deployment) and let kubernetes restart the pod. That should fix it.
+
+2. Mongo and Storage seem too slow
+
+Sympton is basically that store is not responding and you get a bad gateway
+when acessing the storage.
+
+Here the best thing to do is scale up the storage deployment (say to 3)
+and wait until the new pods are up and running. Then delete the old pod
+(it will get restarted).
