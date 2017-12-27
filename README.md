@@ -209,6 +209,7 @@ test that it worked
     kubectl get nodes
 
 That should respond with the provisioned nodes at the respect cloud provider.
+Once all nodes are available, continue.
 
 Then build the stackpoint specific YAMLs for orchestration, also including
 the subdomain to be used for the later access. Do not create this domain
@@ -286,3 +287,8 @@ them as is:
 
 And that should be it. Now the entire cluster should be up and running with
 SSL certificates being automagically generated.
+
+SSL certificates are available when the following matches the number of ingress
+hosts created:
+
+    kubectl get secrets -n pushtech | grep tls
