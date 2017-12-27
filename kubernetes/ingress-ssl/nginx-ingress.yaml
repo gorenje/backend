@@ -23,7 +23,7 @@ data:
   proxy-read-timeout: "3800"
   proxy-send-timeout: "3800"
   hsts-include-subdomains: "false"
-  body-size: "64m"
+  proxy-body-size: "64m"
   server-name-hash-bucket-size: "256"
   compute-full-forwarded-for: "true"
 kind: ConfigMap
