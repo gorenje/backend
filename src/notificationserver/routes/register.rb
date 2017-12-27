@@ -1,4 +1,5 @@
 post '/register' do
+  protected!
   orig_params = params.clone
 
   params = if request.env['CONTENT_TYPE'] =~ /application\/json/

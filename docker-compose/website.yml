@@ -26,9 +26,14 @@ services:
       - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
       - DOCKER_ENV_STORE=/var/lib/website/env
       - ASSETS_HOST=http://imageserver:$IMAGE_SERVER_PORT
+      - ASSETS_API_USER=$IMAGESERVER_API_USER
+      - ASSETS_API_PASSWORD=$IMAGESERVER_API_PASSWORD
+      - EXTERNAL_ASSETS_HOST=http://localhost:$IMAGE_SERVER_PORT
       - PROFILE_HOST=https://profile.pushtech.de
       - LOGIN_HOST=website:$WEBSITE_PORT
       - NOTIFIER_HOST=http://notificationserver:$NOTIFICATION_SERVER_PORT
+      - NOTIFIER_API_USER=$NOTIFICATION_API_USER
+      - NOTIFIER_API_PASSWORD=$NOTIFICATION_API_PASSWORD
       - GOOGLE_API_KEY=$GOOGLE_API_KEY
       - MANDRILL_API_KEY=$MANDRILL_API_KEY
       - PUSHTECH_API_USER=$PUSHTECH_API_USER

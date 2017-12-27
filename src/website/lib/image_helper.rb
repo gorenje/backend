@@ -1,9 +1,15 @@
 module ImageHelper
   extend self
 
+  def _base_url
+    host = $hosthandler.assets
+    user, pass = ["USER","PASSWORD"].map { |a| ENV["ASSETS_API_#{a}"] }
+    "#{host.protocol}://#{user}:#{pass}@#{host.host}/"
+  end
+
   def upload_file(file)
     begin
-      RestClient.post($hosthandler.assets.url+ "/assets/upload",
+      RestClient.post(_base_url + "assets/upload",
                       { :file => File.open(file), :multipart => true})
     rescue Exception => e
       nil
@@ -17,7 +23,7 @@ module ImageHelper
     end
 
     begin
-      RestClient.post($hosthandler.assets.url+ "/assets/upload",
+      RestClient.post(_base_url + "assets/upload",
                       { :file => File.open(file), :multipart => true})
     rescue Exception => e
       nil

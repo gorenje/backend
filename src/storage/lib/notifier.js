@@ -3,11 +3,12 @@ var Client = require('node-rest-client').Client;
 function matchFound(offer, search){
   if (!offer.is_valid() || !search.is_valid()) return;
 
-  var client = new Client();
+  var client = new Client({user:     process.env.NOTIFY_API_USER,
+                           password: process.env.NOTIFY_API_PASSWORD});
 
   var args = {
     data: {
-      category:         "match_found",
+      category: "match_found",
       offer: {
         device_id: offer.owner,
         title:     offer.text,

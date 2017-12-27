@@ -18,6 +18,8 @@ services:
       - IMAGE_HOST=http://imageserver:$IMAGE_SERVER_PORT
       - GOOGLE_API_KEY=$GOOGLE_API_KEY
       - NOTIFY_HOST=https://notify.pushtech.de
+      - NOTIFY_API_USER=$NOTIFICATION_API_USER
+      - NOTIFY_API_PASSWORD=$NOTIFICATION_API_PASSWORD
       - MONGOHQ_URL=mongodb://mongo-store:27017/store
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
       - WEB_CONCURRENCY=8

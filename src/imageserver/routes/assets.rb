@@ -29,6 +29,7 @@ get '/assets/images/:id(/:size)?' do
 end
 
 post '/assets/upload' do
+  protected!
   img = Image.create
   img.post_image(params[:file])
   img.save

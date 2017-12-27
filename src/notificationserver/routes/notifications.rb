@@ -24,6 +24,7 @@ post '/notification' do
 end
 
 post '/notify' do
+  protected!
   return_json do
     params = get_json_params
 

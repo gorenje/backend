@@ -67,11 +67,29 @@ spec:
           rake appjson:to_dotenv        &&
           foreman start web
         env:
+        - name: DB_POOL_SIZE
+          value: "20"
+        - name: DB_TIMEOUT_MSEC
+          value: "5000"
+        - name: DOCKER_ENV_STORE
+          value: /var/lib/website/env
+        - name: RACK_ENV
+          value: production
         - name: ASSETS_HOST
           valueFrom:
             secretKeyRef:
               name: k8scfg
               key: IMAGE_HOST
+        - name: ASSETS_API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_API_USER
+        - name: ASSETS_API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_API_PASSWORD
         - name: EXTERNAL_ASSETS_HOST
           valueFrom:
             secretKeyRef:
@@ -82,12 +100,6 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: WEBSITE_DB_URL
-        - name: DB_POOL_SIZE
-          value: "20"
-        - name: DB_TIMEOUT_MSEC
-          value: "5000"
-        - name: DOCKER_ENV_STORE
-          value: /var/lib/website/env
         - name: GOOGLE_API_KEY
           valueFrom:
             secretKeyRef:
@@ -108,6 +120,16 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: NOTIFY_HOST
+        - name: NOTIFIER_API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: NOTIFICATION_API_USER
+        - name: NOTIFIER_API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: NOTIFICATION_API_PASSWORD
         - name: PORT
           valueFrom:
             secretKeyRef:
@@ -123,18 +145,16 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: PUSHTECH_API_HOST
-        - name: PUSHTECH_API_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: PUSHTECH_API_PASSWORD
         - name: PUSHTECH_API_USER
           valueFrom:
             secretKeyRef:
               name: envsecrets
               key: PUSHTECH_API_USER
-        - name: RACK_ENV
-          value: development
+        - name: PUSHTECH_API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: PUSHTECH_API_PASSWORD
         - name: SENDBIRD_API_ID
           valueFrom:
             secretKeyRef:
