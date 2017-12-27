@@ -43,6 +43,16 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: IMAGE_HOST
+        - name: IMAGE_API_USER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_API_USER
+        - name: IMAGE_API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_API_PASSWORD
         - name: PUSHTECH_API_HOST
           valueFrom:
             secretKeyRef:
