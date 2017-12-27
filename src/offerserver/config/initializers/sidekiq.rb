@@ -48,6 +48,12 @@ cron_jobs = [{
     'args'  => nil
   },
   {
+    'name'  => 'luft_daten_importer',
+    'class' => 'LuftDatenImporter',
+    'cron'  => '50 */4 * * * *',
+    'args'  => nil
+  },
+  {
     'name'  => 'berlin_kinos_import',
     'class' => 'BerlinDeKinosImporter',
     'cron'  => '45 */1 * * *',
