@@ -50,7 +50,7 @@ cron_jobs = [{
   {
     'name'  => 'luft_daten_importer',
     'class' => 'LuftDatenImporter',
-    'cron'  => '50 */4 * * * *',
+    'cron'  => '50 */10 * * * *',
     'args'  => nil
   },
   {

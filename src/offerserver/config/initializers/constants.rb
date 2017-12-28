@@ -33,3 +33,4 @@ Car2GoHardwareLookup = {
 TenMinutesMS      = 10 * 60 * 1000
 TwentyFourHoursMS = 24 * 60 * 60 * 1000
 TwoHoursMS        = 2  * 60 * 60 * 1000
+TwentyMinutesMS   = 20 * 60 * 1000
