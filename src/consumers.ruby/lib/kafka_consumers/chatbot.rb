@@ -14,6 +14,7 @@ module Consumers
     BerlinDeKinos      = "BerlinDeKinos"
     UrbaniteNet        = "UrbaniteNet"
     DriveNowCarSharing = "DriveNowCarSharing"
+    LuftDaten          = "LuftDatenInfo"
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
 
@@ -55,6 +56,8 @@ module Consumers
           handle_urbanite_chat(event)
         when event.is_for?(DriveNowCarSharing)
           handle_drivenow_chat(event)
+        when event.is_for?(LuftDaten)
+          handle_luftdaten_chat(event)
         end
       rescue Exception => e
         puts "Chatbot: Errror handling #{event}"
@@ -65,6 +68,29 @@ module Consumers
 
     def handle_drivenow_chat(event)
       event.post_message(UnknownCmd, DriveNowCarSharing)
+    end
+
+    def handle_luftdaten_chat(event)
+      offer, search = event.offer_and_search
+      msg = if extdata = offer["extdata"]
+              urlstr =
+                "http://api.luftdaten.info/v1/sensor/%s/" % extdata["sid"]
+              begin
+                data = JSON(mechanize_agent.get(urlstr).body)
+                newestdp = data.last
+                value_type = extdata["id"].split(/:/).first
+                value = newestdp["sensordatavalues"].select do |sdata|
+                  sdata["value_type"].downcase == value_type
+                end.first
+                "Current value: #{value['value']}"
+              rescue Exception => e
+                puts "LuftDaten failed: #{e.message}"
+                puts e.backtrace
+                UnknownCmd
+              end
+            end || UnknownCmd
+
+      event.post_message(msg, LuftDaten)
     end
 
     def handle_urbanite_chat(event)
