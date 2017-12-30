@@ -88,6 +88,11 @@ spec:
             secretKeyRef:
               name: extcfg
               key: ASSETS_HOST
+        - name: CDN_HOSTS
+          valueFrom:
+            secretKeyRef:
+              name: extcfg
+              key: WEBSITE_CDN_HOSTS
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:

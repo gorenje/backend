@@ -76,6 +76,7 @@ module Helpers
           "ASSETS_HOST"       => "http://#{nodeip}:30361",
           "LOGIN_HOST"        => "http://#{nodeip}:30223",
           "PROFILE_HOST"      => "http://#{nodeip}:30223",
+          "WEBSITE_CDN_HOSTS" => "",
         }.to_a.each do |key,value|
           Helpers::Secrets.push(ctnt, key, overrides[key] || value)
         end

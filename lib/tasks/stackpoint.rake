@@ -12,6 +12,8 @@ namespace :stackpoint do
       external_domain   = ENV['DOMAIN'] || 'staging.pushtech.de'
       external_services = []
       docs              = Hash.new{|h,k| h[k] = [] }
+      website_cdn_hosts =
+        ["www1", "www2", "www3"].map { |a| a + "." + external_domain }
 
       Dir.glob("kubernetes/**/*.yaml").each do |file_name|
         YAML.load_documents( File.read(file_name) ).each do |hsh|
@@ -79,6 +81,7 @@ namespace :stackpoint do
           "ASSETS_HOST"       => assets_host,
           "LOGIN_HOST"        => website_host,
           "PROFILE_HOST"      => website_host,
+          "WEBSITE_CDN_HOSTS" => website_cdn_hosts.join(",")
         }
 
         [Helpers::Secrets.for_env(KubernetesNS),
@@ -126,6 +129,27 @@ namespace :stackpoint do
           "serviceName" => servname,
           "servicePort" => port
         }
+
+        docs["Ingress"] << ingress
+      end
+
+      # create the cdn servers for the website.
+      ingress_template = docs["Ingress"].select do |ingress|
+        ingress["metadata"]["name"] == "website"
+      end.first
+
+      website_cdn_hosts.each do |cdn_domain|
+        ingress = YAML.load(ingress_template.to_yaml) # deep clone
+        servname = "website-" + cdn_domain.split(".").first
+
+        ingress["metadata"]["name"] = servname
+
+        tls = ingress["spec"]["tls"].first
+        tls["hosts"]      = [cdn_domain]
+        tls["secretName"] = servname + "-tls"
+
+        rule = ingress["spec"]["rules"].first
+        rule["host"] = cdn_domain
 
         docs["Ingress"] << ingress
       end
