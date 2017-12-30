@@ -30,7 +30,8 @@ get '/resend/email/:eid' do
 end
 
 post '/login' do
-  key = OpenSSL::PKey::RSA.new(ENV['RSA_PRIVATE_KEY'].gsub(/\\n/,"\n"))
+  require 'base64'
+  key = OpenSSL::PKey::RSA.new(Base64.decode64(ENV['RSA_PRIVATE_KEY_BASE64']))
   data = JSON(JWE.decrypt(params[:creds], key))
 
   case data["type"]

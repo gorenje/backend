@@ -20,22 +20,6 @@ kind: PersistentVolumeClaim
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: websiteenv
-  name: websiteenv
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 100Mi
-status: {}
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  creationTimestamp: null
-  labels:
     io.kompose.service: imgserverdb
   name: imgserverdb
 spec:

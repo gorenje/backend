@@ -1,9 +1,10 @@
 = haml :"_js_encrypt"
+- require 'base64'
 
 :javascript
   function encrypt() {
     var data = JSON.stringify({email: $('#email').val(), name: $('#name').val(), type: 'register', password1: $('#pword').val(), password2: $('#pword2').val()});
-    encrypt_data(data, "#{ENV['RSA_PUBLIC_KEY']}", function(result){
+    encrypt_data(data, "#{Base64.decode64(ENV['RSA_PUBLIC_KEY_BASE64']).gsub(/\n/,'')}", function(result){
       document.getElementById("enc_token_field").value = result;
       document.getElementById("send_data").submit();
     });

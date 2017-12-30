@@ -83,7 +83,9 @@ storing those secrets. But these secrets are checked in, so you will have
 to find these from existing heroku installations (or elsewhere).
 
 The [template](.env.template) gives an overview of what needs to be defined,
-so copy that to ```.env``` and add the missing secrets.
+generate the ```.env``` file using:
+
+    rake dotenv:generate
 
 ### Docker
 

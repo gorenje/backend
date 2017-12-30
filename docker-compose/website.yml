@@ -16,7 +16,6 @@ services:
       - "$WEBSITE_PORT:$WEBSITE_PORT"
     command: "/bin/bash -c 'rake docker:pause_for_db      && \
                             rake docker:if_db_is_migrated && \
-                            rake appjson:to_dotenv        && \
                             foreman start web'"
     links:
       - pgwebsite
@@ -24,7 +23,6 @@ services:
       - RACK_ENV=development
       - PORT=$WEBSITE_PORT
       - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
-      - DOCKER_ENV_STORE=/var/lib/website/env
       - ASSETS_HOST=http://imageserver:$IMAGE_SERVER_PORT
       - ASSETS_API_USER=$IMAGESERVER_API_USER
       - ASSETS_API_PASSWORD=$IMAGESERVER_API_PASSWORD
@@ -44,8 +42,12 @@ services:
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
       - DB_POOL_SIZE=20
       - DB_TIMEOUT_MSEC=5000
-    volumes:
-      - websiteenv:/var/lib/website/env
+      - COOKIE_SECRET=$WEBSITE_COOKIE_SECRET
+      - PASSWORD_PEPPER=$WEBSITE_PASSWORD_PEPPER
+      - CRED_KEY_BASE64=$WEBSITE_CRED_KEY_BASE64
+      - CRED_IV_BASE64=$WEBSITE_CRED_IV_BASE64
+      - RSA_PRIVATE_KEY_BASE64=$WEBSITE_RSA_PRIVATE_KEY_BASE64
+      - RSA_PUBLIC_KEY_BASE64=$WEBSITE_RSA_PUBLIC_KEY_BASE64
     restart: always
 
   website-migrate-db:
@@ -69,6 +71,4 @@ networks:
 
 volumes:
   websitedb:
-    external: true
-  websiteenv:
     external: true

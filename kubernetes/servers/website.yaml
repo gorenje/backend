@@ -33,10 +33,6 @@ spec:
       imagePullSecrets:
       - name: meatdocker
       restartPolicy: Always
-      volumes:
-      - name: websiteenv
-        persistentVolumeClaim:
-          claimName: websiteenv
       initContainers:
       - image: pushtech.website:v1
         name: website-migrate-db
@@ -64,15 +60,12 @@ spec:
         - -c
         - rake docker:pause_for_db      &&
           rake docker:if_db_is_migrated &&
-          rake appjson:to_dotenv        &&
           foreman start web
         env:
         - name: DB_POOL_SIZE
           value: "20"
         - name: DB_TIMEOUT_MSEC
           value: "5000"
-        - name: DOCKER_ENV_STORE
-          value: /var/lib/website/env
         - name: RACK_ENV
           value: production
         - name: ASSETS_HOST
@@ -170,8 +163,35 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: TRACKER_HOST
+        - name: COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_COOKIE_SECRET
+        - name: PASSWORD_PEPPER
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_PASSWORD_PEPPER
+        - name: CRED_KEY_BASE64
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_CRED_KEY_BASE64
+        - name: CRED_IV_BASE64
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_CRED_IV_BASE64
+        - name: RSA_PRIVATE_KEY_BASE64
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_RSA_PRIVATE_KEY_BASE64
+        - name: RSA_PUBLIC_KEY_BASE64
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: WEBSITE_RSA_PUBLIC_KEY_BASE64
         ports:
         - containerPort: 5123
-        volumeMounts:
-        - mountPath: /var/lib/website/env
-          name: websiteenv
