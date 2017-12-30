@@ -46,6 +46,7 @@ services:
       - RATE_LIMIT_SECONDS=300
       - API_USER=$NOTIFICATION_API_USER
       - API_PASSWORD=$NOTIFICATION_API_PASSWORD
+      - COOKIE_SECRET=$NOTIFICATION_SERVER_COOKIE_SECRET
     restart: always
 
   notserver-migrate-db:

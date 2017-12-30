@@ -42,7 +42,10 @@ spec:
         image: pushtech.storage:v1
         env:
         - name: COOKIE_SECRET
-          value: X1n4zsExsKtngfv4HqGGIz6bZoL5YIvo
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: STORAGE_COOKIE_SECRET
         - name: GOOGLE_API_KEY
           valueFrom:
             secretKeyRef:

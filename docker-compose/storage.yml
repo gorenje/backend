@@ -26,6 +26,7 @@ services:
       - COOKIE_SECRET=X1n4zsExsKtngfv4HqGGIz6bZoL5YIvo
       - API_USER=$PUSHTECH_API_USER
       - API_PASSWORD=$PUSHTECH_API_PASSWORD
+      - COOKIE_SECRET=$STORAGE_COOKIE_SECRET
     restart: always
 
 networks:

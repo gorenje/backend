@@ -70,6 +70,11 @@ spec:
             secretKeyRef:
               name: envsecrets
               key: KAFIDX_PASSWORD
+        - name: COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: KAFIDX_COOKIE_SECRET
         ports:
         - containerPort: 5031
         resources: {}

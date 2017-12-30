@@ -138,6 +138,11 @@ spec:
             secretKeyRef:
               name: envsecrets
               key: NOTIFICATION_API_PASSWORD
+        - name: COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: NOTIFICATION_SERVER_COOKIE_SECRET
         ports:
         - containerPort: 5041
         resources: {}

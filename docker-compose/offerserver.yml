@@ -17,7 +17,7 @@ services:
       - RACK_ENV=production
       - REDISTOGO_URL=redis://redis-offerserver:6379?db=6
       - PORT=$OFFERSERVER_PORT
-      - COOKIE_SECRET=x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
+      - COOKIE_SECRET=$OFFERSERVER_COOKIE_SECRET
       - REDIS_POOL_SIZE=20
       - API_USER=$OFFERSERVER_API_USER
       - API_PASSWORD=$OFFERSERVER_API_PASSWORD

@@ -59,6 +59,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: COOKIE_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: envsecrets
+                key: TRACKER_COOKIE_SECRET
         ports:
         - containerPort: 5222
       - image: pushtech.kafkastore:v1

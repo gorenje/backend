@@ -18,7 +18,7 @@ services:
       - RACK_ENV=production
       - REDISTOGO_URL=redis://ruby-consumers-db:6379?db=6
       - REDIS_POOL_SIZE=25
-      - COOKIE_SECRET=lydbrYEvxBxdUBnGa8TPpVaeBuWez5PG
+      - COOKIE_SECRET=$CONSUMERS_RUBY_COOKIE_SECRET
       - ZOOKEEPER_HOST=zookeeper:2181
       - TRACKER_HOST=http://tracker:$TRACKER_PORT
       - API_USER=$CONSUMER_API_USER

@@ -16,7 +16,7 @@ services:
     environment:
       - REDIS_URL=redis://redis-tracker:6379?db=6
       - PORT=$TRACKER_PORT
-
+      - COOKIE_SECRET=$TRACKER_COOKIE_SECRET
 networks:
   default:
     external:

@@ -28,6 +28,7 @@ services:
       - DB_TIMEOUT_MSEC=5000
       - API_USER=$IMAGESERVER_API_USER
       - API_PASSWORD=$IMAGESERVER_API_PASSWORD
+      - COOKIE_SECRET=$IMAGESERVER_COOKIE_SECRET
     volumes:
       - imgserverstore:/var/lib/imagesrv/store
     restart: always

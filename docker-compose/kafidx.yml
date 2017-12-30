@@ -11,6 +11,7 @@ services:
       - API_USER=$KAFIDX_USER
       - API_PASSWORD=$KAFIDX_PASSWORD
       - REDIS_URL=redis://redis-consumer:6379?db=
+      - COOKIE_SECRET=$KAFIDX_COOKIE_SECRET
 
 networks:
   default:

@@ -43,7 +43,10 @@ spec:
         - web
         env:
         - name: COOKIE_SECRET
-          value: lydbrYEvxBxdUBnGa8TPpVaeBuWez5PG
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: CONSUMERS_RUBY_COOKIE_SECRET
         - name: PORT
           valueFrom:
             secretKeyRef:

@@ -99,6 +99,11 @@ spec:
             secretKeyRef:
               name: envsecrets
               key: IMAGESERVER_API_PASSWORD
+        - name: COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: IMAGESERVER_COOKIE_SECRET
         ports:
         - containerPort: 5061
         resources: {}

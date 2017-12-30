@@ -46,7 +46,10 @@ spec:
         - web
         env:
         - name: COOKIE_SECRET
-          value: x7kGp9ci24xugSNTnn9sVajQnoKmFhEx
+          valueFrom:
+            secretKeyRef:
+              name: envsecrets
+              key: OFFERSERVER_COOKIE_SECRET
         - name: PORT
           valueFrom:
             secretKeyRef:
