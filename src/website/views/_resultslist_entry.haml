@@ -7,7 +7,7 @@
         = i18n.keywords.t
         = keywords.join(", ")
     .col-md-4
-      - if images && !images.empty?
+      - if images && !images.empty? && images.first
         .rounded-image-corners
           %img{ ImageSize, :src => $hosthandler.external_assets.url + images.first + "/iconbigger" }
       - else
