@@ -1,3 +1,4 @@
+# coding: utf-8
 require_relative 'base'
 
 module Consumers
@@ -17,6 +18,13 @@ module Consumers
     LuftDaten          = "LuftDatenInfo"
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
+
+    LuftDatenValueTypeNamesMap = {
+      "temperature" => "Temperature",
+      "humidity"    => "Humidity",
+      "p1"          => "Feinstaub (10 µg/m³)",
+      "p2"          => "Feinstaub (2.5 µg/m³)"
+    }
 
     def initialize
       handle_these_events ["chm"]
@@ -72,21 +80,43 @@ module Consumers
 
     def handle_luftdaten_chat(event)
       offer, search = event.offer_and_search
+
       msg = if extdata = offer["extdata"]
-              urlstr =
+              case event.message_text
+              when /link/
                 "http://api.luftdaten.info/v1/sensor/%s/" % extdata["sid"]
-              begin
-                data = JSON(mechanize_agent.get(urlstr).body)
-                newestdp = data.last
-                value_type = extdata["id"].split(/:/).first
-                value = newestdp["sensordatavalues"].select do |sdata|
-                  sdata["value_type"].downcase == value_type
-                end.first
-                "Current value: #{value['value']}"
-              rescue Exception => e
-                puts "LuftDaten failed: #{e.message}"
-                puts e.backtrace
-                UnknownCmd
+              else
+                urlstr =
+                  "http://api.luftdaten.info/v1/sensor/%s/" % extdata["sid"]
+                begin
+                  data = JSON(mechanize_agent.get(urlstr).body)
+                  newestdp = data.last
+                  value_type = extdata["id"].split(/:/).first
+
+                  values = if value_type == "ht"
+                             newestdp["sensordatavalues"].select do |sdata|
+                               ["temperature","humidity"].
+                                 include?(sdata["value_type"].downcase)
+                             end
+                           else
+                             newestdp["sensordatavalues"].select do |sdata|
+                               ["p1","p2"].
+                                 include?(sdata["value_type"].downcase)
+                             end
+                           end
+
+                  str = values.map do |senvalues|
+                    "%s: %s" %
+                      [LuftDatenValueTypeNamesMap[senvalues["value_type"].
+                                                    downcase],
+                       senvalues["value"]]
+                  end.join(", ")
+                  "Current values: #{str}"
+                rescue Exception => e
+                  puts "LuftDaten failed: #{e.message}"
+                  puts e.backtrace
+                  UnknownCmd
+                end
               end
             end || UnknownCmd
 
