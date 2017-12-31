@@ -54,6 +54,12 @@ cron_jobs = [{
     'args'  => nil
   },
   {
+    'name'  => 'index_berlin_importer',
+    'class' => 'IndexBerlinImporter',
+    'cron'  => '45 0,3,6,9,12,15,18,21 * * *',
+    'args'  => nil
+  },
+  {
     'name'  => 'berlin_kinos_import',
     'class' => 'BerlinDeKinosImporter',
     'cron'  => '45 */1 * * *',
