@@ -39,8 +39,18 @@ class LuftDatenImporter
               h["lat"] = sensorhsh["location"]["latitude"]
               h["lng"] = sensorhsh["location"]["longitude"]
               h["keywords"] = ["##{value_type}"] + extra_keywords
+              h["_grp"] = "%s:%s" % [sensorid, value_type =~ /^p/ ? "f" : "t"]
             end)
-    end.compact
+    end.compact.group_by { |a| a._grp }.
+      map do |key,values|
+      rval    = values.first
+      rval.id = key =~ /:f$/ ? "fe:%s" % rval.sid : "ht:%s" % rval.sid
+
+      rval.keywords += values.last.keywords
+      rval.keywords = rval.keywords.uniq
+      rval.text += ", " + values.last.text
+      rval
+    end.flatten
   end
 
   def perform
