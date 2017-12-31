@@ -16,6 +16,7 @@ module Consumers
     UrbaniteNet        = "UrbaniteNet"
     DriveNowCarSharing = "DriveNowCarSharing"
     LuftDaten          = "LuftDatenInfo"
+    IndexBerlin        = "IndexBerlin"
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
 
@@ -66,6 +67,8 @@ module Consumers
           handle_drivenow_chat(event)
         when event.is_for?(LuftDaten)
           handle_luftdaten_chat(event)
+        when event.is_for?(IndexBerlin)
+          handle_indexberlin_chat(event)
         end
       rescue Exception => e
         puts "Chatbot: Errror handling #{event}"
@@ -76,6 +79,28 @@ module Consumers
 
     def handle_drivenow_chat(event)
       event.post_message(UnknownCmd, DriveNowCarSharing)
+    end
+
+    def handle_indexberlin_chat(event)
+      offer, search = event.offer_and_search
+      msg =
+        if extdata = offer["extdata"]
+          case event.message_text
+          when /link/
+            extdata["elink"].empty? ? extdata["ilink"] : extdata['elink']
+          when /open/
+            extdata["otime"]
+          when /tele/
+            extdata["tel"]
+          when /all/
+            extdata.map do |k,v|
+              next if ["id", "vid"].include?(k)
+              "#{k}: #{v}"
+            end.compact.join(",\n")
+          end
+        end || UnknownCmd
+
+      event.post_message(msg, IndexBerlin)
     end
 
     def handle_luftdaten_chat(event)
