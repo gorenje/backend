@@ -48,4 +48,20 @@ namespace :docker do
       exit(false)
     end
   end
+
+  task :nfs_mount do
+    class NilClass
+      def empty?
+        true
+      end
+    end
+    Kernel.exit(true) if ENV['NFS_REMOTE_MP'].empty?
+
+    `/bin/systemctl enable rpcbind`
+    `/etc/init.d/rpcbind start`
+    `/usr/sbin/service nfs-common start`
+    `mkdir -p #{ENV['NFS_MOUNT_POINT'] || '/mnt'}`
+
+    `mount #{ENV['NFS_REMOTE_MP']} #{ENV['NFS_MOUNT_POINT'] || '/mnt'} -t nfs`
+  end
 end

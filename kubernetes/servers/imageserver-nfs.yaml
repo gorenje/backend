@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: imageserver-nfs
+  name: imageserver-nfs
+spec:
+  ports:
+    - name: nfs
+      port: 2049
+    - name: mountd
+      port: 20048
+    - name: rpcbind
+      port: 111
+  selector:
+    io.kompose.service: imageserver-nfs
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: imageserver-nfs
+  name: imageserver-nfs
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: imageserver-nfs
+    spec:
+      volumes:
+      - name: imgserverstore
+        persistentVolumeClaim:
+          claimName: imgserverstore
+
+      containers:
+      - name: imageserver-nfs
+        image: pushtech.imageserver.nfs:v1
+        args:
+          - /usr/local/bin/run_nfs.sh
+          - /var/lib/imagesrv/store
+        ports:
+          - name: nfs
+            containerPort: 2049
+          - name: mountd
+            containerPort: 20048
+          - name: rpcbind
+            containerPort: 111
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/imagesrv/store
+          name: imgserverstore

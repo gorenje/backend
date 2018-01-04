@@ -36,10 +36,6 @@ spec:
       imagePullSecrets:
       - name: meatdocker
       restartPolicy: Always
-      volumes:
-      - name: imgserverstore
-        persistentVolumeClaim:
-          claimName: imgserverstore
 
       initContainers:
       - name: imageserver-migrate-db
@@ -69,6 +65,7 @@ spec:
         - -c
         - rake docker:pause_for_db      &&
           rake docker:if_db_is_migrated &&
+          rake docker:nfs_mount         &&
           foreman start web
         env:
         - name: DATABASE_URL
@@ -104,9 +101,12 @@ spec:
             secretKeyRef:
               name: envsecrets
               key: IMAGESERVER_COOKIE_SECRET
+        - name: NFS_REMOTE_MP
+          value: imageserver-nfs:/var/lib/imagesrv/store
+        - name: NFS_MOUNT_POINT
+          value: /var/lib/imagesrv/store
         ports:
         - containerPort: 5061
+        securityContext:
+          privileged: true
         resources: {}
-        volumeMounts:
-        - mountPath: /var/lib/imagesrv/store
-          name: imgserverstore
