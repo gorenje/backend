@@ -27,12 +27,22 @@ Ten main parts to the infrastructure:
    which shows live tracking events as they come in. It is useful for debugging
    consumers and generally ensuring that events are going through the
    system.
-5. [Nodejs consumsers](src/consumers.nodejs)
-6. [Ruby consumsers](src/consumers.ruby)
-7. [Website](src/website)
-8. [Image server](src/imageserver)
-9. [Offer Server](src/offerserver)
-10. [Kafka and Zookeeper](docker-compose/kafka-zookeeper.yml)
+5. [Nodejs consumers](src/consumers.nodejs) which just provide some
+   statistical data.
+6. [Ruby consumers](src/consumers.ruby) which trigger various actions
+   when various events happen.
+7. [Website](src/website) providing a simple home page.
+8. [Image server](src/imageserver) providing a store for images for offers
+   and searches. Basically the same as a amazon bucket but with
+   [image processing](src/imageserver/models/image_uploader.rb).
+9. [Offer Server](src/offerserver) for generating offers of various places
+   are the internet. All offer generators are
+   [here](src/offerserver/lib/importers).
+10. [Kafka and Zookeeper](docker-compose/kafka-zookeeper.yml) - just that!
+11. [NFS Server](src/imageserver.nfs) for providing data storage for the
+   the imageserver. This was not possible using a persistent volume since
+   these are bound to a single node in kubernetes. Instead the imageserver
+   now connects to the NFS server that has the persistent volume.
 
 Design decisions:
 
@@ -45,14 +55,12 @@ Design decisions:
 
 What's missing?
 
-1. SSL-Termination done by a haproxy or nginx in front of the tracker
-   instances.
-2. Optimisation and configuration of the kafka and zookeeper instances.
+1. Optimisation and configuration of the kafka and zookeeper instances.
    At the moment, there is a single kafka broker and a single instance
    of zookeeper running in the cluster.
-3. Batch interface for the tracker for handling batched tracking calls
+2. Batch interface for the tracker for handling batched tracking calls
    from the client.
-4. Logging and monitoring.
+3. Logging and monitoring.
 
 
 ## Prerequistes for local testing
@@ -83,7 +91,7 @@ storing those secrets. But these secrets are checked in, so you will have
 to find these from existing heroku installations (or elsewhere).
 
 The [template](.env.template) gives an overview of what needs to be defined,
-generate the ```.env``` file using:
+and is the basis for a generated ```.env```:
 
     rake dotenv:generate
 
@@ -94,9 +102,11 @@ generate the ```.env``` file using:
 
 ### Kompose
 
-
 To convert docker compose files to kubernetes, [kompose](https://kompose.io)
-was used. This could also be [installed](http://kompose.io/setup/).
+was used. This could also be [installed](http://kompose.io/setup/) but
+is not required since the conversion was a one-off. Any changes to the
+kubernetes files should be done directly in the [kubernetes](kubernetes)
+directory.
 
 ## Deployment
 
