@@ -154,10 +154,10 @@ namespace :stackpoint do
         docs["Ingress"] << ingress
       end
 
+      tstamp = DateTime.now.strftime("%Y%m%d%H%m%S")
       docs.keys.each do |kind|
         outfile_name = "stackpoint.#{kind.downcase}.yaml"
         if File.exists?(outfile_name)
-          tstamp = DateTime.now.strftime("%H%m%S%d%m%Y")
           `mv #{outfile_name} #{outfile_name}.#{tstamp}`
         end
 
