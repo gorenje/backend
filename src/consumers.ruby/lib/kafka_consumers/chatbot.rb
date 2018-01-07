@@ -169,11 +169,12 @@ module Consumers
                        BerlinDeKinos)
       end
 
-      filmurl, kinoid, starttime = offer["extdata"]["id"].split(/\|/)
+      extdata = offer["extdata"]
+      filmurl, kinoid, starttime = extdata["id"].split(/\|/)
 
       msg = case event.message_text
             when /when/i
-              "Starting at #{offer["extdata"]["berlin_time"]}"
+              "Starting at #{extdata["berlin_time"]} @ #{extdata["where"]}"
             when /wherelse/i
               begin
                 result = []
