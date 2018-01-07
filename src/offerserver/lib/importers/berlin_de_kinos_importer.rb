@@ -72,6 +72,7 @@ class BerlinDeKinosImporter
     30226 => ["Kino Krokodil", [13.419321,52.552354]],
     30227 => ["Odeon", [13.34941751,52.48219666]],
     30228 => ["Passage Kinos", [13.43903929,52.47702592]],
+    30230 => ["Regenbogen Kino", [13.426058,52.495977]],
     30231 => ["Rollberg Kino", [13.42736486,52.47837292]],
     30235 => ["Tilsiter-Lichtspiele", [13.44742529,52.52047868]],
     30236 => ["Cineplex Titania", [13.32681298,52.46416867]],
@@ -80,24 +81,51 @@ class BerlinDeKinosImporter
     30239 => ["UCI KINOWELT Am Eastgate", [13.540994,52.541823]],
     30241 => ["Zoo Palast", [13.33402786,52.50573046]],
     30242 => ["CineStar - Treptower Park", [13.45883969,52.49227135]],
+    30243 => ["Urania", [13.348369, 52.501618]],
     30245 => ["Cinestar Kino in der Kulturbrauerei", [13.4125461,52.5384522]],
     30246 => ["Xenon", [13.35904637,52.48634891]],
     30247 => ["Zeughauskino des Deutschen Historischen Museums Berlin",
               [13.39705776,52.51778946]],
+    30248 => ["Filmpalast Bernau", [13.595929, 52.676247]],
+    30304 => ["Concerthaus-Kinos", [13.336787, 52.453198]],
+    30371 => ["OBENKINO im Glad-House", [13.505009, 53.115269]],
+    30382 => ["Kino-Café", [13.4266129,51.8685349]],
+    30466 => ["Movie Magic", [13.786796,52.836401]],
+    30481 => ["Filmpalast Eisenhüttenstadt", [14.6318455,52.1523101]],
+    30504 => ["Movieland", [13.753488,52.422188]],
+    30534 => ["Weltspiegel Kino Finsterwalde", [13.7071749,51.6339489]],
+    30560 => ["Cinestar", [14.5510113,52.3437033]],
+    30663 => ["UCI Kinowelt Am Lausitzpark", [14.3102113,51.7186333]],
+    30666 => ["Filmgalerie", [13.5302769,51.2916505]],
+    30902 => ["Neue Kammerspiele", [13.2242949,52.4176044]],
+    31035 => ["Spreewald-Lichtspiele", [13.8926703,51.9422706]],
+    31216 => ["Union Filmtheater Neuruppin", [12.7848236,52.9180828]],
     31295 => ["Filmpalast", [13.2370575,52.7499456]],
     31345 => ["Filmmuseum", [13.0559503,52.3952015]],
     31347 => ["Thalia Arthouse-Kino Babelsberg", [13.0953996,52.3917533]],
     31348 => ["UCI KINOWELT Potsdam", [13.06528595,52.3934182]],
+    31364 => ["Haveltorkino", [12.3271507,52.6087203]],
+    31487 => ["FilmforUM", [14.2628929,53.069146]],
+    31574 => ["Multikulturelles Centrum Templin e.V.", [13.5055513,53.1218732]],
+    31730 => ["Movietown Wust", [12.612109,52.4090804]],
+    31770 => ["Union Filmtheater", [13.1683213,52.0862533]],
     31975 => ["Kino Sputnik Südstern", [13.40967208,52.48895776]],
+    31986 => ["Extra-Kinowelt", [13.8453895,51.4810911]],
     32139 => ["CineStar Berlin – CUBIX am Alexanderplatz", [13.37842,52.4514]],
+    32149 => ["Z-inema", [13.3935413,52.5294832]],
     33998 => ["Freiluftkino Friedrichshagen", [13.6189037,52.45871876]],
     34000 => ["ARTE Sommerkino Kulturforum", [13.3681941,52.5085781]],
+    34150 => ["Weltspiegel", [14.3297713,51.7562033]],
+    34177 => ["Fontane Klub", [12.5536817,52.4119947]],
     34187 => ["Alhambra", [13.35984321,52.54417738]],
     34286 => ["Filmrauschpalast", [13.3591731,52.5342385]],
     34313 => ["Kino Spreehöfe", [13.50999176,52.46312462]],
+    34474 => ["Scala Kulturpalast", [12.9308813,52.3820833]],
     34516 => ["Freilichtbühne Weißensee", [13.45542,52.556609] ],
     34524 => ["Union Filmtheater Friedrichshagen", [13.62550296,52.45626961]],
     34687 => ["Autokino Berlin Schönefeld", [13.467553,52.35625] ],
+    34872 => ["Kleines Kino - im Gräfin-Dönhoff-Gebäude der EU...",
+              [14.5440413,52.3544833]],
     34990 => ["Open Air Kino Mitte", [13.401842,52.51696] ],
     35211 => ["b-ware! Ladenkino", [13.4615156,52.5119038]],
     35284 => ["Freiluftkino Spandau", [13.2010102,52.5361091]],
@@ -118,6 +146,7 @@ class BerlinDeKinosImporter
     36814 => ["WBB Kinogarten", [13.411927,52.554895] ],
     36947 => ["B-ware! Open Air Gärten Gut Hellersdorf",
                [13.558169,52.544168] ],
+    36969 => ["Delphi LUX", [13.32819,52.5060474]],
   }
 
   include BaseImporter
@@ -157,7 +186,10 @@ class BerlinDeKinosImporter
                next
              end
 
-      address = page.search("span[@class=street-address]").text rescue ""
+      address     = page.search("span[@class=street-address]").text rescue ""
+      postal_code = page.search("span[@class=postal-code]").text rescue ""
+      locality    = page.search("span[@class=locality]").text rescue ""
+
       kino_proper_name =
         page.search("div.bo_mainbar h1[@class=top]").text rescue kinoname
 
@@ -190,9 +222,13 @@ class BerlinDeKinosImporter
               (new_offers << JSON(base_data.to_json)).last
 
             offr.tap do |d|
-              p = d["location"]["place"]
-              p["en"]["route"]             =
-                "%s (%s)" % [address,kino_proper_name]
+              add_place(d).
+                merge!(parse_street_and_number(address)).
+                merge!("postal_code" => postal_code.strip).
+                merge!("locality"    => locality.strip).
+                merge!("administrative_area_level_1" =>
+                       locality.split(/-/).first.strip)
+
               d["validfrom"]               =
                 utctime.strftime("%s%L").to_i - TwoHoursMS
               d["text"]                    = filmname
@@ -203,7 +239,8 @@ class BerlinDeKinosImporter
               d["keywords"]                = BaseKeyWords + [filmname.downcase]
               d["extdata"]                 = {
                 "id"          => entry_id,
-                "berlin_time" => "#{datestr}, #{timestr}"
+                "berlin_time" => "#{datestr}, #{timestr}",
+                "where"       => kino_proper_name
               }
             end
           end

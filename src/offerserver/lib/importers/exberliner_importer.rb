@@ -25,7 +25,9 @@ class ExberlinerImporter
       "id" => elems.xpath("//a").first.attributes["href"].value,
       "desc" => (elems.xpath("//div[@class='details']/p[@class='description']").
                  first.content)
-    }
+    }.tap do |hsh|
+      hsh["route"] = parse_address_line(hsh["address"])
+    end
   end
 
   def perform
@@ -51,8 +53,7 @@ class ExberlinerImporter
         # clone is shallow, use Json to do deep cloning. But it means keys
         # become strings.
         offr.tap do |d|
-          p = d["location"]["place"]
-          p["en"]["route"]             = entry.address
+          add_place(d).merge!(entry.route)
 
           d["text"]                    = entry.title
           d["validuntil"]              = timestamp + TwentyFourHoursMS

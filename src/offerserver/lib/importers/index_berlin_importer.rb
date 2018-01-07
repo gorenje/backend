@@ -29,20 +29,19 @@ class IndexBerlinImporter
 
     return nil if attrs["geolat"].nil? || attrs["geolng"].nil?
 
-    OpenStruct.
-      new({}.tap do |h|
-            h["vid"]  = venueid
-            h["id"]   = "idxber:%s" % [venueid]
-            h["text"] = venue.text
-            h["lat"]  = attrs["geolat"].to_s
-            h["lng"]  = attrs["geolng"].to_s
-            h["keywords"]    = ["##{attrs["venuestatus"].to_s.gsub(/ /,'')}"]
-            h["idxberlnk"]   = index_link
-            h["addr"]        = addr
-            h["telefon"]     = telefon
-            h["website"]     = artist_website
-            h["openingtime"] = openingtime
-          end)
+    OpenStruct.new({}.tap do |h|
+      h["vid"]  = venueid
+      h["id"]   = "idxber:%s" % [venueid]
+      h["text"] = venue.text
+      h["lat"]  = attrs["geolat"].to_s
+      h["lng"]  = attrs["geolng"].to_s
+      h["keywords"]    = ["##{attrs["venuestatus"].to_s.gsub(/ /,'')}"]
+      h["idxberlnk"]   = index_link
+      h["route"]       = parse_address_line(addr)
+      h["telefon"]     = telefon
+      h["website"]     = artist_website
+      h["openingtime"] = openingtime
+    end)
   end
 
   def perform
@@ -71,8 +70,7 @@ class IndexBerlinImporter
              (new_offers << JSON(base_data.to_json)).last
 
       offr.tap do |d|
-        p = d["location"]["place"]
-        p["en"]["route"] = entry.addr
+        add_place(d).merge!(entry.route)
 
         d["text"]                    = entry.text
         d["validuntil"]              = timestamp + TwentyFourHoursMS

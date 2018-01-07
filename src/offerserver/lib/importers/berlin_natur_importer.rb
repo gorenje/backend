@@ -1,3 +1,4 @@
+# coding: utf-8
 class BerlinNaturImporter
   include Sidekiq::Worker
 
@@ -68,8 +69,7 @@ class BerlinNaturImporter
           (new_offers << JSON(base_data.to_json)).last
 
         offr.tap do |d|
-          p = d["location"]["place"]
-          p["en"]["route"]             = entry.location
+          add_place(d).merge!(parse_street_and_number(entry.location))
 
           d["text"]                    = entry.title
           d["validuntil"]              = timestamp + TwentyFourHoursMS

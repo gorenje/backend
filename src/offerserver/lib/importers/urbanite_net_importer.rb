@@ -94,8 +94,7 @@ class UrbaniteNetImporter
             (new_offers << JSON(base_data.to_json)).last
 
           offr.tap do |d|
-            p = d["location"]["place"]
-            p["en"]["route"]             = entry.address
+            add_place(d).merge!("route" => entry.address)
 
             d["text"]                    = entry.title
             d["validuntil"]              = timestamp + TwentyFourHoursMS

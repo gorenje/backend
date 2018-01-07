@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'sidekiq/api'
 
 module BaseImporter
@@ -14,7 +15,7 @@ module BaseImporter
         :allowContacts => true,
         :showLocation  => true,
         :extdata       => {},
-        :location => {
+        :location      => {
           :type        => "Point",
           :coordinates => [ 0, 0 ],
           :radius      => 225,
@@ -22,16 +23,46 @@ module BaseImporter
             :longitudeDelta => 0.0017342150719485971,
             :latitudeDelta => 0.0017342150719485971
           },
-          :place => {
-            :en  => {
-              :locality => "Berlin",
-              :country  => "Germany",
-              :route    => ""
-            }
-          }
         }
       })
     end
+  end
+
+  def parse_street_and_number(addr)
+    if addr =~ /(.+) ([0-9\/\-–]+)$/
+      { "route"         => $1.strip,
+        "street_number" => $2
+      }
+    else
+      { "route" => addr }
+    end
+  end
+
+  def parse_address_line(addr)
+    if addr =~ /(.+), ([0-9]+) (.+)$/
+      {
+        "route"                       => $1.strip,
+        "postal_code"                 => $2,
+        "locality"                    => $3,
+        "administrative_area_level_1" => $3,
+      }.merge(parse_street_and_number(hsh["route"]))
+    else
+      { "route" => addr }
+    end
+  end
+
+  def add_place(subject)
+    subject["location"]["place"] = {
+      "en" => {
+        "route"                       => "",
+        "street_number"               => "",
+        "postal_code"                 => "",
+        "locality"                    => "Berlin",
+        "administrative_area_level_1" => "Berlin",
+        "country"                     => "Germany",
+      }
+    }
+    subject["location"]["place"]["en"]
   end
 
   def timestamp

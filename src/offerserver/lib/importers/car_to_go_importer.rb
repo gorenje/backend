@@ -26,14 +26,11 @@ class CarToGoImporter
         select { |a| a["extdata"]["vin"] == car.vin }.first ||
         (new_offers << JSON(base_data.to_json)).last
 
-      # clone is shallow, use Json to do deep cloning. But it means keys
-      # become strings.
       offr.tap do |d|
-        p = d["location"]["place"]
+        add_place(d).merge!(parse_address_line(car.address_line))
         d["text"]                    = BaseText % car.license_plate
         d["validuntil"]              = timestamp + TenMinutesMS
         d["location"]["coordinates"] = [car.location.lng, car.location.lat]
-        p["en"]["route"]             = car.address_line
         d["extdata"]                 = { :vin => car.vin }
         d["keywords"] =
           BaseKeyWords + (car.needs_fuelling? ? ["#fuelablec2g"] : [])
