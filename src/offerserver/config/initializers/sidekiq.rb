@@ -12,12 +12,6 @@ cron_jobs = [{
     'args'  => nil
   },
   {
-    'name'  => 'drivenow_importer',
-    'class' => 'DriveNowImporter',
-    'cron'  => '10 */1 * * * *',
-    'args'  => nil
-  },
-  {
     'name'  => 'exberliner_importer',
     'class' => 'ExberlinerImporter',
     'cron'  => '0 0,3,6,9,12,15,18,21 * * *',
