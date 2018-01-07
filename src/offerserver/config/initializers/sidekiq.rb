@@ -24,12 +24,6 @@ cron_jobs = [{
     'args'  => nil
   },
   {
-    'name'  => 'berlin_de_importer',
-    'class' => 'BerlinDeImporter',
-    'cron'  => '20 0,2,4,6,8,10,12,14,16,18,20,22 * * *',
-    'args'  => nil
-  },
-  {
     'name'  => 'berlin_de_natur',
     'class' => 'BerlinNaturImporter',
     'cron'  => '30 1,3,5,7,9,11,13,15,17,19,21,23 * * *',
