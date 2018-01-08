@@ -65,7 +65,8 @@ class LuftDatenImporter
       old_offers.each { |ofr| idm[ofr["extdata"]["id"]] = ofr }
     end
 
-    JSON(RestClient.get("http://api.luftdaten.info/static/v2/data.json")).
+    (JSON(RestClient.get("http://api.luftdaten.info/static/v2/data.json")) ||
+      JSON(RestClient.get("http://api.luftdaten.info/static/v1/data.json"))).
       each do |sensorhsh|
 
       sensor_hash_to_readings(sensorhsh).each do |reading|
