@@ -33,13 +33,9 @@ router.route('/')
     }
 
     if (sw) {
-      properties.location = {
-        $geoWithin: { $box: [
-          [ parseFloat(sw.longitude), parseFloat(sw.latitude) ],
-          [ parseFloat(ne.longitude), parseFloat(ne.latitude) ]
-        ]}
-      }
+      properties = qryHelper.locationBySwNe(properties, sw, ne);
     }
+
     if (offer_id) {
       properties._id = offer_id
     }

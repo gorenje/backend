@@ -209,9 +209,8 @@ router
         var properties =
           qryHelper.keyWordsAndOwner(srch, qryHelper.validate({isActive:true}));
 
-        properties = qryHelper.locationByGeoBox(properties, lng, lat,
-                                                srch.longitudeDelta(),
-                                                srch.latitudeDelta());
+        properties = qryHelper.locationByCenterSphere(properties, lng, lat,
+                                                      srch.radius());
 
         Offer.find(properties, function(err, offers) {
           if (err) return next(err)
@@ -235,9 +234,8 @@ router
         var properties =
           qryHelper.keyWordsAndOwner(offer,qryHelper.validate({isActive:true}));
 
-        properties = qryHelper.locationByGeoBox(properties, lng, lat,
-                                                offer.longitudeDelta(),
-                                                offer.latitudeDelta());
+        properties = qryHelper.locationByCenterSphere(properties, lng, lat,
+                                                      offer.radius());
 
         Search.find(properties, function(err, searches) {
           if (err) return next(err)

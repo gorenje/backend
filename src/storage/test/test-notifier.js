@@ -19,8 +19,8 @@ describe('Notifier', function() {
 
     fakeweb.allowNetConnect = false;
     var spy = fakeweb.registerUri({uri: 'http://localhost:3000/notify',
-      body: '{"status": "ok"}',
-      contentType: "application/json"
+                                   body: '{"status": "ok"}',
+                                   contentType: "application/json"
     })
     notifier.matchFound(offr, srch)
 
@@ -63,10 +63,12 @@ describe('Notifier', function() {
 
     fakeweb.allowNetConnect = false;
     var spy = fakeweb.registerUri({uri: 'http://localhost:3000/notify',
-      body: '{"status": "ok"}',
-      contentType: "application/json"
+                                   body: '{"status": "ok"}',
+                                   contentType: "application/json"
     })
 
+    assert.isOk(srch.is_valid());
+    assert.isOk(offr.is_valid());
     notifier.matchFound(offr, srch)
 
     assert.strictEqual(spy.useCount, 1);

@@ -136,7 +136,9 @@ OfferSchema.methods.is_search_within_range = function(search) {
 
 OfferSchema.methods.is_point_within_range = function(lng, lat) {
   var pt = { latitude: lat, longitude: lng  }
-  return geolib.isPointInside(pt, hlpr.generate_polygon(this));
+  return geolib.isPointInCircle(pt, { latitude: this.latitude(),
+                                      longitude: this.longitude() },
+                                this.radius())
 };
 
 OfferSchema.methods.findMatchingSearchesAndNotify = function(next,callback) {

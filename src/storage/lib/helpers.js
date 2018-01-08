@@ -33,21 +33,5 @@ function stupidSort(subjects, keywords) {
   .sort(compareRank)
 }
 
-function generate_polygon(subject) {
-  var lngDelta = subject.longitudeDelta() / 2.0;
-  var latDelta = subject.latitudeDelta() / 2.0;
-
-  var lat = subject.latitude();
-  var lng = subject.longitude();
-
-  return [
-    { latitude: lat + latDelta, longitude: lng - lngDelta },
-    { latitude: lat + latDelta, longitude: lng + lngDelta },
-    { latitude: lat - latDelta, longitude: lng + lngDelta },
-    { latitude: lat - latDelta, longitude: lng - lngDelta }
-  ]
-}
-
 exports.is_valid = is_valid;
 exports.stupidSort = stupidSort;
-exports.generate_polygon = generate_polygon;

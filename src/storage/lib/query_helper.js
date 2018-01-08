@@ -1,19 +1,31 @@
-function geoBox(lng, lat, lngDelta,  latDelta) {
-  return [ [lng - lngDelta/2.0, lat - latDelta/2.0],
-           [lng + lngDelta/2.0, lat + latDelta/2.0] ];
-}
+var geolib    = require('geolib');
 
-function locationByGeoBox(properties, lng, lat, lngDelta, latDelta) {
+function locationByCenterSphere(properties, lng, lat, radius) {
+  // assuming radius is in meters, not kilometers nor in bananas.
+  // 6,378.1 km is the equatorial radius of the Earth
   properties.location = {
-    $geoWithin: { $box: geoBox(lng, lat, lngDelta, latDelta) }
+    $geoWithin: { $centerSphere: [ [parseFloat(lng), parseFloat(lat)],
+                                   radius / 6378100] }
   };
   return properties;
 }
 
+function locationBySwNe(properties, sw, ne) {
+  var points = [
+    { latitude: parseFloat(sw.latitude), longitude: parseFloat(sw.longitude) },
+    { latitude: parseFloat(ne.latitude), longitude: parseFloat(ne.longitude) }
+  ];
+
+  var diagonal_in_meters = geolib.getPathLength(points);
+  var center             = geolib.getCenter(points);
+
+  return locationByCenterSphere(properties, center.longitude, center.latitude,
+                                Math.sqrt(2*((diagonal_in_meters/2)**2))/2);
+}
+
 function locationFor(subject, properties) {
-  return locationByGeoBox(properties,
-                          subject.longitude(),      subject.latitude(),
-                          subject.longitudeDelta(), subject.latitudeDelta());
+  return locationByCenterSphere(properties, subject.longitude(),
+                                subject.latitude(), subject.radius());
 }
 
 function validate(properties) {
@@ -35,7 +47,8 @@ function lookupProps(subject, properties) {
   return locationFor(subject, keyWordsAndOwner(subject, validate(properties)));
 }
 
-exports.lookupProps      = lookupProps;
-exports.validate         = validate;
-exports.keyWordsAndOwner = keyWordsAndOwner;
-exports.locationByGeoBox = locationByGeoBox;
+exports.lookupProps            = lookupProps;
+exports.validate               = validate;
+exports.keyWordsAndOwner       = keyWordsAndOwner;
+exports.locationByCenterSphere = locationByCenterSphere;
+exports.locationBySwNe         = locationBySwNe;

@@ -11,6 +11,7 @@ describe('Query Helper', function() {
     var offer = new Offer();
     offer.owner = "Fubar"
     offer.location = {
+      radius: 10,
       coordinates: [100,50],
       dimension: {
         longitudeDelta: 10,
@@ -33,10 +34,9 @@ describe('Query Helper', function() {
     assert.strictEqual(props.keywords.$in, offer.keywords);
     assert.strictEqual(props.owner.$ne, offer.owner);
 
-    assert.strictEqual(props.location.$geoWithin.$box[0][0], 95);
-    assert.strictEqual(props.location.$geoWithin.$box[0][1], 47.5);
-    assert.strictEqual(props.location.$geoWithin.$box[1][0], 105);
-    assert.strictEqual(props.location.$geoWithin.$box[1][1], 52.5);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[0][0], 100);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[0][1], 50);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[1], 10/6378100);
 
     done();
   });
@@ -45,6 +45,7 @@ describe('Query Helper', function() {
     var search = new Search();
     search.owner = "Fubar"
     search.location = {
+      radius: 10,
       coordinates: [100,50],
       dimension: {
         longitudeDelta: 10,
@@ -67,21 +68,19 @@ describe('Query Helper', function() {
     assert.strictEqual(props.keywords.$in, search.keywords);
     assert.strictEqual(props.owner.$ne, search.owner);
 
-    assert.strictEqual(props.location.$geoWithin.$box[0][0], 95);
-    assert.strictEqual(props.location.$geoWithin.$box[0][1], 47.5);
-    assert.strictEqual(props.location.$geoWithin.$box[1][0], 105);
-    assert.strictEqual(props.location.$geoWithin.$box[1][1], 52.5);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[0][0], 100);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[0][1], 50);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[1], 10/6378100);
 
     done();
   });
 
   it('should set location', function(done){
-    var props = qryHelper.locationByGeoBox({}, 100, 50, 10, 5);
+    var props = qryHelper.locationByCenterSphere({}, 100, 50, 10);
 
-    assert.strictEqual(props.location.$geoWithin.$box[0][0], 95);
-    assert.strictEqual(props.location.$geoWithin.$box[0][1], 47.5);
-    assert.strictEqual(props.location.$geoWithin.$box[1][0], 105);
-    assert.strictEqual(props.location.$geoWithin.$box[1][1], 52.5);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[0][0], 100);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[0][1], 50);
+    assert.strictEqual(props.location.$geoWithin.$centerSphere[1], 10/6378100);
 
     done();
   });

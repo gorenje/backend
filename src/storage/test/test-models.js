@@ -12,11 +12,8 @@ describe('Models', function() {
     var search = new Search();
 
     offer.location = {
+      radius: 100,
       coordinates: [13.4502912, 52.5140393],
-      dimension: {
-        longitudeDelta: 0.014847703278066504,
-        latitudeDelta: 0.016081701755844335
-      },
     }
 
     search.location = {
@@ -47,11 +44,8 @@ describe('Models', function() {
     var search = new Search();
 
     search.location = {
+      radius: 100,
       coordinates: [13.4502912, 52.5140393],
-      dimension: {
-        longitudeDelta: 0.014847703278066504,
-        latitudeDelta: 0.016081701755844335
-      },
     }
 
     offer.location = {
