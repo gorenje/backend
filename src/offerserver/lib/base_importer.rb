@@ -45,7 +45,7 @@ module BaseImporter
         "postal_code"                 => $2,
         "locality"                    => $3,
         "administrative_area_level_1" => $3,
-      }.merge(parse_street_and_number(hsh["route"]))
+      }.merge(parse_street_and_number($1.strip))
     else
       { "route" => addr }
     end
