@@ -197,12 +197,23 @@ After that, shut down minikube
 
 
 1. Start services (e.g. redis or postgres) locally with with docker-compose
+
 2. Run service locally against the resources started via docker-compose
+
 3. Once happy, build docker images to minikube
+
 4. Test in minikube
+
 5. Rebuild images locally against the local docker and then push them to
-   docker hub.
-6. Redeploy production.
+   docker hub. ```rake docker:image:build && rake docker:image:push```
+
+6. Redeploy production. For redeploying, you will have to set the image
+   pull policy to always. ```ImagePullPolicy: Always``` which is set in
+   the deployment.yaml file for the corresponding container.
+
+   ```kubectl create -f *.deployment.yaml```
+
+   where ```*``` probably stackpoint is (see below).
 
 
 ### Working with StackPoint.io
@@ -216,7 +227,12 @@ test that it worked
     kubectl get nodes
 
 That should respond with the provisioned nodes at the respect cloud provider.
-Once all nodes are available, continue.
+Once all nodes are ready, continue. I.e. something like this:
+
+    NAME                  STATUS    ROLES     AGE       VERSION
+    spc0hu6dl8-master-1   Ready     master    7m        v1.8.5
+    spc0hu6dl8-worker-1   Ready     <none>    57s       v1.8.5
+    spc0hu6dl8-worker-2   Ready     <none>    57s       v1.8.5
 
 Then build the stackpoint specific YAMLs for orchestration, also including
 the subdomain to be used for the later access. Do not create this domain
@@ -275,6 +291,9 @@ The services that we currently have (at time of writing):
     trk.staging.pushtech.de    --> service: tracker
     notify.staging.pushtech.de --> service: notificationserver
     www.staging.pushtech.de    --> service: website
+    www1.staging.pushtech.de   --> service: website
+    www2.staging.pushtech.de   --> service: website
+    www3.staging.pushtech.de   --> service: website
     assets.staging.pushtech.de --> service: imageserver
 
 And administration services, not required to be accessible from the outside
@@ -304,15 +323,15 @@ hosts created:
 
 1. Notification server does not start
 
-This happens when waiting for all deployments to come up. If the notification
-server (or another server) does not seem to come, delete the associated
-pod (not deployment) and let kubernetes restart the pod. That should fix it.
+   This happens when waiting for all deployments to come up. If the notification
+   server (or another server) does not seem to come, delete the associated
+   pod (not deployment) and let kubernetes restart the pod. That should fix it.
 
 2. Mongo and Storage seem too slow
 
-Sympton is basically that store is not responding and you get a bad gateway
-when acessing the storage.
+   Sympton is basically that store is not responding and you get a bad gateway
+   when acessing the storage.
 
-Here the best thing to do is scale up the storage deployment (say to 3)
-and wait until the new pods are up and running. Then delete the old pod
-(it will get restarted).
+   Here the best thing to do is scale up the storage deployment (say to 3)
+   and wait until the new pods are up and running. Then delete the old pod
+   (it will get restarted).
