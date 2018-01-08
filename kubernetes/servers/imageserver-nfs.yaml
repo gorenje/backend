@@ -32,11 +32,13 @@ spec:
       labels:
         io.kompose.service: imageserver-nfs
     spec:
+      imagePullSecrets:
+      - name: meatdocker
+      restartPolicy: Always
       volumes:
       - name: imgserverstore
         persistentVolumeClaim:
           claimName: imgserverstore
-
       containers:
       - name: imageserver-nfs
         image: pushtech.imageserver.nfs:v1
