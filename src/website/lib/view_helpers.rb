@@ -1,3 +1,4 @@
+# coding: utf-8
 module ViewHelpers
   def return_json
     content_type :json
@@ -85,7 +86,8 @@ module ViewHelpers
     return nil if place.blank? ||  place.keys.empty?
     details = place[place.keys.first]
     return nil if details.blank?
-    "%s %s, %s, %s" % ["route", "strnum", "locality", "country"].map { |a| details[a]}
+    "%s %s, %s, %s" % ["route", "street_number", "locality", "country"].
+                        map { |a| details[a] }
   end
 
   def page_can_be_viewed_while_not_logged_in
@@ -162,7 +164,7 @@ module ViewHelpers
                []
              end
 
-    {
+    hsh = {
       :owner         => owner,
       :text          => params[:text],
       :keywords      => params[:text].downcase.split(/[[:space:]]+/),
@@ -181,14 +183,39 @@ module ViewHelpers
           :longitudeDelta => params[:lngDelta],
           :latitudeDelta => params[:latDelta]
         },
-        :place => {
-          :en  => {
-            :locality => params[:address].split(/,/)[1],
-            :country  => params[:address].split(/,/).last,
-            :route    => params[:address].split(/,/).first
-          }
-        }
       }
     }
+
+    unless params[:address].empty?
+      # address is assumed to be of the format:
+      #     Veteranenstraße 21, 10119 Berlin, Germany
+      # i.e. street_name street_number, postal_code city_name, country
+
+      street, city_details, country = params[:address].split(/,/).map(&:strip)
+      street_number, city_name, postal_code = [nil]*4
+
+      if street =~ /(.+) ([0-9\/\-–]+)$/
+        street        = $1.strip
+        street_number = $2
+      end
+
+      if city_details =~ /(.+) (.+)/
+        city_name   = $2
+        postal_code = $1
+      end
+
+      hsh[:location][:place] = {
+        :en => {
+          :locality                    => city_name     || city_details,
+          :street_number               => street_number || "",
+          :administrative_area_level_1 => city_name     || city_details,
+          :postal_code                 => postal_code   || "",
+          :country                     => country,
+          :route                       => street,
+        }
+      }
+    end
+
+    hsh
   end
 end
