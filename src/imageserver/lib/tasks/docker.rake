@@ -62,6 +62,7 @@ namespace :docker do
     `/usr/sbin/service nfs-common start`
     `mkdir -p #{ENV['NFS_MOUNT_POINT'] || '/mnt'}`
 
-    `mount #{ENV['NFS_REMOTE_MP']} #{ENV['NFS_MOUNT_POINT'] || '/mnt'} -t nfs`
+    exit(system("mount #{ENV['NFS_REMOTE_MP']} " +
+                "#{ENV['NFS_MOUNT_POINT'] || '/mnt'} -t nfs"))
   end
 end
