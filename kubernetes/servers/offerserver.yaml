@@ -30,7 +30,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: offerserver
     spec:

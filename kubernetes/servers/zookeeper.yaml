@@ -26,7 +26,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: zookeeper
     spec:
@@ -39,4 +38,3 @@ spec:
         - containerPort: 2181
         resources: {}
       restartPolicy: Always
-status: {}
