@@ -81,10 +81,11 @@ router.route('/:id/set_active/:value')
       { isActive: req.params.value === "true" },
       function (err, offer) {
         if (err) return next(err)
-        tracker.sendTrackingEvent("offr",offer.trackingParams('setact'),
-          function(d,resp){
-            res.json({status: 'ok'})
-          })
+        res.json({status: 'ok'})
+        Offer.findOne({_id: req.params.id}, function (err, upoffer) {
+          tracker.sendTrackingEvent("offr",
+              upoffer.trackingParams('setact'), function(d,resp){})
+        })
       })
   })
 
@@ -92,10 +93,11 @@ router.route('/:id')
   .put(auth.isAuthenticated, function(req, res, next) {
     Offer.findByIdAndUpdate(req.params.id, req.body, function (err, offer) {
       if (err) return next(err)
-      tracker.sendTrackingEvent("offr",offer.trackingParams('update'),
-        function(d,resp){
-          res.json(offer)
-        })
+      res.json(offer)
+      Offer.findOne({_id: req.params.id}, function (err, upoffer) {
+        tracker.sendTrackingEvent("offr",
+            upoffer.trackingParams('update'),function(d,resp){})
+      })
     })
   })
   .delete(auth.isAuthenticated, function(req, res, next) {
