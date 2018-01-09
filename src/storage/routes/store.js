@@ -131,9 +131,7 @@ router
     Offer.find(properties, function(err, offers){
       if ( offers.length > 0 ) {
         req.body.location = JSON.parse(JSON.stringify(offers[0])).location;
-        req.body.location.dimension.latitudeDelta  = req.body.latDelta;
-        req.body.location.dimension.longitudeDelta = req.body.lngDelta;
-        req.body.location.radius = req.body.radius;
+        req.body.radiusMeters = req.body.radius;
         delete(req.body["latDelta"]);
         delete(req.body["lngDelta"]);
         delete(req.body["radius"]);
@@ -145,9 +143,7 @@ router
           if (searches.length > 0 ){
             req.body.location =
                 JSON.parse(JSON.stringify(searches[0])).location;
-            req.body.location.dimension.latitudeDelta  = req.body.latDelta;
-            req.body.location.dimension.longitudeDelta = req.body.lngDelta;
-            req.body.location.radius = req.body.radius;
+            req.body.radiusMeters = req.body.radius;
             delete(req.body["latDelta"]);
             delete(req.body["lngDelta"]);
             delete(req.body["radius"]);
@@ -168,19 +164,11 @@ router
       var properties = { _id: req.params.id }
       Offer.findOne(properties, function(err, offer){
         if ( offer ) {
-          if ( offer.location.radius ) {
-             res.render('details_circle', { obj: offer });
-          } else {
-             res.render('details', { obj: offer });
-          }
+          res.render('details', { obj: offer });
         } else {
           Search.findOne(properties, function(err, search){
             if (search ){
-              if ( search.location.radius ) {
-                res.render('details_circle', { obj: search });
-              } else {
-                res.render('details', { obj: search });
-              }
+              res.render('details', { obj: search });
             } else {
               res.render('noresult');
             }

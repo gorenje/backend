@@ -15,8 +15,7 @@ function matchFound(offer, search){
         id:        offer._id,
         lat:       offer.latitude(),
         lng:       offer.longitude(),
-        latD:      offer.latitudeDelta(),
-        lngD:      offer.longitudeDelta()
+        radi:      offer.radius(),
       },
       search: {
         device_id: search.owner,
@@ -24,8 +23,7 @@ function matchFound(offer, search){
         id:        search._id,
         lat:       search.latitude(),
         lng:       search.longitude(),
-        latD:      search.latitudeDelta(),
-        lngD:      search.longitudeDelta()
+        radi:      search.radius(),
       },
     },
     headers: { "Content-Type": "application/json" }
@@ -33,10 +31,7 @@ function matchFound(offer, search){
 
   var endpoint = (process.env.NOTIFY_HOST || "http://localhost:3000")+"/notify";
 
-  client.post(endpoint, args, function (data, response) {
-    // parsed response body as js object
-    console.log(data);
-  });
+  client.post(endpoint, args, function (data, response) {});
 }
 
 exports.matchFound = matchFound;

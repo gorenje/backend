@@ -9,18 +9,17 @@
 
   <script>
     var current_location = null;
-    var rectangle = null;
-    var ignoreNextShowRectCall = false;
+    var circle = null;
+    var ignoreNextShowCircleCall = false;
 
     function initMap() {
       var lat =  <%= obj.latitude() %>;
       var lng = <%= obj.longitude() %>;
-      var latDelta = <%= obj.latitudeDelta() %> / 2.0;
-      var lngDelta = <%= obj.longitudeDelta() %> / 2.0;
+      var radius = <%= obj.radius() %>;
 
       current_location = new google.maps.LatLng(lat, lng);
 
-      var bounds = generateBounds(lat, lng, latDelta, lngDelta);
+      var bounds = generateBounds(current_location, radius);
       bounds.extend(current_location);
 
       var map = new google.maps.Map(document.getElementById('map'), {
@@ -45,11 +44,10 @@
         map: map
       });
 
-      var rbounds = generateBounds(lat, lng, latDelta, lngDelta);
-
-      rectangle = new google.maps.Rectangle({
+      circle = new google.maps.Circle({
         map: map,
-        bounds: rbounds,
+        center: current_location,
+        radius: <%= obj.radius() %>,
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -58,53 +56,23 @@
         editable: true
       });
 
-      rectangle.addListener('bounds_changed', showNewRect);
+      circle.addListener('bounds_changed', showNewCircle);
     }
 
-    function showNewRect() {
-      if ( ignoreNextShowRectCall ) {
-        ignoreNextShowRectCall = false;
+    function showNewCircle() {
+      if ( ignoreNextShowCircleCall ) {
+        ignoreNextShowCircleCall = false;
         return;
       }
 
-      var lat = current_location.lat();
-      var lng = current_location.lng();
+      $('#radius').val(circle.getRadius());
 
-      var ne = rectangle.getBounds().getNorthEast();
-      var sw = rectangle.getBounds().getSouthWest();
-
-      var latDelta = ( ( ne.lat() - lat ) + ( lat - sw.lat() ) ) / 2.0;
-      var lngDelta = ( ( ne.lng() - lng ) + ( lng - sw.lng() ) ) / 2.0;
-
-      $('#latDelta').val(latDelta * 2.0);
-      $('#lngDelta').val(lngDelta * 2.0);
-
-      var radius = google.maps.geometry.spherical
-        .computeDistanceBetween(rectangle.getBounds().getNorthEast(),
-                                rectangle.getBounds().getSouthWest());
-
-      $('#radius').val(Math.ceil(radius/2.0));
-
-      ignoreNextShowRectCall = true;
-      rectangle.setBounds(generateBounds(lat, lng, latDelta, lngDelta));
+      ignoreNextShowCircleCall = true;
     }
 
-    function generateBounds(lat, lng, latDelta, lngDelta ) {
-      var rbounds = new google.maps.LatLngBounds();
-
-      var redCoords = [
-        {lat: lat + latDelta, lng: lng - lngDelta},
-        {lat: lat + latDelta, lng: lng + lngDelta},
-        {lat: lat - latDelta, lng: lng + lngDelta},
-        {lat: lat - latDelta, lng: lng - lngDelta},
-      ];
-
-      rbounds.extend(redCoords[0]);
-      rbounds.extend(redCoords[1]);
-      rbounds.extend(redCoords[2]);
-      rbounds.extend(redCoords[3]);
-
-      return rbounds;
+    function generateBounds(current_location, radius ) {
+      return new google.maps.Circle({ center: current_location,
+                                      radius: radius * 1.10 }).getBounds();
     }
 
     function mapStyle(){
@@ -233,7 +201,6 @@
   <h1>Update</h1>
 
   <form method="post" action="/store/update/subject/<%= obj._id %>">
-    <input id="radius" type="hidden" name="radius" value="<%= obj.location.radius %>" size=60/>
     <table>
       <tr>
        <th>Owner</th>
@@ -253,13 +220,8 @@
       </tr>
 
       <tr>
-       <th>Latitude Delta</th>
-       <td><input id="latDelta" type="text" name="latDelta" value="<%= obj.latitudeDelta() %>" size=60/></td>
-      </tr>
-
-      <tr>
-       <th>Longitude Delta</th>
-       <td><input id="lngDelta" type="text" name="lngDelta" value="<%= obj.longitudeDelta() %>" size=60/></td>
+       <th>Radius</th>
+       <td><input id="radius" type="text" name="radius" value="<%= obj.radius() %>" size=60/></td>
       </tr>
 
       <tr>

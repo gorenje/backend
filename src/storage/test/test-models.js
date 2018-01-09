@@ -12,9 +12,9 @@ describe('Models', function() {
     var search = new Search();
 
     offer.location = {
-      radius: 100,
       coordinates: [13.4502912, 52.5140393],
     }
+    offer.radiusMeters = 100;
 
     search.location = {
       coordinates: [13.4503912, 52.5141393],
@@ -44,9 +44,9 @@ describe('Models', function() {
     var search = new Search();
 
     search.location = {
-      radius: 100,
       coordinates: [13.4502912, 52.5140393],
     }
+    search.radiusMeters = 100;
 
     offer.location = {
       coordinates: [13.4503912, 52.5141393],
@@ -118,26 +118,18 @@ describe('Models', function() {
 
     offer.location = {
       coordinates: [100,50],
-      dimension: {
-        longitudeDelta: 10,
-        latitudeDelta: 5
-      },
-      place: {
-        en: { 'Country': "Fubar"
-        }
+    }
+    offer.place= {
+      en: { 'Country': "Fubar"
       }
     }
 
     assert.deepEqual(offer.location.coordinates, [100,50]);
-    assert.deepEqual(offer.location.place, {en: { "Country": "Fubar" } });
-    assert.strictEqual(offer.location.dimension.longitudeDelta, 10)
-    assert.strictEqual(offer.location.dimension.latitudeDelta, 5)
+    assert.deepEqual(offer.place, {en: { "Country": "Fubar" } });
 
     var cln = offer.cloneReplacingLngLat(1,2);
     assert.deepEqual(cln.location.coordinates, [1,2]);
-    assert.deepEqual(cln.location.place, {});
-    assert.strictEqual(cln.location.dimension.longitudeDelta, 10)
-    assert.strictEqual(cln.location.dimension.latitudeDelta, 5)
+    assert.deepEqual(cln.place, {});
 
     done();
   });
@@ -147,26 +139,18 @@ describe('Models', function() {
 
     search.location = {
       coordinates: [100,50],
-      dimension: {
-        longitudeDelta: 10,
-        latitudeDelta: 5
-      },
-      place: {
-        en: { 'Country': "Fubar"
-        }
+    }
+    search.place = {
+      en: { 'Country': "Fubar"
       }
     }
 
     assert.deepEqual(search.location.coordinates, [100,50]);
-    assert.deepEqual(search.location.place, {en: { "Country": "Fubar" } });
-    assert.strictEqual(search.location.dimension.longitudeDelta, 10)
-    assert.strictEqual(search.location.dimension.latitudeDelta, 5)
+    assert.deepEqual(search.place, {en: { "Country": "Fubar" } });
 
     var cln = search.cloneReplacingLngLat(1,2);
     assert.deepEqual(cln.location.coordinates, [1,2]);
-    assert.deepEqual(cln.location.place, {});
-    assert.strictEqual(cln.location.dimension.longitudeDelta, 10)
-    assert.strictEqual(cln.location.dimension.latitudeDelta, 5)
+    assert.deepEqual(cln.place, {});
 
     done();
   });
@@ -176,13 +160,9 @@ describe('Models', function() {
 
     search.location = {
       coordinates: [100,50],
-      dimension: {
-        longitudeDelta: 10,
-        latitudeDelta: 5
-      },
-      place: {
-        en: { 'Country': "Fubar"
-        }
+    }
+    search.place = {
+      en: { 'Country': "Fubar"
       }
     }
     search.text = "Fubar";
@@ -190,8 +170,6 @@ describe('Models', function() {
     var hsh = search.trackingParams();
     var tmp = JSON.parse(JSON.stringify(search));
 
-    assert.strictEqual(hsh.lngD, 10)
-    assert.strictEqual(hsh.latD, 5)
     assert.strictEqual(hsh.lng, 100)
     assert.strictEqual(hsh.lat, 50)
     assert.strictEqual(hsh.title, "Fubar")

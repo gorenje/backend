@@ -92,7 +92,7 @@ var OfferSchema = new mongoose.Schema({
 OfferSchema.methods.cloneReplacingLngLat = function(lng, lat) {
   var tmp = JSON.parse(JSON.stringify(this));
   tmp.location.coordinates = [lng, lat]
-  tmp.location.place = {}
+  tmp.place = {}
   return tmp;
 };
 
@@ -149,8 +149,6 @@ OfferSchema.methods.trackingParams = function(action) {
     title:  this.text,
     lat:    this.latitude(),
     lng:    this.longitude(),
-    latD:   this.latitudeDelta(),
-    lngD:   this.longitudeDelta(),
     radi:   this.radius()
   };
 }
