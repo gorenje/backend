@@ -8,7 +8,7 @@
 - if session['latitude'] && session['longitude']
   :javascript
     var user_location = { coords: { latitude: #{session['latitude']}, longitude: #{session['longitude']} } };
-    if ( !undefined(google) ) {
+    if ( typeof google !== 'undefined' ) {
       current_location = new google.maps.LatLng( user_location.coords.latitude,
                                                  user_location.coords.longitude);
     }

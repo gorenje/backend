@@ -51,13 +51,9 @@ post '/whatareyouoffering' do
       hsh.tap do |h|
         clat = h["location"]["coordinates"][1]
         clng = h["location"]["coordinates"][0]
-        latDelta = h["location"]["dimension"]["latitudeDelta"]
-        lngDelta = h["location"]["dimension"]["longitudeDelta"]
 
         h["json_location"] = { "lat" => clat, "lng" => clng }
-        h["latDelta"]      = latDelta
-        h["lngDelta"]      = lngDelta
-        h["address"]       = place_to_address(h["location"]["place"])
+        h["address"]       = place_to_address(h["place"])
 
         l1 = Geokit::LatLng.new(clat, clng)
         l2 = Geokit::LatLng.new(session["latitude"], session["longitude"])

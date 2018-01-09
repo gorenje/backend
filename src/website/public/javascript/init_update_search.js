@@ -42,7 +42,7 @@ function setup_for_update_search() {
 
   circle = new google.maps.Circle({
     map: map,
-    radius: search_obj.location.radius || InitialCircleRadiusMeters,
+    radius: search_obj.radiusMeters || InitialCircleRadiusMeters,
     center: current_location,
     strokeColor: '#000',
     strokeOpacity: 0.8,

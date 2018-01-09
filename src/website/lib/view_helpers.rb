@@ -72,7 +72,8 @@ module ViewHelpers
              AdtekioUtilities::Encrypt.decode_from_base64(encstr)
            rescue
              begin
-               AdtekioUtilities::Encrypt.decode_from_base64(CGI.unescape(encstr))
+               AdtekioUtilities::Encrypt.
+                 decode_from_base64(CGI.unescape(encstr))
              rescue
                "{}"
              end
@@ -128,24 +129,12 @@ module ViewHelpers
   def fill_hash(h, cnt)
     clat = h["location"]["coordinates"][1]
     clng = h["location"]["coordinates"][0]
-    latDelta = h["location"]["dimension"]["latitudeDelta"]
-    lngDelta = h["location"]["dimension"]["longitudeDelta"]
 
     h["json_location"] = { "lat" => clat, "lng" => clng }
-    h["latDelta"]      = latDelta
-    h["lngDelta"]      = lngDelta
-    h["address"]       = place_to_address(h["location"]["place"])
-
-    h["radius"] = if h["location"]["radius"]
-                    h["location"]["radius"]
-                  else
-                    l1 = Geokit::LatLng.new(clat - latDelta, clng - lngDelta)
-                    l2 = Geokit::LatLng.new(clat + latDelta, clng + lngDelta)
-                    (l1.distance_to(l2) / 2.0).to_i
-                  end
-
-    h["ranking_num"]      = cnt
-    h["marker_icon"]      = "/images/marker/#{h["ranking_num"]}.svg"
+    h["address"]       = place_to_address(h["place"])
+    h["radius"]        = h["radiusMeters"].to_i
+    h["ranking_num"]   = cnt
+    h["marker_icon"]   = "/images/marker/#{h["ranking_num"]}.svg"
     h["marker_icon_highlight"] =
       "/images/marker/#{h["ranking_num"]}.svg?c=%23444"
   end
@@ -175,14 +164,10 @@ module ViewHelpers
       :showLocation  => true,
       :images        => images,
       :extdata       => {},
+      :radiusMeters  => params[:radius],
       :location => {
         :type        => "Point",
         :coordinates => [ params[:longitude].to_f, params[:latitude].to_f ],
-        :radius      => params[:radius],
-        :dimension   => {
-          :longitudeDelta => params[:lngDelta],
-          :latitudeDelta => params[:latDelta]
-        },
       }
     }
 
@@ -204,7 +189,7 @@ module ViewHelpers
         postal_code = $1
       end
 
-      hsh[:location][:place] = {
+      hsh[:place] = {
         :en => {
           :locality                    => city_name     || city_details,
           :street_number               => street_number || "",
