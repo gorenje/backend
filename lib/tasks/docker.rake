@@ -8,9 +8,9 @@ namespace :docker do
           imagename=`basename $n`
           tagname="#{KubernetesNS}.${imagename}"
           prevversion=`docker images -a | grep ${tagname} | grep v1 | awk 'BEGIN { yes=0 } // { print $3; yes=1; } END { if (yes==0) { print "- unknown -" }}'`
-          echo "!!! Building ====> ${imagename}"
+          echo "\\033[1;31m!!! \\033[0;35mBuilding ====> ${imagename} \\033[0m"
           docker build -t ${tagname}:v1 .
-          echo "===> Prev version: ${prevversion} of ${tagname}"
+          echo "\\033[1;31m===>\\033[0m Prev version: \\033[0;31m${prevversion}\\033[0m of ${tagname}"
           cd ../..
         done
       EOF
@@ -21,7 +21,7 @@ namespace :docker do
       system <<-EOF
         for n in src/* ; do
           imagename=`basename $n`
-          echo "!!! Pushing ====> ${imagename}"
+          echo "!!! Pushing \\033[0;31m ====> ${imagename} \\033[0m"
           docker tag #{KubernetesNS}.${imagename}:v1 gorenje/pushtech:${imagename}
           docker push gorenje/pushtech:${imagename}
         done
@@ -61,6 +61,7 @@ namespace :docker do
       system <<-EOF
         $(cat .env)
         for n in docker-compose/*.yml ; do
+          echo "\\033[0;34m ====> $n \\033[0m"
           docker-compose -f $n down
         done
       EOF
@@ -71,6 +72,7 @@ namespace :docker do
       system <<-EOF
         $(cat .env)
         for n in docker-compose/*.yml ; do
+          echo "\\033[0;31m ====> $n \\033[0m"
           docker-compose -f $n up -d
         done
       EOF
