@@ -10,6 +10,9 @@ zkClient
       case "event_counter":
         require("./lib/event_counter").start(broker_list)
         break;
+      case "search_counter":
+        require("./lib/search_counter").start(broker_list)
+        break;
       case "stats_collector":
         require("./lib/stats_consumer").start(broker_list)
         break;

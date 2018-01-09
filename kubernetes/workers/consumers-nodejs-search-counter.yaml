@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: search-counter
+  name: consumers-nodejs-search-counter
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: search-counter
+    spec:
+      imagePullSecrets:
+      - name: meatdocker
+      restartPolicy: Always
+      containers:
+      - image: pushtech.consumers.nodejs:v1
+        name: search-counter
+        env:
+        - name: CONSUMER_NAME
+          value: search_counter
+        - name: REDIS_CONSUMER
+          value: redis://consumers-nodejs-redis:6379?db=9
+        - name: ZOOKEEPER_HOST
+          valueFrom:
+            secretKeyRef:
+              name: k8scfg
+              key: ZOOKEEPER_HOST
