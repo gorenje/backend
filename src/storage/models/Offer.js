@@ -26,25 +26,15 @@ var OfferSchema = new mongoose.Schema({
       type: [Number],
       required: true,
     },
-    radius: {
-      type: Number,
-      required: false,
-    },
-    dimension: {
-      longitudeDelta: {
-        type: Number,
-        required: true,
-      },
-      latitudeDelta: {
-        type: Number,
-        required: true,
-      },
-    },
-    place: {
-      type : mongoose.Schema.Types.Mixed,
-      default : {},
-      required: false,
-    },
+  },
+  radiusMeters: {
+    type: Number,
+    required: false,
+  },
+  place: {
+    type : mongoose.Schema.Types.Mixed,
+    default : {},
+    required: false,
   },
   showLocation: {
     type: Boolean,
@@ -114,16 +104,8 @@ OfferSchema.methods.longitude = function() {
   return this.location.coordinates[0];
 };
 
-OfferSchema.methods.latitudeDelta = function() {
-  return this.location.dimension.latitudeDelta;
-};
-
-OfferSchema.methods.longitudeDelta = function() {
-  return this.location.dimension.longitudeDelta;
-};
-
 OfferSchema.methods.radius = function() {
-  return this.location.radius;
+  return this.radiusMeters;
 };
 
 OfferSchema.methods.is_valid = function() {
