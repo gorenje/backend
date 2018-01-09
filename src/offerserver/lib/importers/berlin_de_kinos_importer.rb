@@ -234,8 +234,8 @@ class BerlinDeKinosImporter
               d["text"]                    = filmname
               d["validuntil"]              = utctime.strftime("%s%L").to_i
               d["location"]["coordinates"] = kinoloc
-              d["location"]["dimension"]   = LocationDimension
-              d["location"]["radius"]      = LocationRadius
+              # d["location"]["dimension"]   = LocationDimension
+              d["radiusMeters"]            = LocationRadius
               d["keywords"]                = BaseKeyWords + [filmname.downcase]
               d["extdata"]                 = {
                 "id"          => entry_id,
