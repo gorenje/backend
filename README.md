@@ -319,6 +319,17 @@ hosts created:
 
     kubectl get secrets -n pushtech | grep tls
 
+As an absolute final step, log on into the mongo pod and create the geo-spatial
+indicies:
+
+    kubectl exec -n pushtech -it `kubectl get pods -n pushtech | grep storage-db | awk '// { print $1; }'` -- /bin/bash
+    prompt> mongo
+    mongo> use store
+    mongo> db.offers.createIndex({"location": "2dsphere"})
+    mongo> db.searches.createIndex({"location": "2dsphere"})
+
+That should make things a little faster.
+
 #### Known Issues with Stackpoint
 
 1. Notification server does not start
