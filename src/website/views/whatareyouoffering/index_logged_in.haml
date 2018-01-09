@@ -1,5 +1,7 @@
 = haml :"_js_global_variables"
-= haml :"_js_include_files", :locals => {:files => ["geolocation","code","init_whatareyouoffering"]}
+= haml :"_js_include_files", :locals => {:files => ["geolocation","code"]}
+
+%script{:async => "", :defer => "defer", :src => "/javascript/init_whatareyouoffering.js?#{rand}"}
 
 = haml :"_sendbird_widget"
 - i18n = TranslatorHelper.new("pages.whatareyouoffering")
