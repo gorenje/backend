@@ -6,10 +6,6 @@ class BerlinDeKinosImporter
   BaseKeyWords = ["#all", "#film"].map(&:downcase)
   Owner        = "BerlinDeKinos"
 
-  LocationDimension = {
-    "longitudeDelta" => 0.014265495589370403,
-    "latitudeDelta" => 0.009410271202277443
-  }
   LocationRadius = 1500
 
   BerlinTimeZone = TZInfo::Timezone.new('Europe/Berlin')
@@ -234,7 +230,6 @@ class BerlinDeKinosImporter
               d["text"]                    = filmname
               d["validuntil"]              = utctime.strftime("%s%L").to_i
               d["location"]["coordinates"] = kinoloc
-              # d["location"]["dimension"]   = LocationDimension
               d["radiusMeters"]            = LocationRadius
               d["keywords"]                = BaseKeyWords + [filmname.downcase]
               d["extdata"]                 = {
