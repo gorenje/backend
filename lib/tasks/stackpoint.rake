@@ -10,7 +10,7 @@ namespace :stackpoint do
       require 'json'
 
       external_domain   = ENV['DOMAIN'] || 'staging.pushtech.de'
-      image_pull_policy = ENV['IMAGE_PULL_POLICY']
+      image_pull_policy = ENV['IMAGE_PULL_POLICY'] || "IfNotPresent"
       external_services = []
       docs              = Hash.new{|h,k| h[k] = [] }
       website_cdn_hosts =
@@ -102,14 +102,14 @@ namespace :stackpoint do
           if container["image"] =~ /pushtech.(.+):v1/
             container["image"] = "index.docker.io/gorenje/pushtech:#{$1}"
           end
-          container["imagePullPolicy"] = image_pull_policy if image_pull_policy
+          container["imagePullPolicy"] = image_pull_policy
         end
 
         (spec["initContainers"] || []).each do |container|
           if container["image"] =~ /pushtech.(.+):v1/
             container["image"] = "index.docker.io/gorenje/pushtech:#{$1}"
           end
-          container["imagePullPolicy"] = image_pull_policy if image_pull_policy
+          container["imagePullPolicy"] = image_pull_policy
         end
       end
 
