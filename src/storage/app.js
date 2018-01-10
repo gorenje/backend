@@ -25,7 +25,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 
 var index    = require('./routes/index');
-var users    = require('./routes/users');
 var offers   = require('./routes/offers');
 var searches = require('./routes/searches');
 var store    = require('./routes/store');
@@ -59,7 +58,6 @@ app.use(session({
 }));
 
 app.use('/',         index);
-app.use('/users',    users);
 app.use('/offers',   offers);
 app.use('/searches', searches);
 app.use('/store',    store);
