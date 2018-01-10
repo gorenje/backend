@@ -25,7 +25,8 @@ module StoreHelper
     end
 
     def get(params = "")
-      JSON(RestClient.get(_base_url + @actions.join("/")+"?#{params}", Header))
+      query = params.empty? ? "" : "?#{params}"
+      JSON(RestClient.get(_base_url + @actions.join("/") + query, Header))
     end
 
     def post(data)
