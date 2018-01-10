@@ -8,7 +8,7 @@ module Helpers
     end
 
     def sendoff(contents)
-      file_name = File.dirname(__FILE__) + "/../secrets.yaml"
+      file_name = File.dirname(__FILE__) + "/../secrets#{rand}.yaml"
       (File.open(file_name, "w+") << contents).close
       system "kubectl create -n #{KubernetesNS} -f #{file_name}"
       File.unlink(file_name)
@@ -47,11 +47,8 @@ module Helpers
     def for_env(namespace = nil)
       # create envsecrets which contains api tokens etc
       secrets_name = "envsecrets"
-      require 'dotenv'
-      Dotenv.load
       content = [].tap do |ctnt|
-        Helpers::Secrets.header(ctnt, secrets_name,
-                                {:namespace => namespace})
+        Helpers::Secrets.header(ctnt, secrets_name, {:namespace => namespace})
         File.read(".env").split(/\n/).each do |lne|
           next if lne.empty?
           varname = lne.split(/ /).last.split(/=/).first
@@ -87,10 +84,8 @@ module Helpers
     def for_internal_cfg(namespace = nil)
       # create k8scfg which contains the configuration stuff for kubernetes
       secrets_name = "k8scfg"
-      require 'dotenv'
-      Dotenv.load
       pgpassword   = "nicesecret"
-      network      = "pushtech.svc.cluster.local"
+      network      = "#{KubernetesNS}.svc.cluster.local"
 
       content = [].tap do |ctnt|
         Helpers::Secrets.header(ctnt, secrets_name,

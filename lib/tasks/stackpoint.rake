@@ -9,12 +9,15 @@ namespace :stackpoint do
       require 'base64'
       require 'json'
 
-      external_domain   = ENV['DOMAIN'] || 'staging.pushtech.de'
+      external_domain   = ENV['DOMAIN']            || 'staging.pushtech.de'
       image_pull_policy = ENV['IMAGE_PULL_POLICY'] || "IfNotPresent"
+      docker_account    = ENV['DOCKER_ACCOUNT']    || "gorenje"
       external_services = []
       docs              = Hash.new{|h,k| h[k] = [] }
       website_cdn_hosts =
         ["www1", "www2", "www3"].map { |a| a + "." + external_domain }
+
+      RemoteImagePrefix = "index.docker.io/#{docker_account}/#{KubernetesNS}"
 
       Dir.glob("kubernetes/**/*.yaml").each do |file_name|
         YAML.load_documents( File.read(file_name) ).each do |hsh|
@@ -100,14 +103,14 @@ namespace :stackpoint do
         # replace docker image names with external accessible ones
         spec["containers"].each do |container|
           if container["image"] =~ /pushtech.(.+):v1/
-            container["image"] = "index.docker.io/gorenje/pushtech:#{$1}"
+            container["image"] = "#{RemoteImagePrefix}:#{$1}"
           end
           container["imagePullPolicy"] = image_pull_policy
         end
 
         (spec["initContainers"] || []).each do |container|
           if container["image"] =~ /pushtech.(.+):v1/
-            container["image"] = "index.docker.io/gorenje/pushtech:#{$1}"
+            container["image"] = "#{RemoteImagePrefix}:#{$1}"
           end
           container["imagePullPolicy"] = image_pull_policy
         end
