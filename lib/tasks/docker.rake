@@ -18,12 +18,13 @@ namespace :docker do
 
     desc "Push to hub.docker.com into private repo"
     task :push do
+      docker_account = ENV['DOCKER_ACCOUNT'] || 'gorenje'
       system <<-EOF
         for n in src/* ; do
           imagename=`basename $n`
           echo "!!! Pushing \\033[0;31m ====> ${imagename} \\033[0m"
-          docker tag #{KubernetesNS}.${imagename}:v1 gorenje/pushtech:${imagename}
-          docker push gorenje/pushtech:${imagename}
+          docker tag #{KubernetesNS}.${imagename}:v1 #{docker_account}/#{KubernetesNS}:${imagename}
+          docker push #{docker_account}/#{KubernetesNS}:${imagename}
         done
       EOF
     end
@@ -59,7 +60,6 @@ namespace :docker do
     desc "spin down everything"
     task :spin_down do
       system <<-EOF
-        $(cat .env)
         for n in docker-compose/*.yml ; do
           echo "\\033[0;34m ====> $n \\033[0m"
           docker-compose -f $n down
@@ -70,7 +70,6 @@ namespace :docker do
     desc "spin up everything"
     task :spin_up do
       system <<-EOF
-        $(cat .env)
         for n in docker-compose/*.yml ; do
           echo "\\033[0;31m ====> $n \\033[0m"
           docker-compose -f $n up -d
@@ -81,14 +80,13 @@ namespace :docker do
     desc "Open pages that are relevant"
     task :open_urls do
       system <<-EOF
-        $(cat .env)
-        open -a Safari http://localhost:$KAFIDX_PORT/kafidx
-        open -a Safari http://localhost:$TRACKER_PORT/event?d=1
-        open -a Safari http://localhost:$IMAGE_SERVER_PORT/assets
+        open -a Safari http://localhost:#{ENV['KAFIDX_PORT']}/kafidx
+        open -a Safari http://localhost:#{ENV['TRACKER_PORT']}/event?d=1
+        open -a Safari http://localhost:#{ENV['IMAGE_SERVER_PORT']}/assets
 
-        open -a Firefox http://localhost:$WEBSITE_PORT
-        open -a Firefox http://localhost:$STORAGE_PORT/store/offers
-        open -a Firefox http://localhost:$NOTIFICATION_SERVER_PORT/mappings
+        open -a Firefox http://localhost:#{ENV['WEBSITE_PORT']}
+        open -a Firefox http://localhost:#{ENV['STORAGE_PORT']}/store/offers
+        open -a Firefox http://localhost:#{ENV['NOTIFICATION_SERVER_PORT']}/mappings
       EOF
     end
 
@@ -100,7 +98,6 @@ namespace :docker do
       puts ">>>> Generating files into #{dirname}"
 
       system <<-EOF
-        $(cat .env)
         cd #{dirname}
         for n in ../docker-compose/*.yml ; do
           kompose convert -f $n
