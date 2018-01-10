@@ -10,7 +10,7 @@ var qryHelper = require('../lib/query_helper')
 router.route('/offers/:owner')
   .get(auth.isAuthenticated, function(req, res, next) {
     var comma = "";
-    res.write("[")
+    res.write('{ "version": "1.0", "data": [')
 
     Offer.find({ owner: req.params.owner })
       .cursor()
@@ -20,7 +20,7 @@ router.route('/offers/:owner')
         comma = ","
       })
       .on('end', function() {
-        res.end("]")
+        res.end("]}")
       })
   })
   .delete(auth.isAuthenticated, function(req, res, next) {

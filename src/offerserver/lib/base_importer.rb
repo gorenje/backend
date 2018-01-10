@@ -81,7 +81,9 @@ module BaseImporter
   end
 
   def get_old_offers_raw
-    StoreHelper::Agent.new.bulk.offers.send(owner).get
+    data = StoreHelper::Agent.new.bulk.offers.send(owner).get
+    raise "UnsupportedMismatch: #{data["version"]}" if data["version"] != "1.0"
+    data["data"]
   end
 
   def get_old_offers(&block)
