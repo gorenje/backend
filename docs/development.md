@@ -94,7 +94,7 @@ postgres databases and only one port!)
 
 So power up postgres:
 
-    docker-compose -f docker-compose/website.yaml up
+    eval $(cat .env) ; docker-compose -f docker-compose/website.yaml up
 
 This will also spin up a container with the website running (it will
 also migrate the database for you!).
@@ -109,7 +109,60 @@ But remember the database url will be
 ```postgres://user:pass@localhost:5432/dbname```!
 
 Of course, there are bunch of other references to the other services
-in the backend, whether they also need starting via docker-compose, is
+in the backend, whether they also need to be started via docker-compose, is
 depended on the change to be made. But it's the same principle: open their
 ports on localhost, change their URL to localhost plus port and the website
 code will be able to connect to the respective service.
+
+But now the code can be run using
+
+    foreman start web
+
+and you can make the necessary changes and test locally. Once everything
+works, you can rebuild the docker image ```rake docker:images:build```
+and test everything together.
+
+#### Take aways
+
+So what we done here is starting parts of the architecture using docker
+compose and running the code locally.
+
+Ddownside is having to setup a .env file locally for doing that. But that
+only has to be done once.
+
+Advantage is that changes can be tested directly and quickly.
+
+### 2. Cowboy coding ....
+
+This is more rough-and-ready since what we're doing here is making local
+changes, building a docker image and restarting the service directly using
+docker-compose.
+
+Turnaround time for checking changes is slightly longer than running code
+directly but advantage is that you are testing changes with the complete
+environment.
+
+First start by spinning up the entire architecture
+
+    rake docker:compose:spin_up
+
+Now say you want to make a change to the website, first thing to do
+is to take it out of the architecture:
+
+    eval $(cat .env) ; docker-compose -f docker-compose/website.yaml down
+
+Now make the necessary changes. Afterwards, rebuild the docker image and
+spin up the website:
+
+    rake docker:images:build
+    eval $(cat .env) ; docker-compose -f docker-compose/website.yaml up
+
+Don't worry about the docker rebuild, it only rebuilds what has changed,
+i.e. is super quick. Also starting up the service is also quick.
+
+#### Take aways
+
+Advantage here is that you're testing everything combined together and
+don't have a extra overhead generating another .env file.
+
+Disadvantage is that it takes a little longer to test changes.
