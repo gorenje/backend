@@ -262,3 +262,15 @@ This is related to the ImagePullPolicy defined when the setup was deployed.
 If you set ```Always```, then updating a service with new code is just a
 matter of deleting the corresponding Pods. Once they're recreated, the
 images are pulled automagically by kubernetes.
+
+The default value of ```IfNotPresent``` is a litte more difficult since
+it requires removing the image from the node running the container. So even
+if you delete the deployment and the recreate the deployment, if the
+corresponding pods are created on nodes that already had the image, you'll
+end with the same old image.
+
+My workaround has been to delete the deployment from the kubernetes
+cluster, updated the ```*.deployment.yaml```, adding the imagePullPolicy
+of ```Always``` and redeploying the deployment description.
+
+Hence for a staging environment, always use Always!
