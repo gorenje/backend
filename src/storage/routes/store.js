@@ -9,6 +9,12 @@ var vwhlpr    = require('../lib/helpers.js')
 var qryHelper = require('../lib/query_helper')
 
 router
+  .route('/')
+  .get(auth.isAuthenticated, function(req, res, next) {
+    res.redirect("/store/searches");
+  })
+
+router
   .route("/offers")
   .get(auth.isAuthenticated, function(req, res, next) {
     var pageOptions = {
@@ -75,7 +81,8 @@ router
       });
   });
 
-router.route('/matches')
+router
+  .route('/matches')
   .get(auth.isAuthenticated, function(req, res, next) {
     if ( req.session.search_id && req.session.offer_id ) {
       Search.find({_id: req.session.search_id}, function(err, searches){
@@ -179,6 +186,19 @@ router
       res.render('noresult');
     }
   });
+
+router
+  .route('/aggregate')
+  .get(auth.isAuthenticated, function(req, res, next) {
+    var group_by_owner = [ {"$group" : {_id: "$owner", count: {$sum: 1}}}]
+    Offer.aggregate(group_by_owner, function(err, offers){
+      if (err) return next(err);
+      Search.aggregate(group_by_owner, function(err,searches){
+        if (err) return next(err);
+        res.render('aggregate', {offers: offers, searches: searches});
+      })
+    })
+  })
 
 router
   .route('/geo')

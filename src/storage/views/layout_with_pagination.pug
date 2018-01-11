@@ -1,0 +1,34 @@
+mixin pagination(linkprefix)
+  - for( var idx = 0; idx < Math.ceil(pageOptions.total / pageOptions.limit) ; idx++ ) {
+    - if ( pageOptions.page == idx ) {
+      = `${idx} `
+    - } else {
+      a(href=linkprefix+"?page="+idx+"&limit="+pageOptions.limit)
+        = idx
+      = " "
+    - }
+  - }
+
+html
+  head
+    block head
+      link(rel='stylesheet' href='/stylesheets/style.css')
+      script(src='/javascript/jquery.3.2.1.min.js')
+      script(src='/javascript/support.js')
+
+  body
+    a.link_ao(href="/store/offers") All Offers
+    = " | "
+    a.link_as(href="/store/searches") All Searches
+    = " | "
+    a.link_cm(href="/store/matches") Create Match
+    = " | "
+    a.link_ag(href="/store/aggregate") Aggregration
+
+    block content
+      h1
+        = "Total Count: "
+        = pageOptions.total
+
+    block inlinejs
+    block inlinecss

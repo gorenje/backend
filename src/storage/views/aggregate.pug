@@ -1,0 +1,61 @@
+extends layout
+
+append head
+  title Owner Aggregation
+
+append content
+  p
+  h2 Offers
+  table
+    thead
+      tr
+        th Owner
+        th Count
+    tbody
+      - for ( obj of offers )
+        tr
+          th= obj._id
+          td= obj.count
+
+  p
+  h2 Searches
+  table
+    thead
+      tr
+        th Owner
+        th Count
+    tbody
+      - for ( obj of searches )
+        tr
+          th= obj._id
+          td= obj.count
+
+
+block inlinecss
+  style.
+    table {
+      width: 50%;
+      padding: 10px;
+      border-collapse: collapse;
+      border: 1px solid #aaa;
+    }
+    thead tr {
+      border-bottom: 1px solid #aaa;
+      background: #888;
+      color: #fff;
+    }
+    tbody tr {
+      border-bottom: 1px solid #aaa;
+    }
+    td {
+      text-align: center;
+    }
+    a {
+      text-decoration: none;
+    }
+
+  style.
+    .link_ag {
+      text-decoration: none;
+      color: black;
+    }
