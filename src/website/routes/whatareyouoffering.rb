@@ -1,4 +1,8 @@
 get '/' do
+  if is_logged_in?
+    # session contains an old user_id that no longer exists.
+    session.delete(:user_id) unless User.where(:id=>session[:user_id]).exists?
+  end
   tmpl_name = "index" + (is_logged_in? ? "_logged_in" : "")
   haml(:"whatareyouoffering/#{tmpl_name}",
          :layout => :"whatareyouoffering/layout")
