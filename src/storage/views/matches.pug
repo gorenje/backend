@@ -1,0 +1,43 @@
+extend layout
+
+append head
+  title Create Match
+
+append content
+  h1 Create Match
+
+  h2 Not showing invalid searches nor offers
+
+  form(method="post" action="/store/matches")
+    table
+      tr
+        th Searches:
+        td
+          select(name = "search_id")
+            - for (obj of searches){
+              - if (obj.is_valid()) {
+                option(value=obj._id)
+                  = `${obj.text}, ${obj.owner}`
+              - }
+            - }
+
+      tr
+        th Offers:
+        td
+          select(name = "offer_id")
+            - for (obj of offers){
+              - if (obj.is_valid()) {
+                option(value=obj._id)
+                  = `${obj.text}, ${obj.owner}`
+              - }
+            - }
+      tr
+        td
+          input(type="submit" value="Send Notification")
+
+block inlinecss
+  style.
+    .link_cm {
+      text-decoration: none;
+      color: black;
+    }

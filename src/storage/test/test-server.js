@@ -6,7 +6,6 @@ var asst = chai.assert;
 
 chai.use(chaiHttp);
 
-
 describe('Basic Server', function() {
   it('should require authentication', function(done){
     if ( process.env.NO_MONGO_CONNECTION ) this.skip();

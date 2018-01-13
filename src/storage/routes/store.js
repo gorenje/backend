@@ -9,6 +9,12 @@ var vwhlpr    = require('../lib/helpers.js')
 var qryHelper = require('../lib/query_helper')
 
 router
+  .route('/')
+  .get(auth.isAuthenticated, function(req, res, next) {
+    res.redirect("/store/searches");
+  })
+
+router
   .route("/offers")
   .get(auth.isAuthenticated, function(req, res, next) {
     var pageOptions = {
@@ -75,7 +81,8 @@ router
       });
   });
 
-router.route('/matches')
+router
+  .route('/matches')
   .get(auth.isAuthenticated, function(req, res, next) {
     if ( req.session.search_id && req.session.offer_id ) {
       Search.find({_id: req.session.search_id}, function(err, searches){
@@ -131,9 +138,7 @@ router
     Offer.find(properties, function(err, offers){
       if ( offers.length > 0 ) {
         req.body.location = JSON.parse(JSON.stringify(offers[0])).location;
-        req.body.location.dimension.latitudeDelta  = req.body.latDelta;
-        req.body.location.dimension.longitudeDelta = req.body.lngDelta;
-        req.body.location.radius = req.body.radius;
+        req.body.radiusMeters = req.body.radius;
         delete(req.body["latDelta"]);
         delete(req.body["lngDelta"]);
         delete(req.body["radius"]);
@@ -145,9 +150,7 @@ router
           if (searches.length > 0 ){
             req.body.location =
                 JSON.parse(JSON.stringify(searches[0])).location;
-            req.body.location.dimension.latitudeDelta  = req.body.latDelta;
-            req.body.location.dimension.longitudeDelta = req.body.lngDelta;
-            req.body.location.radius = req.body.radius;
+            req.body.radiusMeters = req.body.radius;
             delete(req.body["latDelta"]);
             delete(req.body["lngDelta"]);
             delete(req.body["radius"]);
@@ -168,19 +171,11 @@ router
       var properties = { _id: req.params.id }
       Offer.findOne(properties, function(err, offer){
         if ( offer ) {
-          if ( offer.location.radius ) {
-             res.render('details_circle', { obj: offer });
-          } else {
-             res.render('details', { obj: offer });
-          }
+          res.render('details', { obj: offer });
         } else {
           Search.findOne(properties, function(err, search){
             if (search ){
-              if ( search.location.radius ) {
-                res.render('details_circle', { obj: search });
-              } else {
-                res.render('details', { obj: search });
-              }
+              res.render('details', { obj: search });
             } else {
               res.render('noresult');
             }
@@ -191,6 +186,19 @@ router
       res.render('noresult');
     }
   });
+
+router
+  .route('/aggregate')
+  .get(auth.isAuthenticated, function(req, res, next) {
+    var group_by_owner = [ {"$group" : {_id: "$owner", count: {$sum: 1}}}]
+    Offer.aggregate(group_by_owner, function(err, offers){
+      if (err) return next(err);
+      Search.aggregate(group_by_owner, function(err,searches){
+        if (err) return next(err);
+        res.render('aggregate', {offers: offers, searches: searches});
+      })
+    })
+  })
 
 router
   .route('/geo')

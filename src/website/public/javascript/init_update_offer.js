@@ -42,7 +42,7 @@ function setup_for_update_offer() {
 
   circle = new google.maps.Circle({
     map: map,
-    radius: offer_obj.location.radius || InitialCircleRadiusMeters,
+    radius: offer_obj.radiusMeters || InitialCircleRadiusMeters,
     center: current_location,
     strokeColor: '#000',
     strokeOpacity: 0.8,

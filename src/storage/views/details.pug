@@ -1,0 +1,237 @@
+extends layout
+
+append head
+  title Details
+  script(async="" defer="defer" src="https://maps.googleapis.com/maps/api/js?key=" + process.env.GOOGLE_API_KEY +"&callback=initMap")
+
+
+append content
+  p
+  div#map(style="width: 200px; height: 200px;")
+  - if (JSON.parse(JSON.stringify(obj))["images"]) {
+    p
+    - for (path of obj["images"]) {
+      img(src=process.env.IMAGE_HOST + path + "/thumb" width="250" height="250")
+    - }
+  - }
+
+  h1 Details
+
+  table
+    tr
+      th Collection
+      td= obj.collection.name
+    tr
+      th Valid?
+      td= obj.is_valid()
+
+    - for (key in JSON.parse(JSON.stringify(obj))) {
+      tr
+        th= key
+        td
+         - if (typeof(obj[key]) === "string" ) {
+           = obj[key]
+         - } else {
+           = JSON.stringify(obj[key])
+         - }
+    - }
+
+    tr
+      th Google Maps
+      td
+        a(href="https://maps.google.com/maps?q=" +  obj.latitude() +","+ obj.longitude() target="_blank") here
+
+  h1 Update
+
+  form(method="post" action="/store/update/subject/" + obj._id)
+    table
+      tr
+        th Owner
+        td
+          input(type="text" name="owner" value=obj.owner size="60")
+      tr
+        th Valid Until
+        td
+          input(type="text" name="validuntil" value=obj.validuntil size="60")
+      tr
+        th Text
+        td
+          input(type="text" name="text" value=obj.text size="60")
+      tr
+        th Keywords
+        td
+          input(type="text" name="keywords" value=obj.keywords.join(', ') size="60")
+      tr
+        th Radius
+        td
+          input#radius(type="text" name="radius" value=obj.radius() size="60")
+
+      tr
+        th isMobile
+        td
+          input(type="checkbox" name="isMobile" checked=obj.isMobile)
+      tr
+        th allowContacts
+        td
+          input(type="checkbox" name="allowContacts" checked=obj.allowContacts)
+      tr
+        th showLocation
+        td
+          input(type="checkbox" name="showLocation" checked=obj.showLocation)
+      tr
+        td
+          input(type="submit" value="Update")
+        td
+          a(href="#" onclick="toggleActivation('"+ obj._id +"', '"+ obj.collection.name +"', " + obj.isActive + "); return false;")
+            = obj.isActive ? 'Deactivate' : 'Activate'
+          = " | "
+          a(href="#" onclick="notifyMatches('"+ obj._id +"', '"+ obj.collection.name +"'); return false;") Find Matches
+
+
+block inlinejs
+  script
+    = "var lat = " + obj.latitude() + ";"
+    = "var lng = " + obj.longitude() + ";"
+    = "var radius = " + obj.radius() + ";"
+
+  script.
+    var current_location = null;
+    var circle = null;
+    var ignoreNextShowCircleCall = false;
+
+    function initMap() {
+      current_location = new google.maps.LatLng(lat, lng);
+
+      var bounds = generateBounds(current_location, radius);
+      bounds.extend(current_location);
+
+      var map = new google.maps.Map(document.getElementById('map'), {
+           zoom: 14,
+           gestureHandling: 'greedy',
+           mapTypeControl: false,
+           mapTypeId: google.maps.MapTypeId.ROADMAP,
+           styles: mapStyle(),
+           disableDefaultUI: true,
+           streetViewControl: false,
+           zoomControl: true,
+           zoomControlOptions: {
+             position: google.maps.ControlPosition.TOP_LEFT
+           }
+        });
+
+      map.setCenter(current_location);
+      map.fitBounds(bounds);
+
+      var marker = new google.maps.Marker({
+        position: current_location,
+        map: map
+      });
+
+      circle = new google.maps.Circle({
+        map: map,
+        center: current_location,
+        radius: radius,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        editable: true
+      });
+
+      circle.addListener('bounds_changed', showNewCircle);
+    }
+
+    function showNewCircle() {
+      if ( ignoreNextShowCircleCall ) {
+        ignoreNextShowCircleCall = false;
+        return;
+      }
+
+      $('#radius').val(circle.getRadius());
+
+      ignoreNextShowCircleCall = true;
+    }
+
+    function generateBounds(current_location, radius ) {
+      return new google.maps.Circle({ center: current_location,
+                                      radius: radius * 1.10 }).getBounds();
+    }
+
+    function mapStyle(){
+      return [
+        {
+          "featureType": "administrative",
+          "elementType": "geometry",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "administrative.land_parcel",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "poi",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "poi.park",
+          "stylers": [
+            {
+              "visibility": "on"
+            }
+          ]
+        },
+        {
+          "featureType": "road",
+          "elementType": "labels.icon",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        },
+        {
+          "featureType": "transit",
+          "stylers": [
+            {
+              "visibility": "off"
+            }
+          ]
+        }
+      ];
+    }
+
+    function toggleActivation(idstr, type_string, activeness) {
+      $.ajax({
+         url:  "/" + type_string + "/" + idstr + "/set_active/" +
+               (activeness ? "false" : "true"),
+         data: {},
+         method: 'get',
+         dataType: 'json'
+      }).done(function(data){
+         window.location.reload(true);
+      });
+    }
+
+    function notifyMatches(idstr, type_string) {
+      $.ajax({
+         url:  "/" + type_string + "/" + idstr + "/notify",
+         data: {},
+         method: 'get',
+         dataType: 'json'
+      }).done(function(data){
+         alert(data.status);
+      });
+    }

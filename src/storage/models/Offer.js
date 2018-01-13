@@ -26,25 +26,15 @@ var OfferSchema = new mongoose.Schema({
       type: [Number],
       required: true,
     },
-    radius: {
-      type: Number,
-      required: false,
-    },
-    dimension: {
-      longitudeDelta: {
-        type: Number,
-        required: true,
-      },
-      latitudeDelta: {
-        type: Number,
-        required: true,
-      },
-    },
-    place: {
-      type : mongoose.Schema.Types.Mixed,
-      default : {},
-      required: false,
-    },
+  },
+  radiusMeters: {
+    type: Number,
+    required: false,
+  },
+  place: {
+    type : mongoose.Schema.Types.Mixed,
+    default : {},
+    required: false,
   },
   showLocation: {
     type: Boolean,
@@ -102,7 +92,7 @@ var OfferSchema = new mongoose.Schema({
 OfferSchema.methods.cloneReplacingLngLat = function(lng, lat) {
   var tmp = JSON.parse(JSON.stringify(this));
   tmp.location.coordinates = [lng, lat]
-  tmp.location.place = {}
+  tmp.place = {}
   return tmp;
 };
 
@@ -114,16 +104,8 @@ OfferSchema.methods.longitude = function() {
   return this.location.coordinates[0];
 };
 
-OfferSchema.methods.latitudeDelta = function() {
-  return this.location.dimension.latitudeDelta;
-};
-
-OfferSchema.methods.longitudeDelta = function() {
-  return this.location.dimension.longitudeDelta;
-};
-
 OfferSchema.methods.radius = function() {
-  return this.location.radius;
+  return this.radiusMeters;
 };
 
 OfferSchema.methods.is_valid = function() {
@@ -167,8 +149,6 @@ OfferSchema.methods.trackingParams = function(action) {
     title:  this.text,
     lat:    this.latitude(),
     lng:    this.longitude(),
-    latD:   this.latitudeDelta(),
-    lngD:   this.longitudeDelta(),
     radi:   this.radius()
   };
 }

@@ -178,35 +178,11 @@ function showNewCircle() {
   var ne = circle.getBounds().getNorthEast();
   var sw = circle.getBounds().getSouthWest();
 
-  var latDelta = ( ( ne.lat() - lat ) + ( lat - sw.lat() ) ) / 2.0;
-  var lngDelta = ( ( ne.lng() - lng ) + ( lng - sw.lng() ) ) / 2.0;
-
-  $('#latDelta').val(latDelta);
-  $('#lngDelta').val(lngDelta);
   $('#crlRadius').val(Math.ceil(circle.getRadius()));
   $('#radiusText').html(Math.ceil(circle.getRadius()));
 
   circle._ignoreNextCall = true;
-  var bounds = generateBounds(lat, lng, latDelta, lngDelta);
   circle.setCenter(current_location);
-}
-
-function generateBounds(lat, lng, latDelta, lngDelta) {
-  var rbounds = new google.maps.LatLngBounds();
-
-  var redCoords = [
-    {lat: lat + latDelta, lng: lng - lngDelta},
-    {lat: lat + latDelta, lng: lng + lngDelta},
-    {lat: lat - latDelta, lng: lng + lngDelta},
-    {lat: lat - latDelta, lng: lng - lngDelta},
-  ];
-
-  rbounds.extend(redCoords[0]);
-  rbounds.extend(redCoords[1]);
-  rbounds.extend(redCoords[2]);
-  rbounds.extend(redCoords[3]);
-
-  return rbounds;
 }
 
 function ajaxStartChatCall(params) {

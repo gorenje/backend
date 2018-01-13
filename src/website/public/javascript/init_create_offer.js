@@ -54,22 +54,9 @@ function obtainSearchObject() {
 
     $.each(data, function(idx, search_obj) {
       bounds.extend(search_obj.json_location);
-      var lat = search_obj.json_location.lat,
-          lng = search_obj.json_location.lng,
-          latDelta = search_obj.latDelta,
-          lngDelta = search_obj.lngDelta;
 
-      var coords = [
-        {lat: lat + latDelta, lng: lng - lngDelta},
-        {lat: lat + latDelta, lng: lng + lngDelta},
-        {lat: lat - latDelta, lng: lng + lngDelta},
-        {lat: lat - latDelta, lng: lng - lngDelta},
-      ];
-
-      bounds.extend(coords[0]);
-      bounds.extend(coords[1]);
-      bounds.extend(coords[2]);
-      bounds.extend(coords[3]);
+      bounds.extend(new google.maps.Circle({ center: search_obj.json_location,
+                             radius: search_obj.radius * 1.10 }).getBounds());
 
       if ( typeof objectmarkers[idx] === 'undefined' ) {
         objectmarkers[idx] = newObjectMarker({});

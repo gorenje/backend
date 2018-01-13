@@ -11,19 +11,12 @@ describe('Query Helper', function() {
     var offer = new Offer();
     offer.owner = "Fubar"
     offer.location = {
-      radius: 10,
       coordinates: [100,50],
-      dimension: {
-        longitudeDelta: 10,
-        latitudeDelta: 5
-      },
     }
+    offer.radiusMeters = 10
     offer.keywords = ["one", "two", "three"]
 
     var props = qryHelper.lookupProps(offer, {});
-
-    assert.strictEqual(offer.longitudeDelta(), 10);
-    assert.strictEqual(offer.latitudeDelta(), 5);
 
     assert.isOk(props.validuntil);
     assert.isAbove((new Date()).getTime()+1, props.validuntil.$gt);
@@ -45,19 +38,12 @@ describe('Query Helper', function() {
     var search = new Search();
     search.owner = "Fubar"
     search.location = {
-      radius: 10,
       coordinates: [100,50],
-      dimension: {
-        longitudeDelta: 10,
-        latitudeDelta: 5
-      },
     }
+    search.radiusMeters = 10
     search.keywords = ["one", "two", "three"]
 
     var props = qryHelper.lookupProps(search, {});
-
-    assert.strictEqual(search.longitudeDelta(), 10);
-    assert.strictEqual(search.latitudeDelta(), 5);
 
     assert.isOk(props.validuntil);
     assert.isAbove((new Date()).getTime()+1, props.validuntil.$gt);

@@ -45,21 +45,15 @@ describe('Notifier', function() {
     offr.text     = "text"
     offr.location = {
       coordinates: [100,50],
-      dimension: {
-        longitudeDelta: 10,
-        latitudeDelta: 5
-      }
     }
+    offr.radiusMeters = 123
 
     srch.owner    = "SNafo"
     srch.text     = "somemoregetx"
     srch.location = {
       coordinates: [101,51],
-      dimension: {
-        longitudeDelta: 11,
-        latitudeDelta: 6
-      }
     }
+    srch.radiusMeters = 100
 
     fakeweb.allowNetConnect = false;
     var spy = fakeweb.registerUri({uri: 'http://localhost:3000/notify',
@@ -81,15 +75,13 @@ describe('Notifier', function() {
     assert.strictEqual(body.offer.device_id, "Fubar")
     assert.strictEqual(body.offer.lat, 50)
     assert.strictEqual(body.offer.lng, 100)
-    assert.strictEqual(body.offer.latD, 5)
-    assert.strictEqual(body.offer.lngD, 10)
+    assert.strictEqual(body.offer.radi, 123)
 
     assert.strictEqual(body.search.title, "somemoregetx")
     assert.strictEqual(body.search.device_id, "SNafo")
     assert.strictEqual(body.search.lat, 51)
     assert.strictEqual(body.search.lng, 101)
-    assert.strictEqual(body.search.latD, 6)
-    assert.strictEqual(body.search.lngD, 11)
+    assert.strictEqual(body.search.radi, 100)
 
     done();
   });

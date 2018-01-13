@@ -1,0 +1,44 @@
+extends layout_with_pagination.pug
+
+append head
+  title Searches
+
+append content
+  +pagination("/store/searches")
+  p
+
+  table(border=1)
+    thead
+      tr
+        th Id
+        th Owner
+        th Text
+        th Keywords
+        th isMobile
+        th isValid
+        th Actions
+    tbody
+      - for (obj of searches){
+        tr
+          td
+            a(href='#' onclick="setMatch('search', '"+obj.id+"'); return false;")
+              = obj.id
+          td= obj.owner
+          td= obj.text
+          td= obj.keywords.join(",")
+          td(class= obj.isMobile ? 'mobile' : '')= obj.isMobile
+          td(class= obj.is_valid() ? '' : 'invalid')= obj.is_valid()
+          td
+           a(href="/store/details/" + obj._id target="_blank") Details
+           = " | "
+           a(href="/store/delete/search/" + obj._id) Delete
+      - }
+  p
+  +pagination("/store/searches")
+
+block inlinecss
+  style.
+    .link_as {
+      text-decoration: none;
+      color: black;
+    }

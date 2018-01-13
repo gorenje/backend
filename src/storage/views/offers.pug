@@ -1,0 +1,46 @@
+extends layout_with_pagination.pug
+
+block append head
+  title Offers
+
+append content
+  +pagination("/store/offers")
+  p
+
+  table(border=1)
+    thead
+      tr
+        th Id
+        th Owner
+        th Text
+        th Keywords
+        th isMobile
+        th isValid
+        th Actions
+    tbody
+      - for (obj of offers){
+        tr
+          td
+            a(href='#' onclick="setMatch('offer', '"+obj.id+"'); return false;")
+              = obj.id
+          td= obj.owner
+          td= obj.text
+          td= obj.keywords.join(",")
+          td(class= obj.isMobile ? 'mobile' : '')= obj.isMobile
+          td(class= obj.is_valid() ? '' : 'invalid')= obj.is_valid()
+          td
+           a(href="/store/details/" + obj._id target="_blank") Details
+           = " | "
+           a(href="/store/delete/offer/" + obj._id) Delete
+      - }
+
+  p
+  +pagination("/store/offers")
+
+
+block inlinecss
+  style.
+    .link_ao {
+      text-decoration: none;
+      color: black;
+    }

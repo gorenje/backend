@@ -18,12 +18,8 @@ module BaseImporter
         :location      => {
           :type        => "Point",
           :coordinates => [ 0, 0 ],
-          :radius      => 225,
-          :dimension   => {
-            :longitudeDelta => 0.0017342150719485971,
-            :latitudeDelta => 0.0017342150719485971
-          },
-        }
+        },
+        :radiusMeters  => 225,
       })
     end
   end
@@ -52,7 +48,7 @@ module BaseImporter
   end
 
   def add_place(subject)
-    subject["location"]["place"] = {
+    subject["place"] = {
       "en" => {
         "route"                       => "",
         "street_number"               => "",
@@ -62,7 +58,7 @@ module BaseImporter
         "country"                     => "Germany",
       }
     }
-    subject["location"]["place"]["en"]
+    subject["place"]["en"]
   end
 
   def timestamp
