@@ -1,7 +1,7 @@
 namespace :stackpoint do
   namespace :generate do
     desc <<-EOF
-      Generate one single yaml for orchestraction.
+      Generate separate yamls for stackpoint orchestraction.
     EOF
     task :yaml do
       require 'yaml'
@@ -12,10 +12,18 @@ namespace :stackpoint do
       external_domain   = ENV['DOMAIN']            || 'staging.pushtech.de'
       image_pull_policy = ENV['IMAGE_PULL_POLICY'] || "IfNotPresent"
       docker_account    = ENV['DOCKER_ACCOUNT']    || "gorenje"
-      external_services = []
-      docs              = Hash.new{|h,k| h[k] = [] }
       website_cdn_hosts =
         ["www1", "www2", "www3"].map { |a| a + "." + external_domain }
+      deployment_scaling = {
+        "website"            => 3,
+        "storage"            => 3,
+        "offerserver-worker" => 2,
+        "tracker"            => 3,
+        "imageserver"        => 3
+      }
+
+      external_services = []
+      docs              = Hash.new{|h,k| h[k] = [] }
 
       RemoteImagePrefix = "index.docker.io/#{docker_account}/#{KubernetesNS}"
 
@@ -99,6 +107,10 @@ namespace :stackpoint do
 
       docs["Deployment"].each do |depl|
         spec = depl["spec"]["template"]["spec"]
+
+        # define the scaling count.
+        depl["spec"]["replicas"] =
+          deployment_scaling[depl["metadata"]["name"]] || 1
 
         # replace docker image names with external accessible ones
         spec["containers"].each do |container|
