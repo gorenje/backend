@@ -274,3 +274,8 @@ cluster, updated the ```*.deployment.yaml```, adding the imagePullPolicy
 of ```Always``` and redeploying the deployment description.
 
 Hence for a staging environment, always use Always!
+
+## Fixing Live Issues
+
+Please read [fixing live issues](fixing_live_issues.md) about how to fix
+things that go wrong at stackpoint.
