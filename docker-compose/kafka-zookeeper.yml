@@ -1,7 +1,9 @@
 version: '2'
 services:
   zookeeper:
-    image: wurstmeister/zookeeper
+    image: zookeeper:3.4.11
+    environment:
+      - ZOO_MAX_CLIENT_CNXNS=600
     ports:
       - "2181"
     restart: always

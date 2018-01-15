@@ -32,8 +32,11 @@ spec:
       imagePullSecrets:
       - name: meatdocker
       containers:
-      - image: wurstmeister/zookeeper
+      - image: zookeeper:3.4.11
         name: zookeeper
+        env:
+        - name: ZOO_MAX_CLIENT_CNXNS
+          value: 600
         ports:
         - containerPort: 2181
         resources: {}
