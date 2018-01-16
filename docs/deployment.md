@@ -205,6 +205,14 @@ hosts created:
 
     kubectl get secrets -n pushtech | grep tls
 
+## Mapping from service to domain
+
+If you're wondering which service is being hit by which domain, doing:
+
+    kubectl get ingress -n pushtech
+
+provides a handy overview.
+
 ## Mongo Indicies
 
 As an absolute final step, log on into the mongo pod and create the geo-spatial

@@ -152,12 +152,12 @@ namespace :stackpoint do
       end
 
       # create the cdn servers for the website.
-      ingress_template = docs["Ingress"].select do |ingress|
+      ingress_website_template = docs["Ingress"].select do |ingress|
         ingress["metadata"]["name"] == "website"
       end.first
 
       website_cdn_hosts.each do |cdn_domain|
-        ingress = YAML.load(ingress_template.to_yaml) # deep clone
+        ingress = YAML.load(ingress_website_template.to_yaml) # deep clone
         servname = "website-" + cdn_domain.split(".").first
 
         ingress["metadata"]["name"] = servname
@@ -172,6 +172,23 @@ namespace :stackpoint do
         docs["Ingress"] << ingress
       end
 
+      # top level TLD also gets an ingress to the website, else
+      # the TLD will return a 404.
+      ingress = YAML.load(ingress_website_template.to_yaml) # deep clone
+      servname = "website-tld"
+
+      ingress["metadata"]["name"] = servname
+
+      tls = ingress["spec"]["tls"].first
+      tls["hosts"]      = [external_domain]
+      tls["secretName"] = servname + "-tls"
+
+      rule = ingress["spec"]["rules"].first
+      rule["host"] = external_domain
+
+      docs["Ingress"] << ingress
+
+      # finally write out all the files.
       tstamp = DateTime.now.strftime("%Y%m%d%H%m%S")
       docs.keys.each do |kind|
         outfile_name = "stackpoint.#{kind.downcase}.yaml"
