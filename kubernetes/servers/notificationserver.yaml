@@ -110,7 +110,7 @@ spec:
             secretKeyRef:
               name: k8scfg
               key: NOTIFSERVER_REDIS_URL
-        - name: SENDBIRD_API_ID
+        - name: SENDBIRD_APP_ID
           valueFrom:
             secretKeyRef:
               name: envsecrets
