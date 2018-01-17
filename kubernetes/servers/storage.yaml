@@ -39,6 +39,13 @@ spec:
       containers:
       - name: storage
         image: pushtech.storage:v1
+        resources:
+          requests:
+            memory: "400Mi"
+            cpu: "100m"
+          limits:
+            memory: "800Mi"
+            cpu: "300m"
         env:
         - name: COOKIE_SECRET
           valueFrom:
@@ -96,4 +103,3 @@ spec:
               key: NOTIFICATION_API_PASSWORD
         ports:
         - containerPort: 5011
-        resources: {}

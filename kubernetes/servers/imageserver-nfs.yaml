@@ -45,6 +45,13 @@ spec:
         args:
           - /usr/local/bin/run_nfs.sh
           - /var/lib/imagesrv/store
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "200m"
+          limits:
+            memory: "600Mi"
+            cpu: "400m"
         ports:
           - name: nfs
             containerPort: 2049

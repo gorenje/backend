@@ -43,6 +43,13 @@ spec:
         - foreman
         - start
         - web
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "200m"
+          limits:
+            memory: "400Mi"
+            cpu: "400m"
         env:
         - name: COOKIE_SECRET
           valueFrom:
@@ -72,4 +79,3 @@ spec:
               key: OFFERSERVER_API_PASSWORD
         ports:
         - containerPort: 5000
-        resources: {}

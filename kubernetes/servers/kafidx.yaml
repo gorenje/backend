@@ -39,6 +39,13 @@ spec:
       containers:
       - image: pushtech.kafidx:v1
         name: kafidx
+        resources:
+          requests:
+            memory: "150Mi"
+            cpu: "100m"
+          limits:
+            memory: "300Mi"
+            cpu: "300m"
         env:
         - name: REDIS_URL
           value: redis://consumers-nodejs-redis:6379?db=
@@ -76,4 +83,3 @@ spec:
               key: KAFIDX_COOKIE_SECRET
         ports:
         - containerPort: 5031
-        resources: {}

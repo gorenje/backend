@@ -36,6 +36,13 @@ spec:
       containers:
       - image: postgres:9.6.6
         name: pgnotserver
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "200m"
+          limits:
+            memory: "250Mi"
+            cpu: "500m"
         env:
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata

@@ -95,3 +95,50 @@ running. On the other hand, if the logs reply with:
     failed to get container status {"" ""}: rpc error: code = OutOfRange desc = EOF
 
 Then things are pretty much over for the pod.
+
+## 3. Nginx pod dies
+
+Since nginx is the central point of entry into the backend, if everything
+seems to be done (i.e. not reachable), then nginx might have crashed.
+
+To check, do
+
+    kubectl get pods --all-namespaces | grep nginx
+
+If indeed nginx has died or is terminating, get rid of it permanently
+by doing:
+
+    kubectl delete pods <pod id of nginx> --force -n nginx-ingress
+
+That will cause Nginx to be restarted.
+
+The cause for this is sometimes a worker dies.
+
+## 4. Kubernetes Worker Dies.
+
+You can check this by checking all the deployments:
+
+    kubectl get deployments --all-namespaces
+
+If available is less than desired, then you know you have an issue.
+
+## 5. Resources: Finding what is being used by the pods
+
+Show all the resources available:
+
+    kubectl describe nodes
+
+and
+
+    kubectl top nodes
+
+Then have a look what the pods are currently using:
+
+    for ns in kube-lego nginx-ingress pushtech ; do
+      echo "--------> Namespace: $ns"
+      for n in `kubectl get pods -n $ns | awk '// { print $1 }' | tail +2` ; do
+        kubectl top pod -n $ns $n | tail +2
+      done
+    done
+
+From there, redefine the resources in the k8s yamls.

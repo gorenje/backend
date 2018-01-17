@@ -66,6 +66,13 @@ spec:
           rake docker:if_db_is_migrated &&
           rake docker:nfs_mount         &&
           foreman start web
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "400Mi"
+            cpu: "400m"
         env:
         - name: DATABASE_URL
           valueFrom:
@@ -108,4 +115,3 @@ spec:
         - containerPort: 5061
         securityContext:
           privileged: true
-        resources: {}

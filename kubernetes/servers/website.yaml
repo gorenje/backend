@@ -61,6 +61,13 @@ spec:
         - rake docker:pause_for_db      &&
           rake docker:if_db_is_migrated &&
           foreman start web
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "300m"
+          limits:
+            memory: "400Mi"
+            cpu: "600m"
         env:
         - name: DB_POOL_SIZE
           value: "20"

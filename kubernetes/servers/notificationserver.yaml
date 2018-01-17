@@ -66,6 +66,13 @@ spec:
           rake docker:pause_for_redis    &&
           rake docker:if_db_is_migrated  &&
           foreman start web
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "300m"
+          limits:
+            memory: "400Mi"
+            cpu: "600m"
         env:
         - name: DATABASE_URL
           valueFrom:
@@ -144,4 +151,3 @@ spec:
               key: NOTIFICATION_SERVER_COOKIE_SECRET
         ports:
         - containerPort: 5041
-        resources: {}

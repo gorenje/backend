@@ -18,6 +18,13 @@ spec:
       containers:
       - image: pushtech.consumers.nodejs:v1
         name: metadata-counter
+        resources:
+          requests:
+            memory: "25Mi"
+            cpu: "100m"
+          limits:
+            memory: "50Mi"
+            cpu: "300m"
         env:
         - name: CONSUMER_NAME
           value: metadata_counter

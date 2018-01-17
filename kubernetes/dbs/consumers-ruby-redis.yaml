@@ -36,9 +36,15 @@ spec:
       containers:
       - image: redis
         name: ruby-consumers-db
+        resources:
+          requests:
+            memory: "25Mi"
+            cpu: "50m"
+          limits:
+            memory: "75Mi"
+            cpu: "200m"
         ports:
         - containerPort: 6379
-        resources: {}
         volumeMounts:
         - mountPath: /data
           name: rubyconsumerdb

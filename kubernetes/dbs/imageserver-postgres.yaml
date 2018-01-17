@@ -37,6 +37,13 @@ spec:
       containers:
       - image: postgres:9.6.6
         name: pgimgserver
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "200m"
+          limits:
+            memory: "250Mi"
+            cpu: "500m"
         env:
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
@@ -47,7 +54,6 @@ spec:
               key: IMGSERVER_PG_PASSWORD
         ports:
         - containerPort: 5432
-        resources: {}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: imgserverdb
