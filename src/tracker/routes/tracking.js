@@ -8,8 +8,6 @@ var redis = require("redis"),
 router.get('*', function(req, res, next) {
   res.json({status: 'ok'})
 
-  console.log(req.headers)
-
   var msg = [];
 
   var remoteip = null;
