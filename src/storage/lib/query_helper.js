@@ -5,7 +5,7 @@ function locationByCenterSphere(properties, lng, lat, radius) {
   // 6,378.1 km is the equatorial radius of the Earth
   properties.location = {
     $geoWithin: { $centerSphere: [ [parseFloat(lng), parseFloat(lat)],
-                                   radius / 6378100] }
+                                   parseFloat(radius) / 6378100] }
   };
   return properties;
 }

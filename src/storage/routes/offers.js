@@ -18,6 +18,8 @@ router.route('/')
     var ne           = req.query.ne
     var offer_id     = req.query._id
     var active_value = req.query.is_active
+    var radius       = req.query.radius
+    var center       = req.query.center
 
     if (keywords) {
       properties.keywords = { $in: keywords }
@@ -32,8 +34,19 @@ router.route('/')
       properties.owner = { $ne: not_owner }
     }
 
-    if (sw) {
-      properties = qryHelper.locationBySwNe(properties, sw, ne);
+    if (radius && center) {
+      properties =
+        qryHelper.locationByCenterSphere(properties, center.longitude,
+                                         center.latitude, radius)
+    } else {
+      if (sw && ne) {
+        properties.location = {
+          $geoWithin: { $box: [
+            [ parseFloat(sw.longitude), parseFloat(sw.latitude) ],
+            [ parseFloat(ne.longitude), parseFloat(ne.latitude) ]
+          ]}
+        }
+      }
     }
 
     if (offer_id) {
