@@ -15,11 +15,13 @@ namespace :stackpoint do
       website_cdn_hosts =
         ["www1", "www2", "www3"].map { |a| a + "." + external_domain }
       deployment_scaling = {
-        "website"            => 3,
-        "storage"            => 3,
-        "offerserver-worker" => 2,
-        "tracker"            => 3,
-        "imageserver"        => 3
+        "website"            => 2,
+        "storage"            => 2,
+        "offerserver-worker" => 1,
+        "tracker"            => 2,
+        "imageserver"        => 1,
+        "kafidx"             => 1,
+        "kafka"              => 2,
       }
 
       external_services = []
