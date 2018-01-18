@@ -132,13 +132,15 @@ and
 
     kubectl top nodes
 
-Then have a look what the pods are currently using:
+To analyse the resource usage, start collecting datapoints:
 
-    for ns in kube-lego nginx-ingress pushtech ; do
-      echo "--------> Namespace: $ns"
-      for n in `kubectl get pods -n $ns | awk '// { print $1 }' | tail +2` ; do
-        kubectl top pod -n $ns $n | tail +2
-      done
-    done
+    touch last.test.txt
+    while [ 1 ] ; do rake resources:measure >> last.test.txt ; done
+
+Leave that running and perform any loadtesting required.
+
+In a second window, analyse the data points:
+
+    watch rake resources:analyse
 
 From there, redefine the resources in the k8s yamls.
