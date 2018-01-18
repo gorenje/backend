@@ -141,6 +141,6 @@ Leave that running and perform any loadtesting required.
 
 In a second window, analyse the data points:
 
-    watch rake resources:analyse
+    watch -c rake resources:analyse
 
 From there, redefine the resources in the k8s yamls.

@@ -10,9 +10,9 @@ namespace :resources do
     end
 
     datapoints = 0
-    namespace = ""
-    cpudata = Hash.new{|h,k| h[k] = Hash.new{|h2,k2| h2[k2] = [] } }
-    memdata = Hash.new{|h,k| h[k] = Hash.new{|h2,k2| h2[k2] = [] } }
+    namespace  = ""
+    cpudata    = Hash.new{|h,k| h[k] = Hash.new{|h2,k2| h2[k2] = [] } }
+    memdata    = Hash.new{|h,k| h[k] = Hash.new{|h2,k2| h2[k2] = [] } }
 
     File.read("last.test.txt").split(/\n/).each do |line|
       next if line.strip.empty?
@@ -21,7 +21,7 @@ namespace :resources do
       elsif line =~ /(.+)[[:space:]]+([0-9]+)m[[:space:]]+([0-9]+)Mi/
         cpudata[namespace][$1] << $2.to_i
         memdata[namespace][$1] << $3.to_i
-        datapoints+=1
+        datapoints += 1
       else
         puts "Warning: Ignoring '#{line}' because it didn't match"
       end
@@ -34,28 +34,26 @@ namespace :resources do
     end.flatten.max
 
     cnt = 0
-    puts("%#{longest_service_name+10}s %20s %20s" % [
+    puts("\033[1;32m%#{longest_service_name+2}s %20s %20s\033[0;m" % [
            "pod (namespace) - max (avg,min)".center(longest_service_name),
            "cpu (m)".center(20),
-           "memory (Mi)".center(20)
-         ])
+           "memory (Mi)".center(20)])
 
     cpudata.keys.each do |namespace|
       cpudata[namespace].keys.each do |service|
-        clr = (cnt+=1) % 2 == 1 ? "\033[1;31m" : "\033[1;32m"
-        puts("#{clr}%-#{longest_service_name+3}s %5d (%5d,%5d) %5d (%5d,%5d)" % [
+        cpda = cpudata[namespace][service]
+        mmda = memdata[namespace][service]
+        clr  = (cnt+=1) % 2 == 1 ? "\033[1;40m" : "\033[1;44m"
+
+        puts(("#{clr}%-#{longest_service_name+3}s %5d (%5d,%5d) "+
+             "%5d (%5d,%5d)\033[0;m") % [
                "#{service} (#{namespace})",
-               cpudata[namespace][service].max,
-               cpudata[namespace][service].avg,
-               cpudata[namespace][service].min,
-               memdata[namespace][service].max,
-               memdata[namespace][service].avg,
-               memdata[namespace][service].min
-             ])
+               cpda.max, cpda.avg, cpda.min, mmda.max, mmda.avg, mmda.min])
       end
     end
 
-    puts("======> Total Datapoints: " + datapoints.to_s)
+    puts("\033[0;m\033[1;32m======> Total Datapoints: " + datapoints.to_s +
+         "\033[0;m")
   end
 
   desc <<-EOF
