@@ -39,10 +39,10 @@ spec:
         resources:
           requests:
             memory: "150Mi"
-            cpu: "300m"
+            cpu: "30m"
           limits:
             memory: "350Mi"
-            cpu: "600m"
+            cpu: "60m"
         env:
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata

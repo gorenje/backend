@@ -47,11 +47,11 @@ spec:
           - /var/lib/imagesrv/store
         resources:
           requests:
-            memory: "300Mi"
-            cpu: "200m"
+            memory: "200Mi"
+            cpu: "20m"
           limits:
-            memory: "600Mi"
-            cpu: "400m"
+            memory: "400Mi"
+            cpu: "40m"
         ports:
           - name: nfs
             containerPort: 2049

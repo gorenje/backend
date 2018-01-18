@@ -43,11 +43,11 @@ spec:
         - web
         resources:
           requests:
-            memory: "300Mi"
-            cpu: "200m"
+            memory: "200Mi"
+            cpu: "10m"
           limits:
-            memory: "600Mi"
-            cpu: "400m"
+            memory: "400Mi"
+            cpu: "30m"
         env:
         - name: COOKIE_SECRET
           valueFrom:

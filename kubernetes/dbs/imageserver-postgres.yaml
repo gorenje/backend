@@ -39,11 +39,11 @@ spec:
         name: pgimgserver
         resources:
           requests:
-            memory: "100Mi"
-            cpu: "200m"
+            memory: "80Mi"
+            cpu: "20m"
           limits:
-            memory: "250Mi"
-            cpu: "500m"
+            memory: "200Mi"
+            cpu: "50m"
         env:
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata

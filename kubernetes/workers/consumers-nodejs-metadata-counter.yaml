@@ -21,10 +21,10 @@ spec:
         resources:
           requests:
             memory: "25Mi"
-            cpu: "100m"
+            cpu: "10m"
           limits:
             memory: "50Mi"
-            cpu: "300m"
+            cpu: "30m"
         env:
         - name: CONSUMER_NAME
           value: metadata_counter

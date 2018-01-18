@@ -37,10 +37,10 @@ spec:
         resources:
           requests:
             memory: "100Mi"
-            cpu: "300m"
+            cpu: "10m"
           limits:
-            memory: "400Mi"
-            cpu: "600m"
+            memory: "200Mi"
+            cpu: "50m"
         env:
         - name: ZOO_MAX_CLIENT_CNXNS
           value: "600"

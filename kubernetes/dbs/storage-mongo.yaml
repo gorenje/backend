@@ -40,10 +40,10 @@ spec:
         name: mongo-store
         resources:
           requests:
-            memory: "250Mi"
+            memory: "200Mi"
             cpu: "200m"
           limits:
-            memory: "500Mi"
+            memory: "400Mi"
             cpu: "400m"
         ports:
         - containerPort: 27017

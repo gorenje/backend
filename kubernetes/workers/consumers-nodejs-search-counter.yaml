@@ -18,6 +18,13 @@ spec:
       containers:
       - image: pushtech.consumers.nodejs:v1
         name: search-counter
+        resources:
+          requests:
+            memory: "25Mi"
+            cpu: "10m"
+          limits:
+            memory: "50Mi"
+            cpu: "30m"
         env:
         - name: CONSUMER_NAME
           value: search_counter

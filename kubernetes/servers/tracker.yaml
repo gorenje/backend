@@ -40,11 +40,11 @@ spec:
         name: redis-tracker
         resources:
           requests:
-            memory: "50Mi"
-            cpu: "50m"
+            memory: "40Mi"
+            cpu: "15m"
           limits:
             memory: "100Mi"
-            cpu: "200m"
+            cpu: "30m"
         ports:
         - containerPort: 6379
       - image: pushtech.tracker:v1
@@ -52,10 +52,10 @@ spec:
         resources:
           requests:
             memory: "100Mi"
-            cpu: "100m"
+            cpu: "50m"
           limits:
-            memory: "400Mi"
-            cpu: "300m"
+            memory: "200Mi"
+            cpu: "200m"
         env:
           - name: PORT
             valueFrom:
@@ -79,11 +79,11 @@ spec:
         name: kafkastore
         resources:
           requests:
-            memory: "200Mi"
-            cpu: "200m"
+            memory: "150Mi"
+            cpu: "20m"
           limits:
             memory: "300Mi"
-            cpu: "500m"
+            cpu: "100m"
         env:
           - name: REDIS_TRACKING
             value: redis://localhost:6379?db=6

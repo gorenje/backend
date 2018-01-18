@@ -64,10 +64,10 @@ spec:
         resources:
           requests:
             memory: "200Mi"
-            cpu: "300m"
+            cpu: "40m"
           limits:
             memory: "400Mi"
-            cpu: "600m"
+            cpu: "80m"
         env:
         - name: DB_POOL_SIZE
           value: "20"
