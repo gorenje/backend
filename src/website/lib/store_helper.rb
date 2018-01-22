@@ -93,10 +93,11 @@ module StoreHelper
       :ne        => ne,
       :keywords  => keywords,
       :not_owner => not_owner,
-      :is_active => "true"
+      :is_active => "true",
+      :format    => "jsonh"
     }
 
-    Agent.new.searches.get(data.to_query)
+    _checkVersion(Agent.new.searches.get(data.to_query))
   end
 
   def offers(sw, ne, not_owner, keywords = [])
@@ -105,10 +106,11 @@ module StoreHelper
       :ne        => ne,
       :keywords  => keywords,
       :not_owner => not_owner,
-      :is_active => "true"
+      :is_active => "true",
+      :format    => "jsonh"
     }
 
-    Agent.new.offers.get(data.to_query)
+    _checkVersion(Agent.new.offers.get(data.to_query))
   end
 
   def user_offers(sw, ne, owner, keywords = [])
@@ -116,10 +118,11 @@ module StoreHelper
       :sw       => sw,
       :ne       => ne,
       :keywords => keywords,
-      :owner    => owner
+      :owner    => owner,
+      :format   => "jsonh"
     }
 
-    Agent.new.offers.get(data.to_query)
+    _checkVersion(Agent.new.offers.get(data.to_query))
   end
 
   def user_searches(sw, ne, owner, keywords = [])
@@ -127,19 +130,28 @@ module StoreHelper
       :sw       => sw,
       :ne       => ne,
       :keywords => keywords,
-      :owner    => owner
+      :owner    => owner,
+      :format   => "jsonh"
     }
 
-    Agent.new.searches.get(data.to_query)
+    _checkVersion(Agent.new.searches.get(data.to_query))
   end
 
   def searches_by_keywords(keywords = [], not_owner = nil)
     data = {
       :keywords  => keywords,
-      :is_active => "true"
+      :is_active => "true",
+      :format    => "jsonh"
     }
     data.merge!(:not_owner => not_owner) if not_owner
 
-    Agent.new.searches.get(data.to_query)
+    _checkVersion(Agent.new.searches.get(data.to_query))
+  end
+
+  private
+
+  def _checkVersion(data)
+    raise "UnsupportedVersion: #{data["version"]}" if data["version"] != "1.0"
+    data["data"]
   end
 end
