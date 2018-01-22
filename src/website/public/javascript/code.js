@@ -206,6 +206,8 @@ function ajaxStartChatCall(params) {
       }
     }
     stopWaiting();
+  }).fail(function(){
+    stopWaiting();
   });
 }
 

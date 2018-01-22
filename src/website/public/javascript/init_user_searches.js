@@ -9,6 +9,8 @@ function activateSubject(objid, ranking_num){
     $('#resultslistitem'+ranking_num).removeClass("deactivated");
     $('#actbut'+ranking_num).replaceWith(data.html);
     stopWaiting();
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
@@ -22,6 +24,8 @@ function deactivateSubject(objid, ranking_num){
   }).done(function(data){
     $('#resultslistitem'+ranking_num).addClass("deactivated");
     $('#actbut'+ranking_num).replaceWith(data.html);
+    stopWaiting();
+  }).fail(function(){
     stopWaiting();
   });
 }
@@ -41,13 +45,15 @@ function deleteSubject(objid) {
       }
     });
     stopWaiting();
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
 function editSubject(objid) {
   window.location = window.location.protocol + "//" +
-    window.location.hostname + ":" +
-    window.location.port + "/search/" + objid + "/edit";
+                    window.location.hostname + ":" +
+                    window.location.port + "/search/" + objid + "/edit";
 }
 
 function checkForMatchingSubject(objid) {
@@ -71,7 +77,7 @@ function mapChangedCallback() {
     data: { keywords: $('#searchterms').val(),
             sw: {latitude: sw.lat(), longitude: sw.lng() },
             ne: {latitude: ne.lat(), longitude: ne.lng() }
-          },
+    },
     method: 'get',
     dataType: 'json'
   }).done(function(data){
@@ -83,6 +89,8 @@ function mapChangedCallback() {
     $.each(data, function(idx, search_obj) {
       initializeObjectMarkerForSubject(search_obj, idx)
     });
+    stopWaiting();
+  }).fail(function(){
     stopWaiting();
   });
 }

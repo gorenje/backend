@@ -2,7 +2,16 @@
 module ViewHelpers
   def return_json
     content_type :json
-    yield.to_json
+    begin
+      yield.to_json
+    rescue Exception => e
+      puts "ERROR: returning json caught a cold"
+      puts e.message
+      puts "-"*30
+      puts e.backtrace
+      puts "-"*30
+      halt(501)
+    end
   end
 
   def must_be_logged_in

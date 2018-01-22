@@ -20,6 +20,8 @@ function createSubjectFromSubject(offerid, ranking) {
     });
     stopWaiting()
     dialog.dialog("open");
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
@@ -58,11 +60,13 @@ function mapChangedCallback() {
     data: { keywords: $('#searchterms').val(),
             sw: {latitude: sw.lat(), longitude: sw.lng() },
             ne: {latitude: ne.lat(), longitude: ne.lng() }
-          },
+    },
     method: 'get',
     dataType: 'json'
   }).done(function(data){
     constructPagination(data);
+    stopWaiting();
+  }).fail(function(){
     stopWaiting();
   });
 }

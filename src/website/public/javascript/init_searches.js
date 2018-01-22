@@ -20,6 +20,8 @@ function createSubjectFromSubject(srchid, ranking) {
     });
     stopWaiting();
     dialog.dialog("open");
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
@@ -33,6 +35,8 @@ function submitCreateOfferForm() {
   }).done(function(data){
     stopWaiting();
     dialog.dialog('close');
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
@@ -59,13 +63,15 @@ function mapChangedCallback() {
     data: { keywords: $('#searchterms').val(),
             sw: {latitude: sw.lat(), longitude: sw.lng() },
             ne: {latitude: ne.lat(), longitude: ne.lng() }
-          },
+    },
     method: 'get',
     dataType: 'json'
   }).done(function(data){
     stopWaiting();
     constructPagination(data);
     $('#updateresultsdiv').addClass('hidden');
+  }).fail(function(){
+    stopWaiting();
   });
 }
 

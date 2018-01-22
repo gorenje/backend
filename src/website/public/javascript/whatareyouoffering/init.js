@@ -13,6 +13,8 @@ function getSearchesForOffer(text) {
       $('#resultslist').append(search_obj.resultslist_html);
     });
     stopWaiting();
+  }).fail(function(){
+    stopWaiting();
   });
 }
 

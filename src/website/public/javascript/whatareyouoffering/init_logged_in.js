@@ -13,6 +13,8 @@ function getSearchesForOffer(text) {
       $('#resultslist').append(search_obj.resultslist_html);
     });
     stopWaiting();
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
@@ -40,6 +42,8 @@ function createOfferForSearch(srchid) {
     });
     stopWaiting();
     dialog.dialog("open");
+  }).fail(function(){
+    stopWaiting();
   });
   return false;
 }
@@ -54,6 +58,8 @@ function submitCreateOfferForm() {
   }).done(function(data){
     stopWaiting();
     dialog.dialog('close');
+  }).fail(function(){
+    stopWaiting();
   });
 }
 
