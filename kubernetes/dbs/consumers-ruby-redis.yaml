@@ -34,7 +34,7 @@ spec:
         persistentVolumeClaim:
           claimName: rubyconsumerdb
       containers:
-      - image: redis
+      - image: redis:4.0.6
         name: ruby-consumers-db
         resources:
           requests:
