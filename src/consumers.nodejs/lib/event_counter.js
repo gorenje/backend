@@ -2,6 +2,7 @@ require('dotenv').config()
 
 var Kafka = require('node-rdkafka');
 var redis = require("redis");
+var qs    = require('qs');
 
 var redisClient = redis.createClient({url: process.env.REDIS_CONSUMER});
 
@@ -67,7 +68,13 @@ function start(broker_list) {
 
     .on('data', function(data) {
       var type_meta_params = data.value.toString().split(" ");
-      redisClient.incr(type_meta_params[0], function(err, response){});
+      var params = qs.parse( type_meta_params[2] );
+
+      var event_type = type_meta_params[0];
+      if ( params.action ) {
+        event_type = event_type + "[" + params.action + "]";
+      }
+      redisClient.incr(event_type, function(err, response){});
     })
 
     .on('disconnected', function(arg) {
