@@ -6,6 +6,13 @@ get '/api/offers.json' do
     else
       @user = User.find(session[:user_id])
       owner = @user.userid_for_sendbird
+
+      TrackerHelper.
+        search_for_offers({ :kw => params[:keywords] || '',
+                            :sw => params[:sw],
+                            :ne => params[:ne],
+                            :by => owner })
+
       StoreHelper.
         offers(params[:sw], params[:ne], owner,
                  (params[:keywords]||"").downcase.split(/[[:space:]]+/))

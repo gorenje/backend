@@ -5,7 +5,22 @@ module TrackerHelper
 
   def offer_preview(params)
     params = params.merge(:action => "preview")
-    url = $hosthandler.tracker.url + "/offr?#{URI.encode_www_form(params)}"
-    RestClient.get(url) rescue nil
+    _get("/offr?#{URI.encode_www_form(params)}")
+  end
+
+  def search_for_offers(params)
+    params = params.merge(:action => "search")
+    _get("/offr?#{URI.encode_www_form(params)}")
+  end
+
+  def search_for_searches(params)
+    params = params.merge(:action => "search")
+    _get("/srch?#{URI.encode_www_form(params)}")
+  end
+
+  private
+
+  def _get(path)
+    RestClient.get($hosthandler.tracker.url + path) rescue nil
   end
 end
