@@ -9,10 +9,24 @@ var qryHelper = require('../lib/query_helper')
 
 router.route('/offers/:owner')
   .get(auth.isAuthenticated, function(req, res, next) {
+    var properties = {}
+    var sw         = req.query.sw
+    var ne         = req.query.ne
+
+    properties.owner = req.params.owner
+    if (sw && ne) {
+      properties.location = {
+        $geoWithin: { $box: [
+          [ parseFloat(sw.longitude), parseFloat(sw.latitude) ],
+          [ parseFloat(ne.longitude), parseFloat(ne.latitude) ]
+        ]}
+      }
+    }
+
     var comma = "";
     res.write('{ "version": "1.0", "data": [')
 
-    Offer.find({ owner: req.params.owner })
+    Offer.find(properties)
       .cursor()
       .on('data', function(data) {
         res.write(comma)
