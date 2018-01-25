@@ -14,7 +14,8 @@ append content
     tbody
       - for ( obj of offers )
         tr
-          th= obj._id
+          th
+            a(href='/store/offers?owner='+obj._id)= obj._id
           td= obj.count
 
   p
@@ -27,7 +28,8 @@ append content
     tbody
       - for ( obj of searches )
         tr
-          th= obj._id
+          th
+            a(href='/store/searches?owner='+obj._id)= obj._id
           td= obj.count
 
 
