@@ -30,6 +30,12 @@ cron_jobs = [
                'cron'  => '*/1 * * * *',
                'args'  => nil
              },
+             {
+               'name'  => 'geonames_worker_scheduler',
+               'class' => 'Scheduler::Geonames',
+               'cron'  => '*/1 * * * *',
+               'args'  => nil
+             },
 ]
 
 $redis["local"].with do |r|

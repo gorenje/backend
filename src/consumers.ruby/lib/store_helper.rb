@@ -37,6 +37,13 @@ module StoreHelper
     end
   end
 
+  def offers_for_owner(owner, sw, ne)
+    data = sw && ne ? { :sw => sw, :ne => ne} : {}
+    rslt = Agent.new.bulk.offers.send(owner).get(data.to_query)
+    raise "UnsupportedVersion: #{rslt["version"]}" if rslt["version"] != "1.0"
+    rslt["data"]
+  end
+
   def object(objid)
     data = {
       :_id => objid

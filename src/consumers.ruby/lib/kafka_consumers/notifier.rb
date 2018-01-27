@@ -7,6 +7,8 @@ module Consumers
 
     sidekiq_options :queue => :notifier_consumer
 
+    IgnoreActions = ["delete","search"]
+
     def initialize
       handle_these_events ["srch", "offr"]
     end
@@ -27,7 +29,7 @@ module Consumers
     end
 
     def handle_event(event)
-      return if event.action == "delete" || event.obj_id.blank?
+      return if IgnoreActions.include?(event.action) || event.obj_id.blank?
 
       begin
         case event.type

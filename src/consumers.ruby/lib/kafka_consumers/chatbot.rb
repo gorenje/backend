@@ -1,5 +1,7 @@
 # coding: utf-8
+require 'rest-client'
 require_relative 'base'
+require_relative 'geonames'
 
 module Consumers
   class Chatbot
@@ -17,6 +19,7 @@ module Consumers
     DriveNowCarSharing = "DriveNowCarSharing"
     LuftDaten          = "LuftDatenInfo"
     IndexBerlin        = "IndexBerlin"
+    GeonamesOrg        = Consumers::Geonames::Owner
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
 
@@ -69,12 +72,43 @@ module Consumers
           handle_luftdaten_chat(event)
         when event.is_for?(IndexBerlin)
           handle_indexberlin_chat(event)
+        when event.is_for?(GeonamesOrg)
+          handle_geonames_chat(event)
         end
       rescue Exception => e
-        puts "Chatbot: Errror handling #{event}"
-        puts e
+        puts "Chatbot: Errror handling #{event} => #{e.message}"
         puts e.backtrace
       end
+    end
+
+    def handle_geonames_chat(event)
+      offer, search = event.offer_and_search
+      msg = if extdata = offer["extdata"]
+              case event.message_text
+              when /link/i
+                params = {
+                  :geonameId => extdata["geoid"],
+                  :username  => "gorenje"
+                }
+                data =
+                  JSON(RestClient.
+                        get("http://api.geonames.org/"+
+                            "getJSON?#{URI.encode_www_form(params)}")) rescue {}
+
+                an = data["alternateNames"]
+                if an && !(links = an.select {|a| a["lang"] == "link"}).empty?
+                  links.first["name"]
+                else
+                  "http://api.geonames.org/" +
+                    "getJSON?geonameId=#{extdata["geoid"]}&username=demo"
+                end
+              else
+                UnknownCmd
+              end
+            else
+              UnknownCmd
+            end
+      event.post_message(msg, GeonamesOrg)
     end
 
     def handle_drivenow_chat(event)
@@ -165,8 +199,8 @@ module Consumers
       offer, search = event.offer_and_search
       if offer.nil? || offer["extdata"].nil? || offer["extdata"]["id"].blank?
         return event.
-          post_message("Sorry, film has ended. No information available.",
-                       BerlinDeKinos)
+                 post_message("Sorry, film has ended. No information available.",
+                              BerlinDeKinos)
       end
 
       extdata = offer["extdata"]
@@ -205,8 +239,8 @@ module Consumers
       msg = case type
             when "markt"
               urlstr = "http://www.berlin.de/sen/wirtschaft/service/"+
-                "maerkte-feste/wochen-troedelmaerkte/index.php/index/"+
-                "all.json?q="
+                       "maerkte-feste/wochen-troedelmaerkte/index.php/index/"+
+                       "all.json?q="
 
               data = JSON(mechanize_agent.get(urlstr).body) rescue {"index"=>[]}
               object = data["index"].select { |a| a["id"] == idstr }.first

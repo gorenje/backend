@@ -5,3 +5,4 @@
   - [chatbot_consumer, 2]
   - [bulkdata_consumer, 2]
   - [notifier_consumer, 2]
+  - [geonames_consumer, 2]
