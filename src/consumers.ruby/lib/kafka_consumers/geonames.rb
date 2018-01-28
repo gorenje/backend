@@ -43,7 +43,8 @@ module Consumers
 
     def do_work(message)
       Consumers::Kafka::GeonamesEvent.new(message.value).tap do |event|
-        if event.action == "search" && event.keywords =~ /#poi/
+        if event.action == "search" && (event.keywords =~ /#poi/i ||
+                                        event.keywords =~ /#wikipedia/i)
           begin
             handle_event(event)
           rescue Exception => e
@@ -63,7 +64,11 @@ module Consumers
       new_offers = []
       timestamp  = Time.now.utc.strftime("%s%L").to_i
 
-      event.offers["geonames"].shuffle[0..50].each do |geoname|
+      if event.keywords =~ /#poi/i
+        event.offers
+      else
+        event.offers_wikipedia
+      end.shuffle[0..50].each do |geoname|
         offr = old_offers.
                  select { |a| a["extdata"]["geoid"] == geoname["geonameId"] }.
                  first || (new_offers << JSON(BaseOffer.to_json)).last
@@ -72,7 +77,8 @@ module Consumers
           d["location"]["coordinates"] =
             [geoname["lng"].to_f, geoname["lat"].to_f]
           d["text"]       = geoname["toponymName"]
-          d["extdata"]    = { :geoid => geoname["geonameId"]  }
+          d["extdata"]    = (geoname["extdata"] || {}).
+                              merge({ :geoid => geoname["geonameId"] })
           d["validuntil"] = timestamp + SevenDaysMs
           d["keywords"]   = event.hashterms.join(" ")
         end

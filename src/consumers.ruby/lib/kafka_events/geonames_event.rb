@@ -1,4 +1,5 @@
 require_relative 'event'
+require 'digest/sha2'
 
 module Consumers
   module Kafka
@@ -63,8 +64,25 @@ module Consumers
         end
       end
 
-      ## Could also add wikipedia to the mix!
-      ## http://api.geonames.org/findNearbyWikipediaJSON?lat=47&lng=9&username=gorenje
+      def wikipedia_url(opts = {})
+        l1 = Geokit::LatLng.new(south.to_f, east.to_f)
+        l2 = Geokit::LatLng.new(north.to_f, west.to_f)
+
+        midpoint = l2.midpoint_to(l1)
+
+        params = {
+          :username => "gorenje",
+          :lat      => midpoint.lat,
+          :lng      => midpoint.lng,
+          :radius   => (l1.distance_to(l2) / 2000.0).ceil,
+          :maxRows  => 200,
+          :startRow => 0
+        }.merge(opts)
+
+        "http://api.geonames.org/findNearbyWikipediaJSON?"+
+          "#{params_to_query(params)}"
+      end
+
       def search_url(opts = {})
         params = {
           :username => "gorenje",
@@ -80,7 +98,23 @@ module Consumers
       end
 
       def offers
-        JSON(RestClient.get(search_url)) rescue {}
+        data = JSON(RestClient.get(search_url)) rescue {}
+        data["geonames"] || []
+      end
+
+      def offers_wikipedia
+        data = JSON(RestClient.get(wikipedia_url)) rescue {}
+        (data["geonames"] || []).map do |hsh|
+          hsh.tap do |h|
+            h["toponymName"] = h["title"]
+            if h["geoNameId"]
+              h["geonameId"] = h["geoNameId"]
+            else
+              h["extdata"] = { "link" => "https://" + h["wikipediaUrl"] }
+              h["geonameId"] = Digest::SHA256.hexdigest(h["wikipediaUrl"])
+            end
+          end
+        end
       end
 
       private

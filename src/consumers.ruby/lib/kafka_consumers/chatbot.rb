@@ -86,21 +86,25 @@ module Consumers
       msg = if extdata = offer["extdata"]
               case event.message_text
               when /link/i
-                params = {
-                  :geonameId => extdata["geoid"],
-                  :username  => "gorenje"
-                }
-                data =
-                  JSON(RestClient.
-                        get("http://api.geonames.org/"+
-                            "getJSON?#{URI.encode_www_form(params)}")) rescue {}
-
-                an = data["alternateNames"]
-                if an && !(links = an.select {|a| a["lang"] == "link"}).empty?
-                  links.first["name"]
+                if extdata["link"]
+                  extdata["link"]
                 else
-                  "http://api.geonames.org/" +
-                    "getJSON?geonameId=#{extdata["geoid"]}&username=demo"
+                  params = {
+                    :geonameId => extdata["geoid"],
+                    :username  => "gorenje"
+                  }
+                  data =
+                    JSON(RestClient.
+                          get("http://api.geonames.org/"+
+                           "getJSON?#{URI.encode_www_form(params)}")) rescue {}
+
+                  an = data["alternateNames"]
+                  if an && !(links = an.select {|a| a["lang"] == "link"}).empty?
+                    links.first["name"]
+                  else
+                    "http://api.geonames.org/" +
+                      "getJSON?geonameId=#{extdata["geoid"]}&username=demo"
+                  end
                 end
               else
                 UnknownCmd
@@ -108,6 +112,7 @@ module Consumers
             else
               UnknownCmd
             end
+
       event.post_message(msg, GeonamesOrg)
     end
 
