@@ -54,6 +54,7 @@ GEM
     ffi (1.9.18)
     foreman (0.84.0)
       thor (~> 0.19.1)
+    geokit (1.11.0)
     google-ads-common (0.14.1)
       google-ads-savon (~> 1.0.2)
       httpclient (~> 2.7)
@@ -259,6 +260,7 @@ DEPENDENCIES
   fakeweb
   faye-websocket
   foreman
+  geokit
   haml
   hiredis
   jasmine
@@ -287,7 +289,7 @@ DEPENDENCIES
   zk
 
 RUBY VERSION
-   ruby 2.2.5p319
+   ruby 2.4.2p198
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
