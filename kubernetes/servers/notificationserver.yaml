@@ -134,6 +134,8 @@ spec:
               key: TRACKER_HOST
         - name: WEB_TIMEOUT
           value: "30"
+        - name: WEB_CONCURRENCY
+          value: "5"
         - name: API_USER
           valueFrom:
             secretKeyRef:

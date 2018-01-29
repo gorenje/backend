@@ -69,6 +69,10 @@ spec:
             memory: "400Mi"
             cpu: "80m"
         env:
+        - name: WEB_CONCURRENCY
+          value: "5"
+        - name: WEB_TIMEOUT
+          value: "30"
         - name: DB_POOL_SIZE
           value: "20"
         - name: DB_TIMEOUT_MSEC

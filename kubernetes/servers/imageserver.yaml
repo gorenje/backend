@@ -69,10 +69,10 @@ spec:
         resources:
           requests:
             memory: "200Mi"
-            cpu: "200m"
+            cpu: "40m"
           limits:
             memory: "400Mi"
-            cpu: "400m"
+            cpu: "300m"
         env:
         - name: DATABASE_URL
           valueFrom:
@@ -111,6 +111,10 @@ spec:
           value: imageserver-nfs:/var/lib/imagesrv/store
         - name: NFS_MOUNT_POINT
           value: /var/lib/imagesrv/store
+        - name: WEB_CONCURRENCY
+          value: "5"
+        - name: WEB_TIMEOUT
+          value: "15"
         ports:
         - containerPort: 5061
         securityContext:

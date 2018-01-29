@@ -59,6 +59,10 @@ spec:
             secretKeyRef:
               name: envsecrets
               key: CONSUMERS_RUBY_PORT
+        - name: WEB_CONCURRENCY
+          value: "5"
+        - name: WEB_TIMEOUT
+          value: "15"
         - name: RACK_ENV
           value: production
         - name: REDISTOGO_URL
