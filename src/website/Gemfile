@@ -14,7 +14,7 @@ gem 'sinatra-contrib'
 gem 'sinatra-support'
 gem 'haml'
 gem 'foreman'
-gem 'puma'
+gem 'unicorn'
 
 gem 'activerecord'
 gem 'active_record_migrations'
