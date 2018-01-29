@@ -7,7 +7,7 @@ ruby '2.4.3'
 gem 'rake'
 gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'puma'
+gem 'unicorn'
 
 gem 'pry'
 gem 'foreman'
