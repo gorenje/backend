@@ -20,6 +20,7 @@ namespace :docker do
 
       sock.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
       sock.connect(Socket.pack_sockaddr_in(port, addr[0][3]))
+      t.exit
       Kernel.exit(true)
     rescue Errno::ECONNREFUSED => e
       retry
@@ -40,6 +41,7 @@ namespace :docker do
 
       sock.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
       sock.connect(Socket.pack_sockaddr_in(port, addr[0][3]))
+      t.exit
       Kernel.exit(true)
     rescue Errno::ECONNREFUSED => e
       retry
