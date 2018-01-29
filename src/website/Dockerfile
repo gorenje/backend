@@ -1,4 +1,4 @@
-FROM ruby:2.2.5
+FROM ruby:2.4.3
 WORKDIR /usr/src/app
 ENV LANG C.UTF-8
 COPY Gemfile .
