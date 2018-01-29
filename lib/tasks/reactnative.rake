@@ -1,4 +1,4 @@
-namespace :frontend do
+namespace :reactnative do
   namespace :generate do
     desc <<-EOF
       Generate the required basic auths for the frontend client.

@@ -135,12 +135,12 @@ and
 To analyse the resource usage, start collecting datapoints:
 
     touch last.test.txt
-    while [ 1 ] ; do rake resources:measure >> last.test.txt ; done
+    while [ 1 ] ; do rake kubernetes:resources:measure >> last.test.txt ; done
 
 Leave that running and perform any loadtesting required.
 
 In a second window, analyse the data points:
 
-    watch -c rake resources:analyse
+    watch -c rake kubernetes:resources:analyse
 
 From there, redefine the resources in the k8s yamls.
