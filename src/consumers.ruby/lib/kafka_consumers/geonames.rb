@@ -79,6 +79,7 @@ module Consumers
           d["text"]       = geoname["toponymName"]
           d["extdata"]    = (geoname["extdata"] || {}).
                               merge({ :geoid => geoname["geonameId"] })
+          d["validfrom"]  = timestamp
           d["validuntil"] = timestamp + SevenDaysMs
           d["keywords"]   = event.hashterms.join(" ")
         end
