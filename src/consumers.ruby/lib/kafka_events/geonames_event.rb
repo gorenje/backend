@@ -19,11 +19,15 @@ module Consumers
       end
 
       def sw
-        @sw ||= _lat_lng(params[:sw].try(:first))
+        @sw ||= ( _lat_lng(params[:sw].try(:first)) || _from_region("sw"))
       end
 
       def ne
-        @ne ||= _lat_lng(params[:ne].try(:first))
+        @ne ||= ( _lat_lng(params[:ne].try(:first)) || _from_region("ne"))
+      end
+
+      def owner
+        params[:by].try(:first) || params[:di].try(:first)
       end
 
       def south
@@ -125,11 +129,20 @@ module Consumers
         uri.query
       end
 
+      def _from_region(corner)
+        if (lng = params[:"#{corner}[longitude]"].try(:first)) &&
+           (lat = params[:"#{corner}[latitude]"].try(:first))
+          { :latitude => lat.to_f, :longitude => lng.to_f }
+        else
+          {}
+        end
+      end
+
       def _lat_lng(str)
         if str =~ LatLngRegExp
           { :latitude => $1.to_f, :longitude => $2.to_f }
         else
-          {}
+          nil
         end
       end
     end
