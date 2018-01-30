@@ -3,7 +3,8 @@ mixin pagination(linkprefix)
     - if ( pageOptions.page == idx ) {
       = `${idx} `
     - } else {
-      a(href=linkprefix+"?page="+idx+"&limit="+pageOptions.limit)
+      - var qryowner = owner !== undefined ? "&owner="+owner : ""
+      a(href=linkprefix+"?page="+idx+"&limit="+pageOptions.limit+qryowner)
         = idx
       = " "
     - }

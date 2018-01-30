@@ -35,7 +35,8 @@ router
       .exec(function(err, offers){
         Offer.count(srchQuery, function(error, count){
           pageOptions.total = count
-          res.render('offers', { offers: offers, pageOptions: pageOptions  });
+          res.render('offers', { offers: offers, pageOptions: pageOptions,
+                                 owner: req.query.owner });
         });
       });
   });
@@ -76,7 +77,8 @@ router
       .exec( function(err, searches){
         Search.count(srchQuery, function(error, count){
           pageOptions.total = count
-          res.render('searches',{searches: searches, pageOptions: pageOptions});
+          res.render('searches',{searches: searches, pageOptions: pageOptions,
+                                 owner: req.query.owner });
         })
       });
   });

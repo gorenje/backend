@@ -39,8 +39,10 @@ append content
 
 
 block inlinecss
-  style.
-    .link_ao {
-      text-decoration: none;
-      color: black;
-    }
+  - if (owner === undefined) {
+    style.
+      .link_ao {
+        text-decoration: none;
+        color: black;
+      }
+  - }
