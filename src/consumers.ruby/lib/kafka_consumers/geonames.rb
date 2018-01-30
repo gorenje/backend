@@ -60,7 +60,7 @@ module Consumers
 
       return if event.sw.empty? || event.ne.empty?
 
-      old_offers = StoreHelper.offers_for_owner(Owner,event.sw,event.ne)
+      old_offers = StoreHelper.offers_for_owner(Owner,nil,nil)
       new_offers = []
       timestamp  = Time.now.utc.strftime("%s%L").to_i
 
