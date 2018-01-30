@@ -21,11 +21,11 @@ block content
   #handler-listing-template(style = "display: none;")
     span.kafkaevent
       br
-      font.kegame(title = "Topic / Partition / Offset" ).
-        {{topic}} / {{_partition_}} / {{_offset_}} &nbsp;
+      a(onclick = "alert('{{_msgvalue_}}'); return false;")
+        font.kegame(title = "Topic / Partition / Offset" ).
+          {{topic}} / {{_partition_}} / {{_offset_}} &nbsp;
       font.kedate( onmouseover="setDateTitle(this)" data-ts="{{ts}}") {{ts}} &nbsp;
       font.kelag [{{klag}}ms] &nbsp;
-      a( onclick = "alert('{{_msgvalue_}}'); return false;" ) R &nbsp;
       font.keip(onmouseover="setIpTitle(this)" data-ip="{{ip_dot}}") {{ip_dot}} &nbsp;
       font.ketype {{type}} &nbsp;
       span {{params}}
