@@ -125,13 +125,13 @@ module Consumers
       msg =
         if extdata = offer["extdata"]
           case event.message_text
-          when /link/
+          when /link/i
             extdata["elink"].empty? ? extdata["ilink"] : extdata['elink']
-          when /open/
+          when /open/i
             extdata["otime"]
-          when /tele/
+          when /tele/i
             extdata["tel"]
-          when /all/
+          when /all/i
             extdata.map do |k,v|
               next if ["id", "vid"].include?(k)
               "#{k}: #{v}"
@@ -147,7 +147,7 @@ module Consumers
 
       msg = if extdata = offer["extdata"]
               case event.message_text
-              when /link/
+              when /link/i
                 "http://api.luftdaten.info/v1/sensor/%s/" % extdata["sid"]
               else
                 urlstr =
@@ -190,6 +190,8 @@ module Consumers
     def handle_urbanite_chat(event)
       offer, search = event.offer_and_search
       msg = case event.message_text
+            when /link/i
+              offer["extdata"]["link"] || offer["extdata"]["id"]
             when /url/i
               "Url #{offer["extdata"]["link"]}"
             else

@@ -81,7 +81,7 @@ module Consumers
                               merge({ :geoid => geoname["geonameId"] })
           d["validfrom"]  = timestamp
           d["validuntil"] = timestamp + SevenDaysMs
-          d["keywords"]   = event.hashterms.join(" ")
+          d["keywords"]   = event.hashterms + ["#all"]
         end
       end
 
