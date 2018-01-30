@@ -21,14 +21,12 @@ module TrackerHelper
       :oid   => offr.id,
       :olat  => offr.lat,
       :olng  => offr.lng,
-      :olatd => offr.latD,
-      :olngd => offr.lngD,
+      :oradi => offr.radi,
 
       :sid   => srch.id,
       :slat  => srch.lat,
       :slng  => srch.lng,
-      :slatd => srch.latD,
-      :slngd => srch.lngD,
+      :sradi => srch.radi,
     }
 
     url = $hosthandler.tracker.url + "/mtf?#{URI.encode_www_form(params)}"
