@@ -60,11 +60,7 @@ router.route('/')
     Search.find(qryHelper.validate(properties), function (err, searches) {
       if (err) return next(err)
       sortedSearches = vwhlpr.stupidSort(searches,keywords)
-      if (req.query.format === "jsonh") {
-        res.json({ version: "1.0", data: sortedSearches })
-        } else {
-        res.json(sortedSearches)
-      }
+      res.json({ version: "1.0", data: sortedSearches })
     })
   })
   .post(auth.isAuthenticated, function(req, res, next) {

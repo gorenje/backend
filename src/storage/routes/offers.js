@@ -60,11 +60,7 @@ router.route('/')
     Offer.find(qryHelper.validate(properties), function(err, offers) {
       if (err) return next(err)
       sortedOffers = vwhlpr.stupidSort(offers, keywords)
-      if (req.query.format === "jsonh") {
-        res.json({ version: "1.0", data: sortedOffers })
-      } else {
-        res.json(sortedOffers)
-      }
+      res.json({ version: "1.0", data: sortedOffers })
     })
   })
 
