@@ -94,7 +94,6 @@ module StoreHelper
       :keywords  => keywords,
       :not_owner => not_owner,
       :is_active => "true",
-      :format    => "jsonh"
     }
 
     _checkVersion(Agent.new.searches.get(data.to_query))
@@ -107,7 +106,6 @@ module StoreHelper
       :keywords  => keywords,
       :not_owner => not_owner,
       :is_active => "true",
-      :format    => "jsonh"
     }
 
     _checkVersion(Agent.new.offers.get(data.to_query))
@@ -119,7 +117,6 @@ module StoreHelper
       :ne       => ne,
       :keywords => keywords,
       :owner    => owner,
-      :format   => "jsonh"
     }
 
     _checkVersion(Agent.new.offers.get(data.to_query))
@@ -131,7 +128,6 @@ module StoreHelper
       :ne       => ne,
       :keywords => keywords,
       :owner    => owner,
-      :format   => "jsonh"
     }
 
     _checkVersion(Agent.new.searches.get(data.to_query))
@@ -141,7 +137,6 @@ module StoreHelper
     data = {
       :keywords  => keywords,
       :is_active => "true",
-      :format    => "jsonh"
     }
     data.merge!(:not_owner => not_owner) if not_owner
 
