@@ -78,7 +78,7 @@ module Consumers
           :username => "gorenje",
           :lat      => midpoint.lat,
           :lng      => midpoint.lng,
-          :radius   => (l1.distance_to(l2) / 2000.0).ceil,
+          :radius   => [(l1.distance_to(l2) / 2000.0).ceil, 20].min,
           :maxRows  => 200,
           :startRow => 0
         }.merge(opts)
