@@ -21,7 +21,7 @@ class AbandonedBerlinImporter
     puts old_offers.map { |a| a["extdata"]["id"] }.uniq.count
     puts old_offers.count
 
-    agent = City.mechanize_agent
+    agent = BaseImporter.mechanize_agent
     page = agent.get(BaseDataUrl)
 
     data = JSON(page.body)

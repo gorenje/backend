@@ -21,7 +21,7 @@ set(:environment,   ENV['RACK_ENV']) unless ENV['RACK_ENV'].nil?
 Dir[File.join(File.dirname(__FILE__),'config', 'initializers','*.rb')].
   each { |a| require_relative a }
 
-%w[lib models lib/importers models/csc routes].each do |path|
+%w[lib lib/importers routes].each do |path|
   Dir[File.join(File.dirname(__FILE__), path, "*.rb")].each do |lib|
     require lib.gsub(/\.rb$/, '')
   end

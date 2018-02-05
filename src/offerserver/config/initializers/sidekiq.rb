@@ -6,12 +6,6 @@ require 'sidekiq/cron/web'
 require_relative 'redis'
 
 cron_jobs = [{
-    'name'  => 'car2go_importer',
-    'class' => 'CarToGoImporter',
-    'cron'  => '30 */1 * * * *',
-    'args'  => nil
-  },
-  {
     'name'  => 'exberliner_importer',
     'class' => 'ExberlinerImporter',
     'cron'  => '0 0,3,6,9,12,15,18,21 * * *',

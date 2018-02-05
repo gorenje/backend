@@ -24,6 +24,27 @@ module BaseImporter
     end
   end
 
+  module ExtendWithJson
+    def json(*args)
+      JSON(get(*args).body)
+    end
+
+    def jpost(url, data)
+      JSON(post(url,data).body)
+    end
+  end
+
+  def self.mechanize_agent(user_agent = :use_mozilla)
+    Mechanize.new.tap do |agent|
+      agent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      if user_agent == :use_mozilla
+        agent.user_agent_alias = 'Linux Mozilla'
+      else
+        agent.user_agent = user_agent
+      end
+    end.send(:extend, BaseImporter::ExtendWithJson)
+  end
+
   def parse_street_and_number(addr)
     if addr =~ /(.+) ([0-9\/\-–]+)$/
       { "route"         => $1.strip,

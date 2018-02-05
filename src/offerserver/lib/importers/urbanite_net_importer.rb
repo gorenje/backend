@@ -37,7 +37,7 @@ class UrbaniteNetImporter
     puts old_offers.map { |a| a["extdata"]["id"] }.uniq.count
     puts old_offers.count
 
-    agent = City.mechanize_agent
+    agent = BaseImporter.mechanize_agent
 
     AllPages.each do |keyword, urlstr|
       page = agent.get(urlstr)

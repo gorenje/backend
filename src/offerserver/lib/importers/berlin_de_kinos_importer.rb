@@ -172,7 +172,7 @@ class BerlinDeKinosImporter
     puts old_offers.map { |a| a["extdata"]["id"] }.uniq.count
     puts old_offers.count
 
-    agent = City.mechanize_agent
+    agent = BaseImporter.mechanize_agent
 
     Kinos.each do |kinoid, (kinoname, kinoloc)|
       page = begin

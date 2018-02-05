@@ -56,7 +56,7 @@ class IndexBerlinImporter
       old_offers.each { |ofr| idm[ofr["extdata"]["id"]] = ofr }
     end
 
-    agent = City.mechanize_agent
+    agent = BaseImporter.mechanize_agent
     agent.get("http://indexberlin.de/#venues").
       search("tr[@class='venuesItem']").
       each do |row|
