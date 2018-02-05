@@ -1,1 +1,1 @@
-web: bundle exec unicorn -p ${PORT:-8080} -c ./config/unicorn.rb -E ${RAKE_ENV:-development}
+web: bundle exec unicorn -p ${PORT:-8080} -c ./config/unicorn.rb -E ${RACK_ENV:-development}

@@ -1,2 +1,2 @@
-web:    bundle exec unicorn -c ./config/unicorn.rb -p ${PORT:-8080} -E ${RAKE_ENV:-development}
+web:    bundle exec unicorn -c ./config/unicorn.rb -p ${PORT:-8080} -E ${RACK_ENV:-development}
 worker: bundle exec sidekiq -C config/sidekiq.yml -r ./application.rb
