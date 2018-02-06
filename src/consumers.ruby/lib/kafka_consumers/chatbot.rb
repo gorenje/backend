@@ -10,15 +10,15 @@ module Consumers
 
     sidekiq_options :queue => :chatbot_consumer
 
-    Car2GoUser         = "Car2goCarSharing"
     ExBerlinerUser     = 'ExBerlinerLocations'
     AbandonedBerlin    = 'AbandonedBerlin'
     BerlinDeDaten      = "BerlinDeDaten"
     BerlinDeKinos      = "BerlinDeKinos"
     UrbaniteNet        = "UrbaniteNet"
-    DriveNowCarSharing = "DriveNowCarSharing"
     LuftDaten          = "LuftDatenInfo"
     IndexBerlin        = "IndexBerlin"
+    MeetupCom          = "MeetupCom"
+    BerlinDeNatur      = "BerlinDeNatur"
     GeonamesOrg        = Consumers::Geonames::Owner
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
@@ -54,8 +54,6 @@ module Consumers
 
       begin
         case true
-        when event.is_for?(Car2GoUser)
-          handle_car2go_chat(event)
         when event.is_for?(ExBerlinerUser)
           handle_exberliner_chat(event)
         when event.is_for?(AbandonedBerlin)
@@ -66,19 +64,57 @@ module Consumers
           handle_berlin_de_kinos_chat(event)
         when event.is_for?(UrbaniteNet)
           handle_urbanite_chat(event)
-        when event.is_for?(DriveNowCarSharing)
-          handle_drivenow_chat(event)
         when event.is_for?(LuftDaten)
           handle_luftdaten_chat(event)
         when event.is_for?(IndexBerlin)
           handle_indexberlin_chat(event)
         when event.is_for?(GeonamesOrg)
           handle_geonames_chat(event)
+        when event.is_for?(BerlinDeNatur)
+          handle_berlindenatur_chat(event)
+        when event.is_for?(MeetupCom)
+          handle_meetup_chat(event)
         end
       rescue Exception => e
         puts "Chatbot: Errror handling #{event} => #{e.message}"
         puts e.backtrace
       end
+    end
+
+    def handle_meetup_chat(event)
+      offer, search = event.offer_and_search
+      msg = if extdata = offer["extdata"]
+              case event.message_text
+              when /link/i
+                extdata["id"] || UnknownCmd
+              when /group name/i
+                extdata["group_name"] || UnknownCmd
+              when /group link/i, /group/i
+                extdata["group_url"] || UnknownCmd
+              when /when/i
+                extdata["berlin_time"] || UnknownCmd
+              else
+                UnknownCmd
+              end
+            else
+              UnknownCmd
+            end
+      event.post_message(msg, MeetupCom)
+    end
+
+    def handle_berlindenatur_chat(event)
+      offer, search = event.offer_and_search
+      msg = if extdata = offer["extdata"]
+              case event.message_text
+              when /link/i
+                extdata["link"] || UnknownCmd
+              else
+                UnknownCmd
+              end
+            else
+              UnknownCmd
+            end
+      event.post_message(msg, BerlinDeNatur)
     end
 
     def handle_geonames_chat(event)
@@ -114,10 +150,6 @@ module Consumers
             end
 
       event.post_message(msg, GeonamesOrg)
-    end
-
-    def handle_drivenow_chat(event)
-      event.post_message(UnknownCmd, DriveNowCarSharing)
     end
 
     def handle_indexberlin_chat(event)
@@ -324,35 +356,6 @@ module Consumers
             end
 
       event.post_message(msg, ExBerlinerUser)
-    end
-
-    def handle_car2go_chat(event)
-      offer, search = event.offer_and_search
-
-      msg = if car_gone?(offer)
-              "Sorry, car has already been reserved"
-            else
-              case event.message_text
-              when /link/i
-                car2go_reserve_url(offer)
-              else
-                reserve_url = car2go_reserve_url(offer)
-                "Hi there, you can reserve your car by clicking on " +
-                  "#{reserve_url} - Have fun!"
-              end
-            end
-
-      event.post_message(msg, Car2GoUser)
-    end
-
-    def car2go_reserve_url(offer)
-      vin    = offer["extdata"]["vin"]
-      latlng = offer["location"]["coordinates"].reverse.join(",")
-      "https://car2go.com/vehicle/%s?latlng=%s" % [ vin, latlng ]
-    end
-
-    def car_gone?(offer)
-      offer["validuntil"] < Time.now.utc.strftime("%s%L").to_i
     end
 
     def if_blank(str, default)
