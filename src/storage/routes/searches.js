@@ -22,7 +22,18 @@ router.route('/')
     var center       = req.query.center
 
     if (keywords) {
-      properties.keywords = { $in: keywords }
+      var regexps = keywords.map((str) => { return new RegExp(str,"i") })
+      properties.$or = [
+        { keywords: { $in: regexps } },
+        { $text:
+          {
+            $search: keywords.join(" "),
+            $language: "none",
+            $caseSensitive: false,
+            $diacriticSensitive: false
+          }
+        }
+      ]
     } else {
       keywords = []
     }
