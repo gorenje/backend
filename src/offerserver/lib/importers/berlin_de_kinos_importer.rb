@@ -8,8 +8,6 @@ class BerlinDeKinosImporter
 
   LocationRadius = 1500
 
-  BerlinTimeZone = TZInfo::Timezone.new('Europe/Berlin')
-
   BaseHost = "https://www.berlin.de"
   BaseUrl  = BaseHost + "/kino/_bin/kinodetail.php/"
 

@@ -79,6 +79,7 @@ class BerlinNaturImporter
 
           if entry.image_url && d["images"].nil?
             d["images"] = [ImageHelper.upload_url(entry.image_url)]
+            d["extdata"]["link"] = entry.image_url
           end
         end
       end

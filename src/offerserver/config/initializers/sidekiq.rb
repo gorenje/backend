@@ -49,6 +49,27 @@ cron_jobs = [{
   },
 ]
 
+12.times do |idx|
+  crontimes = [" 0 0,6,12,18 * * *",
+               "20 0,6,12,18 * * *",
+               "40 0,6,12,18 * * *",
+               " 0 1,7,13,19 * * *",
+               "20 1,7,13,19 * * *",
+               "40 1,7,13,19 * * *",
+               " 0 2,8,14,20 * * *",
+               "20 2,8,14,20 * * *",
+               "40 2,8,14,20 * * *",
+               " 0 3,9,15,21 * * *",
+               "20 3,9,15,21 * * *",
+               "40 3,9,15,21 * * *"]
+
+  cron_jobs << {
+    'name'  => "meetup_com_import_#{idx}",
+    'class' => 'MeetupImporter',
+    'cron'  => crontimes[idx],
+    'args'  => { :start => 300*idx, :end => 300*(idx+1) }
+  }
+end
 
 Sidekiq.configure_server do |config|
   config.redis = { :url => ENV['REDISTOGO_URL'], :driver => :hiredis, :size => (ENV["REDIS_POOL_SIZE"] || 5).to_i }
