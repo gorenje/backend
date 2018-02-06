@@ -27,7 +27,7 @@ spec:
             memory: "500Mi"
             cpu: "400m"
           limits:
-            memory: "900Mi"
+            memory: "1500Mi"
             cpu: "800m"
         env:
         - name: CAR2GO_CONSUMER_KEY
