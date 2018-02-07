@@ -30,16 +30,6 @@ spec:
             memory: "1500Mi"
             cpu: "800m"
         env:
-        - name: CAR2GO_CONSUMER_KEY
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: CAR2GO_CONSUMER_KEY
-        - name: CARJUMP_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: envsecrets
-              key: CARJUMP_SECRET
         - name: IMAGE_HOST
           valueFrom:
             secretKeyRef:
