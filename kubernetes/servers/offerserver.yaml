@@ -45,10 +45,10 @@ spec:
         - web
         resources:
           requests:
-            memory: "100Mi"
+            memory: "200Mi"
             cpu: "40m"
           limits:
-            memory: "150Mi"
+            memory: "400Mi"
             cpu: "60m"
         env:
         - name: COOKIE_SECRET
