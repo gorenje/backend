@@ -68,10 +68,10 @@ spec:
           foreman start web
         resources:
           requests:
-            memory: "200Mi"
+            memory: "400Mi"
             cpu: "40m"
           limits:
-            memory: "400Mi"
+            memory: "800Mi"
             cpu: "300m"
         env:
         - name: DATABASE_URL
