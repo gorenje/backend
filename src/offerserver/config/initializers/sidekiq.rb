@@ -7,45 +7,45 @@ require_relative 'redis'
 
 cron_jobs = [{
     'name'  => 'exberliner_importer',
-    'class' => 'ExberlinerImporter',
+    'class' => 'RakeWorker',
     'cron'  => '0 0,3,6,9,12,15,18,21 * * *',
-    'args'  => nil
+    'args'  => { :cmd => "exberliner:update" }
   },
   {
     'name'  => 'abandoned_berlin_importer',
-    'class' => 'AbandonedBerlinImporter',
+    'class' => 'RakeWorker',
     'cron'  => '10 0,3,6,9,12,15,18,21 * * *',
-    'args'  => nil
+    'args'  => { :cmd => "abandonedberlin:update" }
   },
   {
     'name'  => 'berlin_de_natur',
-    'class' => 'BerlinNaturImporter',
+    'class' => 'RakeWorker',
     'cron'  => '30 1,3,5,7,9,11,13,15,17,19,21,23 * * *',
-    'args'  => nil
+    'args'  => { :cmd => "berlinnatur:update" }
   },
   {
     'name'  => 'urbanite_net',
-    'class' => 'UrbaniteNetImporter',
+    'class' => 'RakeWorker',
     'cron'  => '10 1,3,5,7,9,11,13,15,17,19,21,23 * * *',
-    'args'  => nil
+    'args'  => { :cmd => "urbanitenet:update" }
   },
   {
     'name'  => 'luft_daten_importer',
-    'class' => 'LuftDatenImporter',
+    'class' => 'RakeWorker',
     'cron'  => '50 */10 * * * *',
-    'args'  => nil
+    'args'  => { :cmd => "luftdaten:update" }
   },
   {
     'name'  => 'index_berlin_importer',
-    'class' => 'IndexBerlinImporter',
+    'class' => 'RakeWorker',
     'cron'  => '45 0,3,6,9,12,15,18,21 * * *',
-    'args'  => nil
+    'args'  => { :cmd => "indexberlin:update" }
   },
   {
     'name'  => 'berlin_kinos_import',
-    'class' => 'BerlinDeKinosImporter',
+    'class' => 'RakeWorker',
     'cron'  => '45 */1 * * *',
-    'args'  => nil
+    'args'  => { :cmd => "berlindekinos:update" }
   },
 ]
 
@@ -65,9 +65,9 @@ cron_jobs = [{
 
   cron_jobs << {
     'name'  => "meetup_com_import_#{idx}",
-    'class' => 'MeetupImporter',
+    'class' => 'RakeWorker',
     'cron'  => crontimes[idx],
-    'args'  => { :start => 300*idx, :end => 300*(idx+1) }
+    'args'  => { :cmd => "meetupcom:update[#{300*idx},#{300*(idx+1)}]" }
   }
 end
 

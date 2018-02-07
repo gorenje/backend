@@ -2,8 +2,9 @@ namespace :meetupcom do
   desc <<-EOF
     Update the Meetup.com offers.
   EOF
-  task :update => :environment do
-    MeetupImporter.new.perform
+  task :update, [:start, :end] => :environment do |t,args|
+    MeetupImporter.new.perform({"start" => args.start.to_i,
+                                "end"   => args.end.to_i})
   end
 
   desc <<-EOF
