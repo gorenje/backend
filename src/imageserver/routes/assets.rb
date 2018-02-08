@@ -17,15 +17,25 @@ end
 get '/assets/images/:id(/:size)?' do
   begin
     file = if params[:size]
-             Image.find(params[:id]).source.send(params[:size]).file
+             Image.find_by_params(params).source.send(params[:size]).file
            else
-             Image.find(params[:id]).source.file
+             Image.find_by_params(params).source.file
            end
     content_type "image/#{file.extension}"
     file.read
   rescue Exception => e
     redirect "/assets/images/#{Image.first.id}"
   end
+end
+
+post '/assets/upload_with_sha/:sha' do
+  protected!
+  unless Image.find_by(:sha => params[:sha])
+    img = Image.create(:sha => params[:sha])
+    img.post_image(params[:file])
+    img.save
+  end
+  "/assets/images/#{params[:sha]}"
 end
 
 post '/assets/upload' do

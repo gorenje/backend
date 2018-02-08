@@ -4,6 +4,10 @@ class Image < ActiveRecord::Base
   has_and_belongs_to_many :events
   mount_uploader :source, ImageUploader
 
+  def self.find_by_params(params)
+    find_by(:id => params[:id]) || find_by(:sha => params[:id])
+  end
+
   def post_image(post_image_data)
     tap do |image|
       timeobj = Time.now
