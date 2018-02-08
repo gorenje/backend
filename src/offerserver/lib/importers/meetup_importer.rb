@@ -75,8 +75,6 @@ class MeetupImporter
 
         next if datetime.nil? || pos.nil? || title.nil?
 
-        puts "Found meetup: #{page.uri}"
-
         offr =
           old_offers.
             select { |a| a["extdata"]["id"] == meetup_id }.first ||

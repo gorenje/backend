@@ -49,6 +49,19 @@ cron_jobs = [{
   },
 ]
 
+["de","es","en"].each_with_index do |lang, idx|
+  crontimes = ["25 2,5,8,11,14,17,20,23 * * *",
+               "25 1,4,7,10,13,16,19,22 * * *",
+               "25 0,3,6,9,12,15,18,21 * * *"]
+
+  cron_jobs << {
+    'name'  => "newstral_#{lang}_import",
+    'class' => 'RakeWorker',
+    'cron'  => crontimes[idx % 3],
+    'args'  => { :cmd => "newstralcom:update[#{lang}]" }
+  }
+end
+
 12.times do |idx|
   crontimes = [" 0 0,6,12,18 * * *",
                "20 0,6,12,18 * * *",
