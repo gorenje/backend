@@ -14,6 +14,11 @@ get '/asset/:id/delete' do
   redirect back
 end
 
+get '/asset/:id/available' do
+  halt(404) if Image.find_by_params(params).nil?
+  "/assets/images/#{params[:id]}"
+end
+
 get '/assets/images/:id(/:size)?' do
   begin
     file = if params[:size]
