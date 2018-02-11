@@ -11,12 +11,22 @@ module ImageHelper
 
 
   def upload_url(urlstr)
+    return nil if urlstr.empty?
+
     sha = Digest::SHA256.hexdigest(urlstr)
     return @@cache[sha] if @@cache[sha]
 
-    extname = File.basename(URI.parse(urlstr).path)
-    file    = Tempfile.open(["prefix", extname]) do |fh|
-      fh << RestClient.get(urlstr)
+    response = RestClient::Request.
+                 execute(:method => "get",
+                         :url => _base_url + "asset/#{sha}/available",
+                         :max_redirects => 0) { |resp,req,res| resp }
+
+    return (@@cache[sha] = response.body) if response.code == 200
+
+    extname = File.basename(URI.parse(urlstr).path) rescue return
+
+    file = Tempfile.open(["prefix", extname]) do |fh|
+      fh << RestClient.get(urlstr) rescue return
     end
 
     begin

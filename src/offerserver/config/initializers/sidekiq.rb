@@ -84,6 +84,23 @@ end
   }
 end
 
+('a'..'z').to_a.each_slice(4).map(&:join).each_with_index do |str, idx|
+  crontimes = ["43  2,8,14,20 * * *",
+               "43  1,7,13,19 * * *",
+               "43  0,6,12,18 * * *",
+               "43  3,9,15,21 * * *",
+               "43 4,10,16,22 * * *",
+               "43 5,11,17,23 * * *"
+              ]
+
+  cron_jobs << {
+    'name'  => "dbpedia_#{str}_import",
+    'class' => 'RakeWorker',
+    'cron'  => crontimes[idx % 6],
+    'args'  => { :cmd => "dbpediaorg:update[#{str}]" }
+  }
+end
+
 Sidekiq.configure_server do |config|
   config.redis = { :url => ENV['REDISTOGO_URL'], :driver => :hiredis, :size => (ENV["REDIS_POOL_SIZE"] || 5).to_i }
 

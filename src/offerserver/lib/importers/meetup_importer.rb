@@ -1,3 +1,5 @@
+require_relative '../base_importer'
+
 class MeetupImporter
   include Sidekiq::Worker
 
