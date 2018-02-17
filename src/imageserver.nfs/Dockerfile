@@ -1,5 +1,5 @@
 FROM centos:7.4.1708
-RUN yum -y install /usr/bin/ps nfs-utils && yum clean all
+RUN yum -y install /usr/bin/ps nfs-utils e2fsprogs && yum clean all
 RUN mkdir -p /exports
 ADD run_nfs.sh /usr/local/bin/
 
