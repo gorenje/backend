@@ -88,10 +88,10 @@ class DbpediaOrgImporter
           d["radiusMeters"]            = LocationRadius
           d["keywords"]                = BaseKeyWords
 
-          if dp["image"] && dp["image"]["value"] && d["images"].nil?
-            idstr = ImageHelper.upload_url(dp["image"]["value"])
-            d["images"] = [idstr] unless idstr.nil?
-          end
+          # if dp["image"] && dp["image"]["value"] && d["images"].nil?
+          #   idstr = ImageHelper.upload_url(dp["image"]["value"])
+          #   d["images"] = [idstr] unless idstr.nil?
+          # end
 
           d["extdata"] = {
             "id"   => offer_id,
