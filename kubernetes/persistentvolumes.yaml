@@ -10,7 +10,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
@@ -25,7 +25,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
@@ -40,7 +40,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 10Gi
 status: {}
 
 ---
@@ -55,7 +55,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
@@ -70,7 +70,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
@@ -85,7 +85,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
@@ -100,7 +100,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
@@ -115,7 +115,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 1Gi
 status: {}
 
 ---
