@@ -144,3 +144,19 @@ In a second window, analyse the data points:
     watch -c rake kubernetes:resources:analyse
 
 From there, redefine the resources in the k8s yamls.
+
+## 6. Expanding Volumes
+
+First expand the volume at Digital Ocean and then login into the
+server which has the mount:
+
+    resize2fs /dev/<device>
+
+to get the name of the device:
+
+    lsblk
+
+that should be it. You might have to install the ext4 tools using:
+
+    apt-get install e2fsprogs ### debian and co.
+    yum install e2fsprogs ### CoreOS and RedHat

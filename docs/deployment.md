@@ -229,6 +229,8 @@ offerserver):
     mongo> db.searches.createIndex({"text": "text"})
     mongo> db.searches.createIndex({keywords: 1})
     mongo> db.offers.createIndex({keywords: 1})
+    mongo> db.offers.createIndex({owner: 1})
+    mongo> db.searches.createIndex({owner: 1})
 
 That should make things a little faster.
 
