@@ -1,6 +1,14 @@
 require 'sinatra'
 require 'haml'
 
+namespace :webapp do
+  desc "Run a simple webserver on top of kubectl"
+  task :run do
+    require 'thin'
+    Thin::Server.new.tap { |s| s.app = Webapp::App }.start
+  end
+end
+
 module Webapp
   class App < Sinatra::Base
     enable :inline_templates
@@ -8,20 +16,23 @@ module Webapp
 
     helpers do
       def header_row(line)
-        "<tr>" + line.split(/[[:space:]]+/).map { |v| "<th>#{v}</th>"}.
+        "<tr>" + line.split(/[[:space:]]+/).map { |v| "<th>#{v}</th>" }.
                    join("\n") + "<th>Actions</th></tr>"
+      end
+
+      def cell(value)
+        o = value =~ /^([0-9]+)(m|Mi|Gi|%|d)/ ? $1 : value
+        "<td data-order='#{o}'>#{value}</td>"
       end
 
       def line_to_row(line,idx)
         content = line.split(/[[:space:]]+/)
-        ns = content.first
-        name = content[1]
+        ns, name = [0,1].map { |idx| content[idx] }
 
-        "<tr>\n" + content.map { |v| "<td>#{v}</td>"}.join("\n") +
-          "<td>" + ["delete", "watch", "scale"].map do |verb|
-          "<a href='" + request.path + "/" + ns + "/" +
-            name + "/" + verb + "'>" + verb + "</a>"
-        end.join("&nbsp;") + "</td></tr>"
+        "<tr>\n" + content.map { |v| cell(v) }.join("\n") +
+          "<td>" + ["delete", "watch", "scale"].map do |v|
+          "<a class='_#{v}' href='#{request.path}/#{ns}/#{name}/#{v}'>#{v}</a>"
+        end.join("\n") + "</td></tr>"
       end
 
       def cmdsp(cmd)
@@ -29,13 +40,10 @@ module Webapp
       end
     end
 
-    get '/top/nodes' do
-      @allrows = cmdsp("kubectl top nodes")
-      haml :table, :layout => :layout
-    end
-
-    get '/top/pods' do
-      @allrows = cmdsp("kubectl top pods --all-namespaces")
+    get '/top/:cmp' do
+      @title = "All " + params[:cmp]
+      @allrows = cmdsp("kubectl top #{params[:cmp]}" +
+                       (params[:cmp] == "pods" ? " --all-namespaces" : ""))
       haml :table, :layout => :layout
     end
 
@@ -52,37 +60,45 @@ module Webapp
       haml :choice, :layout => :layout
     end
 
-    post '/deployments/:namespace/:name/scale' do
-      `kubectl scale deployment -n #{params[:namespace]} #{params[:name]} --replicas=#{params[:scale]}`
+    post '/deployments/:ns/:name/scale' do
+      `kubectl scale deployment -n #{params[:ns]} #{params[:name]} --replicas=#{params[:scale]}`
       redirect '/deployments'
     end
 
-    get '/deployments/:namespace/:name/scale' do
+    get '/deployments/:ns/:name/scale' do
       @title = "Scale deployment"
-      @scale = `kubectl get deployments -n #{params[:namespace]} #{params[:name]} | tail -n +2 | awk '// { print $2; }'`.strip
+      @scale =
+        cmdsp("kubectl get deployments -n #{params[:ns]} #{params[:name]}").
+          last.split(/[[:space:]]+/)[1]
       haml :scale, :layout => :layout
     end
 
-    get '/pods/:namespace/:name/delete/:response' do
-      if params[:response] == "yes"
-        `kubectl delete pods -n #{params[:namespace]} #{params[:name]}`
+    get '(/top)?/pods/:ns/:name/scale' do
+      redirect '/deployments'
+    end
+
+    get '(/top)?/pods/:ns/:name/delete/:r' do
+      if params[:r] == "yes"
+        `kubectl delete pods -n #{params[:ns]} #{params[:name]}`
       end
       redirect '/pods'
     end
 
-    get '/pods/:namespace/:name/delete' do
+    get '(/top)?/pods/:namespace/:name/delete' do
       @title = "Are you sure?"
       @choices = ["Yes", "No"]
       haml :choice, :layout => :layout
     end
 
-    get '/pods/:namespace/:name/watch' do
+    get '(/top)?/pods/:namespace/:name/watch' do
       kbcfg = ENV['KUBECONFIG']
-      system("osascript -e 'tell application \"Terminal\" to do script \"export KUBECONFIG=\\\"#{kbcfg}\\\" ; kubectl logs --follow=true -n #{params[:namespace]} #{params[:name]}\"'")
+      system("osascript -e 'tell application \"Terminal\" to do script " +
+             "\"export KUBECONFIG=\\\"#{kbcfg}\\\" ; kubectl logs " +
+             "--follow=true -n #{params[:namespace]} #{params[:name]}\"'")
       redirect '/pods'
     end
 
-    ["deployments","pods","ingress"].each do |element|
+    ["deployments", "pods", "ingress"].each do |element|
       get '/'+element do
         @title = "All " + element.capitalize
         @allrows = cmdsp("kubectl get #{element} --all-namespaces")
@@ -117,33 +133,27 @@ module Webapp
   end
 end
 
-namespace :webapp do
-  desc "Run a simple webserver on top of kubectl"
-  task :run do
-    require 'thin'
-    server = Thin::Server.new
-    server.app = Webapp::App
-    server.start
-  end
-end
-
-
 __END__
 
 @@ layout
 %html
-  :css
-    a {
-      text-decoration: none;
-    }
-
   %head
-    %link{:crossorigin => "anonymous", :href => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css", :integrity => "sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm", :rel => "stylesheet"}/
-    %script{:crossorigin => "anonymous", :integrity => "sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN", :src => "https://code.jquery.com/jquery-3.2.1.slim.min.js"}
-    %script{:crossorigin => "anonymous", :integrity => "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q", :src => "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"}
-    %script{:crossorigin => "anonymous", :integrity => "sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl", :src => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"}
+    %link{ :href => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.css", :type => "text/css", :rel => "stylesheet" }
+    %link{:href => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css", :rel => "stylesheet"}/
+    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"}
+    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"}
+    %script{:src => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"}
+    %script{ :src => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.js", :type => "text/javascript" }
     %title= @title || 'No Title'
   %body
+    :javascript
+      $(document).ready(function() {
+        $('a._watch').click(function(event){
+          jQuery.get($(event.target).attr('href'));
+          return false;
+        });
+      })
+
     .row
       .col-10
         %a{ :href => "/pods" } Pods
@@ -156,36 +166,45 @@ __END__
     = yield
 
 @@ choice
-%h1 Pick and Choose....
-%h2= request.path
-- @choices.each do |c|
-  %a{ :href => request.path + "/#{c.downcase}" }= c
-  %br
+%center
+  %h1 Pick and Choose....
+  %h2= request.path
+  - @choices.each do |c|
+    %a.btn.btn-primary{ :href => request.path + "/#{c.downcase}" }= c
 
 @@ table
-%table.table.table-striped.table-hover
+%table#datatable.table.table-striped.table-hover
   %thead.thead-dark
     = header_row(@allrows.first)
   %tbody
     - @allrows[1..-1].each_with_index do |row,idx|
       = line_to_row(row,idx)
+:javascript
+  $(document).ready(function() {
+    $('#datatable').DataTable({
+      "pageLength": 100
+    });
+  });
 
 @@ config
 %form{ :action => "/_cfg", :method => :post }
-  %label{ :for => :kubeconfig } KubeConfig
-  %input{ :id => :kubeconfig, :type => :text, :value => ENV['KUBECONFIG'], :size => 80, :name => :kubeconfig }
-  %br
-  %input{ :type => :submit, :value => "Update" }
+  %center
+    %label{ :for => :kubeconfig } KubeConfig
+    %input{ :id => :kubeconfig, :type => :text, :value => ENV['KUBECONFIG'], :size => 80, :name => :kubeconfig }
+    %p
+    %input.btn.btn-success{ :type => :submit, :value => "Update" }
+    %a.btn.btn-warning{ :href => "/" } Cancel
 
 @@ scale
 %form{ :action => request.path, :method => :post }
-  %h1
-    Rescaling
-    = params[:namespace]
-    = "."
-    = params[:name]
-  %label{ :for => :scale } Scale
-  %input#scale{ :type => :number, :value => @scale, :name => :scale }
-  %br
-  %input{ :type => :submit, :value => "Update" }
-  %a{ :href => "/#{request.path.split(/\//)[1]}" } Cancel
+  %center
+    %h1
+      Rescaling
+      = params[:ns]
+      = "."
+      = params[:name]
+    %label{ :for => :scale } Scale
+    %input#scale{ :type => :number, :value => @scale, :name => :scale }
+    %p
+    %input.btn.btn-success{ :type => :submit, :value => "Update" }
+    %a.btn.btn-warning{ :href => "/#{request.path.split(/\//)[1]}" } Cancel
