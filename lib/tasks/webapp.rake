@@ -14,6 +14,50 @@ module Webapp
     enable :inline_templates
     set :show_exceptions, :after_handler
 
+    class Kubectl
+      class << self
+        def kctl(cmdline)
+          `kubectl #{cmdline}`.split(/\n/)
+        end
+
+        def kbcfg(v = nil)
+          v.nil? ? ENV['KUBECONFIG'] : (ENV['KUBECONFIG'] = v)
+        end
+
+        def scale(ns,name,scale)
+          kctl("scale deployment -n #{ns} #{name} --replicas=#{scale}")
+        end
+
+        def delete(cmp, ns, name)
+          kctl("delete #{cmp.to_s} -n #{ns} #{name}")
+        end
+
+        def top(cmp)
+          kctl("top #{cmp}" + (cmp == "pods" ? " --all-namespaces" : ""))
+        end
+
+        def get(cmp)
+          kctl("get #{cmp.to_s} --all-namespaces")
+        end
+
+        def deployment(ns,name)
+          kctl("get deployments -n #{ns} #{name}")
+        end
+
+        def watch(ns,name)
+          system("osascript -e 'tell application \"Terminal\" to do script " +
+                 "\"export KUBECONFIG=\\\"#{kbcfg}\\\" ; kubectl logs " +
+                 "--follow=true -n #{ns} #{name}\"'")
+        end
+
+        def shell(ns,name)
+          system("osascript -e 'tell application \"Terminal\" to do script " +
+                 "\"export KUBECONFIG=\\\"#{kbcfg}\\\" ; kubectl exec -it " +
+                 "-n #{ns} #{name} /bin/bash\"'")
+        end
+      end
+    end
+
     helpers do
       def header_row(line)
         "<tr>" + line.split(/[[:space:]]+/).map { |v| "<th>#{v}</th>" }.
@@ -30,27 +74,20 @@ module Webapp
         ns, name = [0,1].map { |idx| content[idx] }
 
         "<tr>\n" + content.map { |v| cell(v) }.join("\n") +
-          "<td>" + ["delete", "watch", "scale"].map do |v|
+          "<td>" + ["delete", "watch", "scale", "shell"].map do |v|
           "<a class='_#{v}' href='#{request.path}/#{ns}/#{name}/#{v}'>#{v}</a>"
         end.join("\n") + "</td></tr>"
-      end
-
-      def cmdsp(cmd)
-        `#{cmd}`.split(/\n/)
       end
     end
 
     get '/top/:cmp' do
       @title = "All " + params[:cmp]
-      @allrows = cmdsp("kubectl top #{params[:cmp]}" +
-                       (params[:cmp] == "pods" ? " --all-namespaces" : ""))
+      @allrows = Kubectl.top(params[:cmp])
       haml :table, :layout => :layout
     end
 
-    get '/ingress/:namespace/:name/delete/:response' do
-      if params[:response] == "yes"
-        `kubectl delete ingress -n #{params[:namespace]} #{params[:name]}`
-      end
+    get '/ingress/:ns/:name/delete/:r' do
+      Kubectl.delete(:ingress,params[:ns],params[:name]) if params[:r] == "yes"
       redirect '/ingress'
     end
 
@@ -61,15 +98,14 @@ module Webapp
     end
 
     post '/deployments/:ns/:name/scale' do
-      `kubectl scale deployment -n #{params[:ns]} #{params[:name]} --replicas=#{params[:scale]}`
+      Kubectl.scale(params[:ns],params[:name],params[:scale])
       redirect '/deployments'
     end
 
     get '/deployments/:ns/:name/scale' do
       @title = "Scale deployment"
-      @scale =
-        cmdsp("kubectl get deployments -n #{params[:ns]} #{params[:name]}").
-          last.split(/[[:space:]]+/)[1]
+      @scale = Kubectl.deployment(params[:ns],params[:name])[-1].
+                 split(/[[:space:]]+/)[1]
       haml :scale, :layout => :layout
     end
 
@@ -78,9 +114,7 @@ module Webapp
     end
 
     get '(/top)?/pods/:ns/:name/delete/:r' do
-      if params[:r] == "yes"
-        `kubectl delete pods -n #{params[:ns]} #{params[:name]}`
-      end
+      Kubectl.delete(:pods, params[:ns], params[:name]) if params[:r] == "yes"
       redirect '/pods'
     end
 
@@ -91,17 +125,19 @@ module Webapp
     end
 
     get '(/top)?/pods/:namespace/:name/watch' do
-      kbcfg = ENV['KUBECONFIG']
-      system("osascript -e 'tell application \"Terminal\" to do script " +
-             "\"export KUBECONFIG=\\\"#{kbcfg}\\\" ; kubectl logs " +
-             "--follow=true -n #{params[:namespace]} #{params[:name]}\"'")
+      Kubectl.watch(params[:namespace], params[:name])
+      redirect '/pods'
+    end
+
+    get '(/top)?/pods/:namespace/:name/shell' do
+      Kubectl.shell(params[:namespace], params[:name])
       redirect '/pods'
     end
 
     ["deployments", "pods", "ingress"].each do |element|
       get '/'+element do
         @title = "All " + element.capitalize
-        @allrows = cmdsp("kubectl get #{element} --all-namespaces")
+        @allrows = Kubectl.get(element)
         haml :table, :layout => :layout
       end
     end
@@ -118,7 +154,7 @@ module Webapp
     end
 
     post '/_cfg' do
-      ENV['KUBECONFIG'] = params[:kubeconfig]
+      Kubectl.kbcfg(params[:kubeconfig])
       redirect "/"
     end
 
@@ -149,17 +185,25 @@ __END__
     :javascript
       $(document).ready(function() {
         $('a._watch').click(function(event){
-          jQuery.get($(event.target).attr('href'));
+          $.get($(event.target).attr('href'))
+            .fail(function(){alert('not implemented.');});
+          return false;
+        });
+        $('a._shell').click(function(event){
+          $.get($(event.target).attr('href'))
+            .fail(function(){alert('not implemented.');});
           return false;
         });
       })
 
     .row
-      .col-10
+      .col-4
         %a{ :href => "/pods" } Pods
         %a{ :href => "/top" } Top
         %a{ :href => "/ingress" } Ingress
         %a{ :href => "/deployments" } Deployments
+      .col-6
+        Kubectl Website
       .col-2
         %a{ :href => "/_cfg" } Config
     %hr
@@ -190,7 +234,7 @@ __END__
 %form{ :action => "/_cfg", :method => :post }
   %center
     %label{ :for => :kubeconfig } KubeConfig
-    %input{ :id => :kubeconfig, :type => :text, :value => ENV['KUBECONFIG'], :size => 80, :name => :kubeconfig }
+    %input{ :id => :kubeconfig, :type => :text, :value => Kubectl.kbcfg, :size => 80, :name => :kubeconfig }
     %p
     %input.btn.btn-success{ :type => :submit, :value => "Update" }
     %a.btn.btn-warning{ :href => "/" } Cancel
