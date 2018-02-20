@@ -24,6 +24,10 @@ module Webapp
           v.nil? ? ENV['KUBECONFIG'] : (ENV['KUBECONFIG'] = v)
         end
 
+        def namespaces
+          get("namespaces")[1..-1].map { |a| a.split(/[[:space:]]+/)[1] }
+        end
+
         def scale(ns,name,scale)
           kctl("scale deployment -n #{ns} #{name} --replicas=#{scale}")
         end
@@ -37,11 +41,19 @@ module Webapp
         end
 
         def get(cmp)
-          kctl("get #{cmp.to_s} --all-namespaces")
+          kctl("get #{cmp.to_s} --all-namespaces --output=wide")
         end
 
         def deployment(ns,name)
           kctl("get deployments -n #{ns} #{name}")
+        end
+
+        def busybox(ns = nil)
+          ns = ns.nil? ? "" : "-n #{ns}"
+          name = "busybox-#{(rand*1000000).to_i.to_s(16)}"
+          system("osascript -e 'tell application \"Terminal\" to do script " +
+                 "\"export KUBECONFIG=\\\"#{kbcfg}\\\" ; kubectl run " +
+                 "-i -t #{name} #{ns} --image=busybox --restart=Never\"'")
         end
 
         def watch(ns,name)
@@ -109,6 +121,18 @@ module Webapp
       haml :scale, :layout => :layout
     end
 
+    get '/deployments/:ns/:name/delete' do
+      @title = "Delete deployment"
+      @choices = ["Yes", "No"]
+      haml :choice, :layout => :layout
+    end
+
+    get '/deployments/:ns/:name/delete/:r' do
+      Kubectl.
+        delete(:deployments, params[:ns], params[:name]) if params[:r] == "yes"
+      redirect '/deployments'
+    end
+
     get '(/top)?/pods/:ns/:name/scale' do
       redirect '/deployments'
     end
@@ -134,7 +158,7 @@ module Webapp
       redirect '/pods'
     end
 
-    ["deployments", "pods", "ingress"].each do |element|
+    ["deployments", "pods", "ingress", "services"].each do |element|
       get '/'+element do
         @title = "All " + element.capitalize
         @allrows = Kubectl.get(element)
@@ -151,6 +175,19 @@ module Webapp
     get '/_cfg' do
       @title = "Configuration"
       haml :config, :layout => :layout
+    end
+
+    get '/_busybox(/:r)?' do
+      (Kubectl.busybox && halt(200)) if request.xhr?
+
+      if params[:r]
+        Kubectl.busybox(params[:r])
+        redirect "/pods"
+      else
+        @title = "Which Namespace"
+        @choices = Kubectl.namespaces
+        haml :choice, :layout => :layout
+      end
     end
 
     post '/_cfg' do
@@ -194,6 +231,11 @@ __END__
             .fail(function(){alert('not implemented.');});
           return false;
         });
+        $('a._busybox').click(function(event){
+          $.get($(event.target).attr('href'))
+            .fail(function(){alert('not implemented.');});
+          return false;
+        });
       })
 
     .row
@@ -202,16 +244,19 @@ __END__
         %a{ :href => "/top" } Top
         %a{ :href => "/ingress" } Ingress
         %a{ :href => "/deployments" } Deployments
-      .col-6
+        %a{ :href => "/services" } Services
+      .col-4.text-center
         Kubectl Website
-      .col-2
+      .col-4.text-right
         %a{ :href => "/_cfg" } Config
+        %a._busybox{ :href => "/_busybox" } Busybox
+        %a{ :href => "/_busybox" } BusyboxNS
     %hr
     = yield
 
 @@ choice
 %center
-  %h1 Pick and Choose....
+  %h1 Pick and Choose
   %h2= request.path
   - @choices.each do |c|
     %a.btn.btn-primary{ :href => request.path + "/#{c.downcase}" }= c
