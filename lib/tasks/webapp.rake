@@ -1,23 +1,24 @@
-require 'sinatra'
-require 'haml'
+# coding: utf-8
+['sinatra','haml','thin'].map { |a| require(a) }
 
 namespace :webapp do
   desc "Run a simple webserver on top of kubectl"
-  task :run do
-    require('thin') && Thin::Server.new.tap { |s| s.app = Webapp }.start
-  end
+  task(:run) { Thin::Server.new.tap { |s| s.app = Webapp }.start }
 end
 
 class Webapp < Sinatra::Base
   enable :inline_templates
   set :show_exceptions, :after_handler
-  YesNo = ["Yes", "No"]
-  SpcRE = /[[:space:]]+/
+  YesNo  = ["Yes", "No"]
+  SpcRE  = /[[:space:]]+/
+  Cmpnts = ["deployments", "pods", "services", "ingress"]
+  MxPler = {:h=>3600,:m=>60,:d=>86400,:Gi=>1024}
+  Nrm    = Proc.new { |v,u| v.to_i * (MxPler[(u||"").to_sym] || 1) }
 
   module Kubectl
     extend self
     def kctl(cmdline)
-      `kubectl --kubeconfig="#{kbcfg}" #{cmdline}`.split(/\n/)
+      `kubectl #{cmdline} --kubeconfig="#{kbcfg}"`.split(/\n/)
     end
 
     def kbcfg(v = nil)
@@ -25,7 +26,7 @@ class Webapp < Sinatra::Base
     end
 
     def namespaces
-      get("namespaces")[1..-1].map { |a| a.split(SpcRE)[1] }
+      get("namespaces")[1..-1].map { |a| a.split(SpcRE)[0] }
     end
 
     def scale(ns,name,scale)
@@ -33,11 +34,13 @@ class Webapp < Sinatra::Base
     end
 
     def delete(cmp, ns, name)
-      kctl("delete #{cmp.to_s} -n #{ns} #{name}")
+      kctl("delete #{cmp.to_s} -n #{ns} --force #{name}")
     end
 
-    def top(cmp)
-      kctl("top #{cmp}" + (cmp == "pods" ? " --all-namespaces" : ""))
+    def top(cmp, ns = nil)
+      kctl("top #{cmp} " +
+           (cmp == "pods" ? ((ns ? "-n #{ns}" : "--all-namespaces") +
+                             " --containers=true") : ""))
     end
 
     def get(cmp)
@@ -48,19 +51,23 @@ class Webapp < Sinatra::Base
       kctl("get deployments -n #{ns} #{name}")
     end
 
+    def version
+      d = JSON(kctl("version --output=json").join) ; v = 'Version'
+      ["client","server"].map { |a| "#{a}: #{d[a+v]['git'+v]}" }.join(" & ")
+    end
+
     def osascript(script)
       system("osascript -e 'tell application \"Terminal\" to do script " +
-             "\"kubectl --kubeconfig=\\\"#{kbcfg}\\\" #{script} \"'")
+             "\"kubectl #{script} --kubeconfig=\\\"#{kbcfg}\\\"\"'")
     end
 
     def busybox(ns = nil)
-      ns = ns.nil? ? "" : " -n #{ns}"
-      osascript("run -it busybox-#{(rand*1000000).to_i.to_s(16)}" +
-                "#{ns} --image=busybox --restart=Never")
+      osascript("run -it busybox-#{(rand*1000000).to_i.to_s(16)} " +
+                "-n #{ns || 'default'} --image=busybox --restart=Never")
     end
 
-    def watch(ns,name) ; osascript("logs --follow=true -n #{ns} #{name}") ; end
-    def shell(ns,name) ; osascript("exec -it -n #{ns} #{name} /bin/bash") ; end
+    def watch(ns,name) ; osascript("logs #{name} -n #{ns} --follow=true") ; end
+    def shell(ns,name) ; osascript("exec #{name} -n #{ns} -it /bin/bash") ; end
   end
 
   helpers do
@@ -69,7 +76,7 @@ class Webapp < Sinatra::Base
     end
 
     def cell(value)
-      o = value =~ /^([0-9]+)(m|Mi|Gi|%|d)/ ? $1 : value
+      o = value =~ /^([0-9]+)(m|Mi|Gi|%|d|h)/ ? Nrm.call($1,$2) : value
       "<td data-order='#{o}'>#{value}</td>"
     end
 
@@ -79,6 +86,7 @@ class Webapp < Sinatra::Base
         "<a class='_#{v}' href='#{request.path}/#{c[0]}/#{c[1]}/#{v}'>#{v}</a>"
       end.join("\n") + "</td>"
     end
+    def gh(n,v) ; { :name => n, :value => v } ; end
   end
 
   post '/deployments/:ns/:name/scale' do
@@ -92,7 +100,7 @@ class Webapp < Sinatra::Base
     haml :scale, :layout => :layout
   end
 
-  ["ingress", "deployments", "pods", "services"].each do |cmp|
+  Cmpnts.each do |cmp|
     get '(/top)?/' + cmp + '/:ns/:name/delete(/:r)?' do
       if params[:r]
         Kubectl.delete(cmp,params[:ns],params[:name]) if params[:r] == "yes"
@@ -119,7 +127,7 @@ class Webapp < Sinatra::Base
     haml :table, :layout => :layout
   end
 
-  ["deployments", "pods", "ingress", "services"].each do |element|
+  Cmpnts.each do |element|
     get '/'+element do
       @title = "All " + element.capitalize ; @allrows = Kubectl.get(element)
       haml :table, :layout => :layout
@@ -146,8 +154,59 @@ class Webapp < Sinatra::Base
     Kubectl.kbcfg(params[:kubeconfig]) ; redirect "/"
   end
 
+  get '/_graph(/:cmp)?(/:ns)?' do
+    if params[:cmp].nil?
+      @title = "Which Component" ; @choices = ["Pods", "Nodes"]
+      haml :choice, :layout => :layout
+    else
+      @cmp = params[:cmp]
+      if @cmp == "pods"
+        if params[:ns].nil?
+          @title = "Which Namespacke" ; @choices = Kubectl.namespaces
+          haml :choice, :layout => :layout
+        else
+          @ns = params[:ns]
+          @title = 'Resources Graphs' ; haml(:graph, :layout => :layout)
+        end
+      else
+        @title = 'Resources Graphs' ; haml(:graph, :layout => :layout)
+      end
+    end
+  end
+
+  get '/_graph.json' do
+    content_type :json
+    { :data =>
+      case params[:c]
+      when "nodes"
+        case params[:t]
+        when 'cpu'
+          Kubectl.top("nodes")[1..-1].map do |l|
+            d = l.split(SpcRE) ; gh(d[0], d[1].to_i)
+          end
+        when 'mem'
+          Kubectl.top("nodes")[1..-1].map do |l|
+            d = l.split(SpcRE) ; gh(d[0], d[3].to_i)
+          end
+        end
+      when "pods"
+        case params[:t]
+        when 'cpu'
+          Kubectl.top("pods",params[:ns])[1..-1].map do |l|
+            d = l.split(SpcRE); gh(d[0..1].join("."), d[2].to_i)
+          end
+        when 'mem'
+          Kubectl.top("pods",params[:ns])[1..-1].map do |l|
+            d = l.split(SpcRE); gh(d[0..1].join("."), d[3].to_i)
+          end
+        end
+      end || []
+    }.to_json
+  end
+
   get '/' do
-    @title = "All Actions" && haml("", :layout => :layout)
+    @title = "All Actions"
+    haml("%a{:href => '/_cfg'} Config", :layout => :layout)
   end
 
   error(404) do
@@ -160,12 +219,14 @@ __END__
 @@ layout
 %html
   %head
-    %link{ :href => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.css", :type => "text/css", :rel => "stylesheet" }
-    %link{:href => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css", :rel => "stylesheet"}/
+    %link{:href => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.css", :rel => "stylesheet"}
+    %link{:href => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css", :rel => "stylesheet"}
     %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"}
     %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"}
     %script{:src => "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"}
-    %script{ :src => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.js", :type => "text/javascript" }
+    %script{:src => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.js"}
+    %script{:src => "https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.js"}
+    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/highcharts/6.0.7/highcharts.js"}
     %title= @title || 'No Title'
   %body
     :javascript
@@ -177,25 +238,26 @@ __END__
       })
     .row.border-bottom.pb-2.pt-2.mr-2.ml-2
       .col-4.text-left
-        - ["Pods","Top","Ingress","Deployments","Services"].each do |v|
-          %a{ :href => "/#{v.downcase}" }= v
-      .col-4.text-center
-        Kubectl Website
+        - (Cmpnts + ["top"]).each do |v|
+          %a{ :href => "/#{v}" }= v.capitalize
+      .col-4.text-center Kubectl Website
       .col-4.text-right
         %a{ :href => "/_cfg" } Config
+        %a{ :href => "/_graph" } Graphs
         %a._busybox{ :href => "/_busybox" } Busybox
         %a{ :href => "/_busybox" } BusyboxNS
     .row.pt-2
-      .col-12= yield
+      .col-12.text-center= yield
 
 @@ choice
-.text-center
-  %h1 Pick and Choose
-  %h2= request.path
-  - (@choices || YesNo).each do |c|
-    %a.btn.btn-primary{ :href => "#{request.path}/#{c.downcase}" }= c
+%h1 Pick and Choose
+%h2= request.path
+- (@choices || YesNo).each do |c|
+  %a.btn.btn-primary{ :href => "#{request.path}/#{c.downcase}" }= c
 
 @@ table
+:javascript
+  $(document).ready(function(){$('#datatable').DataTable({"pageLength": 100});})
 %table#datatable.table.table-striped.table-hover
   %thead.thead-dark
     %tr= header_row(@allrows.first)
@@ -203,20 +265,82 @@ __END__
     - @allrows[1..-1].each_with_index do |row,idx|
       %tr= line_to_row(row,idx)
 
-:javascript
-  $(document).ready(function(){$('#datatable').DataTable({"pageLength": 100});})
-
 @@ config
-%form.text-center{ :action => "/_cfg", :method => :post }
+- if ENV['KUBECONFIG']
+  %h1= Kubectl.version rescue nil
+%form{ :action => "/_cfg", :method => :post }
   %label{ :for => :kubeconfig } KubeConfig
   %input{ :id => :kubeconfig, :type => :text, :value => Kubectl.kbcfg, :size => 80, :name => :kubeconfig }
   %input.btn.btn-success{ :type => :submit, :value => "Update" }
   %a.btn.btn-warning{ :href => "/" } Cancel
 
 @@ scale
-%form.text-center{ :action => request.path, :method => :post }
+%form{ :action => request.path, :method => :post }
   %h1= "Rescaling #{params[:ns]}.#{params[:name]}"
   %label{ :for => :scale } Scale
   %input#scale{ :type => :number, :value => @scale, :name => :scale }
   %input.btn.btn-success{ :type => :submit, :value => "Update" }
   %a.btn.btn-warning{ :href => "/#{request.path.split(/\//)[1]}" } Cancel
+
+@@ graph
+#cpugraph{ :style => "height: 800px;" }
+#memgraph{ :style => "height: 800px;" }
+:javascript
+  $(document).ready(function(){
+    var optionsCpu = {
+      chart: {
+        renderTo: 'cpugraph', plotBackgroundColor: null,
+        plotBorderWidth: null, plotShadow: false
+      },
+      yAxis: { title: { text: 'CPU usage in millicpu' } },
+      xAxis: {
+        type: 'datetime',
+        title: { text: 'Counter (updated at 5 second intervals)' }
+      },
+      title: { text: 'CPU Resources' },
+      tooltip: { pointFormat: '{series.name}: <b>{point.y}</b>' }
+    }
+
+    var optionsMem = {
+      chart: {
+        renderTo: 'memgraph', plotBackgroundColor: null,
+        plotBorderWidth: null, plotShadow: false
+      },
+      yAxis: { title: { text: 'Memory in MegaBytes' } },
+      xAxis: {
+        type: 'datetime',
+        title: { text: 'Time' }
+      },
+      title: { text: 'Memory Resources' },
+      tooltip: { pointFormat: '{series.name}: <b>{point.y}</b>' }
+    }
+
+    window.chartcpu = Highcharts.chart(optionsCpu);
+    window.chartmem = Highcharts.chart(optionsMem);
+
+    function updateChart(chart, type) {
+      $.get("/_graph.json?t="+type+"&c=#{@cmp}&ns=#{@ns}")
+        .done(function(data){
+          var ts = (new Date()).getTime();
+          $.each(data.data, function(idx, dp) {
+            var dp_def = false;
+            $.each(chart.series, function(idx, series) {
+              if ( series.name === dp.name ) {
+                series.addPoint([ts,dp.value], true)
+                dp_def = true;
+              }
+            })
+            if ( !dp_def ) {
+              chart.addSeries({name: dp.name, data: [ [ts,dp.value] ]})
+            }
+          })
+      })
+    }
+
+    function updateCpuChart() { updateChart(window.chartcpu, "cpu") }
+    function updateMemChart() { updateChart(window.chartmem, "mem") }
+    setInterval(updateMemChart, 5000);
+    setInterval(updateCpuChart, 5000);
+    updateMemChart()
+    updateCpuChart()
+  })
