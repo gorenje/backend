@@ -54,10 +54,8 @@ class NewstralComImporter
           next if lat.nil? || lng.nil?
 
           offr =
-            old_offers.
-              select { |a| a["extdata"]["id"] == offer_id }.first ||
-            new_offers.
-              select { |a| a["extdata"]["id"] == offer_id }.first ||
+            old_offers.select { |a| a["extdata"]["id"] == offer_id }.first ||
+            new_offers.select { |a| a["extdata"]["id"] == offer_id }.first ||
             (new_offers << JSON(base_data.to_json)).last
 
           offr.tap do |d|
@@ -68,15 +66,15 @@ class NewstralComImporter
             d["radiusMeters"]            = LocationRadius
             d["keywords"]                = BaseKeyWords
 
-            if logo && d["images"].nil?
-              idstr = ImageHelper.upload_url(BaseUrl + logo)
-              d["images"] = [idstr] unless idstr.nil?
-            end
-
             d["extdata"] = {
               "id"   => offer_id,
               "link" => link
             }
+
+            if logo && d["images"].nil?
+              idstr = ImageHelper.upload_url(BaseUrl + logo) rescue nil
+              d["images"] = [idstr] unless idstr.nil?
+            end
           end
         rescue Exception => e
           puts e
