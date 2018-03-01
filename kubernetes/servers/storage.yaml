@@ -75,7 +75,7 @@ spec:
               name: k8scfg
               key: TRACKER_HOST
         - name: WEB_CONCURRENCY
-          value: "8"
+          value: "4"
         - name: API_USER
           valueFrom:
             secretKeyRef:
