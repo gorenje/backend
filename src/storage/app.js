@@ -7,7 +7,14 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 // connect to MongoDB
-mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/push')
+mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/push',
+                 { poolSize: 1,
+                   useMongoClient: true,
+                   autoIndex: false,
+                   reconnectTries: 1000,
+                   reconnectInterval: 500,
+                   bufferMaxEntries: 0
+                 })
         .then(() =>  console.log('connection succesful'))
         .catch((err) => {
           console.error(err);
