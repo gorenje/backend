@@ -11,7 +11,7 @@ class Webapp < Sinatra::Base
   set :show_exceptions, :after_handler
   YesNo  = ["Yes", "No"]
   SpcRE  = /[[:space:]]+/
-  Cmpnts = ["deployments", "pods", "services", "ingress"]
+  Cmpnts = ["deployments", "pods", "services", "ingress", "pvc"]
   MxPler = {:h=>3600,:m=>60,:d=>86400,:Gi=>1024}
   Nrm    = Proc.new { |v,u| v.to_i * (MxPler[(u||"").to_sym] || 1) }
 
@@ -68,6 +68,10 @@ class Webapp < Sinatra::Base
 
     def watch(ns,name) ; osascript("logs #{name} -n #{ns} --follow=true") ; end
     def shell(ns,name) ; osascript("exec #{name} -n #{ns} -it /bin/bash") ; end
+
+    def external_ip
+      `kubectl describe svc nginx --namespace nginx-ingress | grep "LoadBalancer Ingress"`.split(SpcRE).last
+    end
   end
 
   helpers do
@@ -148,6 +152,10 @@ class Webapp < Sinatra::Base
 
   get '/_cfg' do
     @title = "Configuration" ; haml(:config, :layout => :layout)
+  end
+
+  get '/_ip' do
+    @title = "External Ip" ; haml(Kubectl.external_ip, :layout => :layout)
   end
 
   post '/_cfg' do
@@ -244,6 +252,7 @@ __END__
       .col-4.text-right
         %a{ :href => "/_cfg" } Config
         %a{ :href => "/_graph" } Graphs
+        %a{ :href => "/_ip" } Ip
         %a._busybox{ :href => "/_busybox" } Busybox
         %a{ :href => "/_busybox" } BusyboxNS
     .row.pt-2
@@ -283,8 +292,13 @@ __END__
   %a.btn.btn-warning{ :href => "/#{request.path.split(/\//)[1]}" } Cancel
 
 @@ graph
-#cpugraph{ :style => "height: 800px;" }
-#memgraph{ :style => "height: 800px;" }
+.container-fluid
+  .row
+    .col-12
+      #cpugraph{ :style => "height: 50%;" }
+  .row
+    .col-12
+      #memgraph{ :style => "height: 50%;" }
 :javascript
   $(document).ready(function(){
     var optionsCpu = {
