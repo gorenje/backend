@@ -93,7 +93,6 @@ function start() {
 // this is is used by mocha for testing.
 function get_app() {
   return app;
-
 }
 
 exports.start = start;
