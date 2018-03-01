@@ -224,12 +224,12 @@ offerserver):
     prompt> mongo
     mongo> use store
     mongo> db.offers.createIndex({"location": "2dsphere"})
-    mongo> db.searches.createIndex({"location": "2dsphere"})
     mongo> db.offers.createIndex({"text": "text"})
-    mongo> db.searches.createIndex({"text": "text"})
-    mongo> db.searches.createIndex({keywords: 1})
     mongo> db.offers.createIndex({keywords: 1})
     mongo> db.offers.createIndex({owner: 1})
+    mongo> db.searches.createIndex({"location": "2dsphere"})
+    mongo> db.searches.createIndex({"text": "text"})
+    mongo> db.searches.createIndex({keywords: 1})
     mongo> db.searches.createIndex({owner: 1})
 
 That should make things a little faster.
