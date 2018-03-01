@@ -76,6 +76,7 @@ router.route('/offers')
 
 router.route('/notify_searchers/:owner')
   .get(auth.isAuthenticated, function(req, res, next) {
+    res.json({status: "ok"})
     var properties = { owner: req.params.owner, isActive: true }
 
     Offer.find(qryHelper.validate(properties))
@@ -83,9 +84,7 @@ router.route('/notify_searchers/:owner')
       .on('data', function(offer){
         offer.findMatchingSearchesAndNotify(next, function(){});
       })
-      .on('end', function(){
-        res.json({status: "ok"})
-      })
+      .on('end', function(){})
   });
 
 module.exports = router
