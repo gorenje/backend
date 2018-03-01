@@ -15,10 +15,19 @@ class Webapp < Sinatra::Base
   MxPler = {:h=>3600,:m=>60,:d=>86400,:Gi=>1024}
   Nrm    = Proc.new { |v,u| v.to_i * (MxPler[(u||"").to_sym] || 1) }
 
+  PidOfForeman = "\\$(pidof 'foreman: master')"
+  PidLookup = {
+    "pushtech" => {
+      "website"            => PidOfForeman,
+      "notificationserver" => PidOfForeman,
+      "imageserver"        => PidOfForeman,
+    }
+  }
+
   module Kubectl
     extend self
     def kctl(cmdline)
-      `kubectl #{cmdline} --kubeconfig="#{kbcfg}"`.split(/\n/)
+      `kubectl --kubeconfig="#{kbcfg}" #{cmdline}`.split(/\n/)
     end
 
     def kbcfg(v = nil)
@@ -69,8 +78,14 @@ class Webapp < Sinatra::Base
     def watch(ns,name) ; osascript("logs #{name} -n #{ns} --follow=true") ; end
     def shell(ns,name) ; osascript("exec #{name} -n #{ns} -it /bin/bash") ; end
 
+    def restart(ns,name)
+      pid = (PidLookup[ns]||{})[name.split(/-/)[0..-3].join("-")] || "1"
+      kctl("exec #{name} -n #{ns} -it -- /bin/bash -c \"kill #{pid}\"")
+    end
+
     def external_ip
-      `kubectl describe svc nginx --namespace nginx-ingress | grep "LoadBalancer Ingress"`.split(SpcRE).last
+      (kctl("describe svc nginx --namespace nginx-ingress").
+         select { |a| a =~ /LoadBalancer Ingress/ }.first||"").split(SpcRE).last
     end
   end
 
@@ -86,7 +101,7 @@ class Webapp < Sinatra::Base
 
     def line_to_row(line,idx)
       (c = line.split(SpcRE)).map { |v| cell(v) }.join("\n") + "<td>" +
-        ["delete", "watch", "scale", "shell"].map do |v|
+        ["delete", "log", "scale", "shell", "restart"].map do |v|
         "<a class='_#{v}' href='#{request.path}/#{c[0]}/#{c[1]}/#{v}'>#{v}</a>"
       end.join("\n") + "</td>"
     end
@@ -118,7 +133,17 @@ class Webapp < Sinatra::Base
 
   get('(/top)?/pods/:ns/:name/scale') { redirect '/deployments' }
 
-  get '(/top)?/pods/:ns/:name/watch' do
+  get '(/top)?/pods/:ns/:name/restart(/:r)?' do
+    if params[:r]
+      Kubectl.restart(params[:ns],params[:name]) if params[:r] == "yes"
+      redirect "/pods"
+    else
+      @title = "Restart Pod"
+      haml :choice, :layout => :layout
+    end
+  end
+
+  get '(/top)?/pods/:ns/:name/log' do
     Kubectl.watch(params[:ns], params[:name]) ; redirect('/pods')
   end
 
@@ -239,7 +264,7 @@ __END__
   %body
     :javascript
       $(document).ready(function() {
-        $('a._watch, a._shell, a._busybox').click(function(event){
+        $('a._log, a._shell, a._busybox').click(function(event){
           $.get($(event.target).attr('href')).fail(function(){alert('n/a');});
           return false;
         });
@@ -295,11 +320,16 @@ __END__
 .container-fluid
   .row
     .col-12
-      #cpugraph{ :style => "height: 50%;" }
+      #cpugraph
   .row
     .col-12
-      #memgraph{ :style => "height: 50%;" }
+      #memgraph
 :javascript
+  function toggleLegend(chartid) {
+    $('#'+chartid).find('g.highcharts-legend-item').click()
+    return false;
+  }
+
   $(document).ready(function(){
     var optionsCpu = {
       chart: {
@@ -309,10 +339,18 @@ __END__
       yAxis: { title: { text: 'CPU usage in millicpu' } },
       xAxis: {
         type: 'datetime',
-        title: { text: 'Counter (updated at 5 second intervals)' }
+        title: { text: 'Time' }
       },
-      title: { text: 'CPU Resources' },
-      tooltip: { pointFormat: '{series.name}: <b>{point.y}</b>' }
+      legend: {
+          align: 'right',
+          verticalAlign: 'middle',
+          layout: 'vertical'
+      },
+      title: {
+        text: 'CPU Resources <a href="#" onclick="return toggleLegend(\'cpugraph\')">Toggle</a>',
+        useHTML: true
+      },
+      tooltip: { pointFormat: '{series.name}: <b>{point.y}</b>' },
     }
 
     var optionsMem = {
@@ -325,8 +363,16 @@ __END__
         type: 'datetime',
         title: { text: 'Time' }
       },
-      title: { text: 'Memory Resources' },
-      tooltip: { pointFormat: '{series.name}: <b>{point.y}</b>' }
+      legend: {
+          align: 'right',
+          verticalAlign: 'middle',
+          layout: 'vertical'
+      },
+      title: {
+        text: 'Memory Resources <a href="#" onclick="return toggleLegend(\'memgraph\')">Toggle</a>',
+        useHTML: true
+      },
+      tooltip: { pointFormat: '{series.name}: <b>{point.y}</b>' },
     }
 
     window.chartcpu = Highcharts.chart(optionsCpu);
