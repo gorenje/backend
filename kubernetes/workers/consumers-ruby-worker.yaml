@@ -25,10 +25,10 @@ spec:
         resources:
           requests:
             memory: "200Mi"
-            cpu: "15m"
+            cpu: "120m"
           limits:
             memory: "400Mi"
-            cpu: "40m"
+            cpu: "200m"
         env:
         - name: IMAGE_HOST
           valueFrom:

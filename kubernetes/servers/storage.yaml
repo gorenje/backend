@@ -42,10 +42,10 @@ spec:
         resources:
           requests:
             memory: "400Mi"
-            cpu: "80m"
+            cpu: "300m"
           limits:
             memory: "800Mi"
-            cpu: "300m"
+            cpu: "600m"
         env:
         - name: COOKIE_SECRET
           valueFrom:

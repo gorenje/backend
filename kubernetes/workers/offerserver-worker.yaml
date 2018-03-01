@@ -24,11 +24,11 @@ spec:
         - worker
         resources:
           requests:
-            memory: "500Mi"
-            cpu: "400m"
+            memory: "800Mi"
+            cpu: "800m"
           limits:
             memory: "1500Mi"
-            cpu: "800m"
+            cpu: "1200m"
         env:
         - name: IMAGE_HOST
           valueFrom:
