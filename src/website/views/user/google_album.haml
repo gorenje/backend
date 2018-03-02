@@ -1,0 +1,33 @@
+= haml :"_js_global_variables"
+= haml :"_js_include_files", :locals => {:files => ["code","google"]}
+= haml :"_sendbird_widget"
+= haml :"_notification_websocket"
+- i18n = TranslatorHelper.new("pages.user_google_album")
+- but = i18n.button.c
+
+= haml :"_response_panel"
+
+.panel.panel-primary
+  = haml(:"_panel_heading", :locals => { :i18n => i18n, :icon => "tag8" })
+  .panel-body
+    .row.pt-10px
+      .col-md-12{ :style => "align: middle;" }
+        %form#dropzoneform.dropzone{ :method => :post, :action => "/google/album" }
+          .row
+            .col-md-12
+              %input.form-control#text{:type => "text", :name => :text, :value => session.delete(:text), :placeholder => "Text" }/
+          .row.pt-10px
+            .col-md-12
+              %input.form-control#text{:type => "text", :name => :link, :value => session.delete(:link), :placeholder => "Link" }/
+          .row.pt-10px
+            .col-md-10
+              %button.btn{:type => "submit" }
+                %span{ "data-icon" => "check4" }
+                  = but.create.t
+          .row.pt-10px
+            .dropzone-previews
+            .dz-message{"data-dz-message" => ""}
+              %span{"data-icon" => "image-outline", :style => "font-size: 20px"}
+                = i18n.image_upload.text.t
+
+= haml :"_dropzone_init_js", :locals => { :redirect_to => "/google/album" }
