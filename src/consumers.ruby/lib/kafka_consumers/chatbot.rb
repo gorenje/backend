@@ -20,6 +20,7 @@ module Consumers
     MeetupCom       = "MeetupCom"
     BerlinDeNatur   = "BerlinDeNatur"
     NewstralCom     = "NewstralCom"
+    DbpediaOrg      = "DbpediaOrg"
     GeonamesOrg     = Consumers::Geonames::Owner
 
     UnknownCmd = "Sorry Dave, I didn't understand that."
@@ -77,11 +78,28 @@ module Consumers
           handle_meetup_chat(event)
         when event.is_for?(NewstralCom)
           handle_newstral_chat(event)
+        when event.is_for?(DbpediaOrg)
+          handle_dbpediaorg_chat(event)
         end
       rescue Exception => e
         puts "Chatbot: Errror handling #{event} => #{e.message}"
         puts e.backtrace
       end
+    end
+
+    def handle_dbpediaorg_chat(event)
+      offer, search = event.offer_and_search
+      msg = if extdata = offer["extdata"]
+              case event.message_text
+              when /link/i
+                extdata["link"] || UnknownCmd
+              else
+                UnknownCmd
+              end
+            else
+              UnknownCmd
+            end
+      event.post_message(msg, DbpediaOrg)
     end
 
     def handle_newstral_chat(event)
