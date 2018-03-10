@@ -78,6 +78,7 @@ class Webapp < Sinatra::Base
 
     def watch(ns,name) ; osascript("logs #{_c(ns,name)} --follow=true") ; end
     def shell(ns,name) ; osascript("exec #{_c(ns,name)} -it /bin/bash") ; end
+    def describe(ns,cmp,name);osascript("describe #{cmp} #{_c(ns,name)}");end
 
     def restart(ns,name)
       pid = (PidLookup[ns]||{})[name.split(/-/)[0..-3].join("-")] || "1"
@@ -142,7 +143,7 @@ class Webapp < Sinatra::Base
 
     def line_to_row(line,idx)
       (c = line.split(SpcRE)).map { |v| cell(v) }.join("\n") + "<td>" +
-        ["delete", "log", "scale", "shell", "restart"].map do |v|
+        ["delete", "log", "desc", "scale", "shell", "restart"].map do |v|
         "<a class='_#{v}' href='#{request.path}/#{c[0]}/#{c[1]}/#{v}'>#{v}</a>"
       end.join("\n") + "</td>"
     end
@@ -186,6 +187,16 @@ class Webapp < Sinatra::Base
 
   get '(/top)?/pods/:ns/:name/log' do
     Kubectl.watch(params[:ns], params[:name]) ; redirect('/pods')
+  end
+
+  get '/top/nodes/:name/:ignore/desc' do
+    Kubectl.describe(nil, "nodes", params[:name])
+    redirect('/top/nodes')
+  end
+
+  get '(/top)?/:cmp/:ns/:name/desc' do
+    Kubectl.describe(params[:ns], params[:cmp], params[:name])
+    redirect('/'+params[:cmp])
   end
 
   get '(/top)?/pods/:ns/:name/shell' do
@@ -346,7 +357,7 @@ __END__
     :javascript
       const NotApp = function(){ alert('N/A') }
       $(document).ready(function() {
-        $('a._log, a._shell, a._busybox').click(function(event){
+        $('a._log, a._shell, a._busybox, a._desc').click(function(event){
           $.get($(event.target).attr('href')).fail(NotApp);
           return false;
         });
