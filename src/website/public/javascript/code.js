@@ -131,7 +131,7 @@ function initializeObjectMarkerForSubject(subject, idx) {
   $('#resultslist').append(subject.resultslist_html);
 
   if ( typeof objectmarkers[idx] === 'undefined' ) {
-    objectmarkers[idx] = newObjectMarker({});
+    objectmarkers[idx] = newObjectMarker({optimized: false});
   }
   objectmarkers[idx].setPosition(subject.json_location);
   objectmarkers[idx].setTitle(subject.text);
@@ -250,6 +250,7 @@ function setUpMarkerClickListener(marker) {
 
     marker.setZIndex(google.maps.Marker.MAX_ZINDEX);
     marker.setIcon(marker._icon_hi);
+    panorama.setPosition(marker.getPosition());
 
     var request = {
       origin: youmarker.getPosition(),
@@ -545,6 +546,73 @@ function centerControl(map) {
   return centerControlDiv;
 }
 
+function togglePanoView(map) {
+  var centerControlDiv = document.createElement('div');
+
+  // Set CSS for the control border.
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = '#fff';
+  controlUI.style.border = '2px solid #fff';
+  controlUI.style.borderRadius = '3px';
+  controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  controlUI.style.cursor = 'pointer';
+  controlUI.title = 'Click to update results';
+  centerControlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior.
+  var controlText = document.createElement('div');
+  controlText.style.height = '30px';
+  controlText.style.width = '30px';
+  controlText.innerHTML =
+    "<img width=30 height=30 src='/images/reloader.svg'/>";
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to Chicago.
+  controlUI.addEventListener('click', function() {
+    panorama.setVisible(!panorama.getVisible());
+  });
+
+  centerControlDiv.index = 1;
+  centerControlDiv.style['padding-top'] = '10px';
+  centerControlDiv.style['padding-right'] = '10px';
+
+  return centerControlDiv;
+}
+
+function panoViewChanged() {
+  var centerControlDiv = document.createElement('div');
+
+  // Set CSS for the control border.
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = '#fff';
+  controlUI.style.border = '2px solid #fff';
+  controlUI.style.borderRadius = '3px';
+  controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  controlUI.style.cursor = 'pointer';
+  controlUI.title = 'Click to update results';
+  centerControlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior.
+  var controlText = document.createElement('div');
+  controlText.style.height = '30px';
+  controlText.style.width = '30px';
+  controlText.innerHTML =
+    "<img width=30 height=30 src='/images/reloader.svg'/>";
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to Chicago.
+  controlUI.addEventListener('click', function() {
+    $(document).trigger("panochanged");
+    $('#updateresultsdiv').addClass('hidden');
+  });
+
+  centerControlDiv.index = 1;
+  centerControlDiv.style['padding-top'] = '10px';
+  centerControlDiv.style['padding-right'] = '10px';
+
+  return centerControlDiv;
+}
+
 function setUpMap(position) {
   var lat = position.coords.latitude,
       lng = position.coords.longitude;
@@ -561,7 +629,7 @@ function setUpMap(position) {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     styles: mapStyle(),
     disableDefaultUI: true,
-    streetViewControl: false,
+    streetViewControl: true,
     zoomControl: true,
     zoomControlOptions: {
       position: google.maps.ControlPosition.TOP_LEFT
@@ -569,6 +637,39 @@ function setUpMap(position) {
   });
 
   map.controls[google.maps.ControlPosition.RIGHT_TOP].push(centerControl(map));
+  map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(togglePanoView(map));
+  panorama = map.getStreetView();
+  panorama.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(togglePanoView(map));
+  panorama.controls[google.maps.ControlPosition.RIGHT_TOP].push(panoViewChanged());
+
+  var panoramaOptions = {
+    position: origin,
+    mode: 'webgl',
+    clickToGo: true,
+    addressControl: true,
+    addressControlOptions: {
+      position: google.maps.ControlPosition.TOP_LEFT
+    },
+    pov: {
+      heading: 0,
+      pitch: 10
+    },
+    disableDefaultUI: false,
+    linksControl: true,
+    panControl:false,
+    enableCloseButton: false,
+    zoomControl: true,
+    zoomControlOptions:{
+      position:google.maps.ControlPosition.RIGHT_TOP
+    },
+    showRoadLabels: false,
+    motionTracking: false,
+    motionTrackingControl: true,
+    motionTrackingControlOptions:{
+      position:google.maps.ControlPosition.RIGHT_TOP
+    },
+  };
+  panorama.setOptions(panoramaOptions);
 
   map.addListener('tilesloaded', function() {
     $(document).trigger("mapinitialized");
@@ -578,6 +679,7 @@ function setUpMap(position) {
   });
   map.addListener('dragend', function() {
     $(document).trigger("mapboundschanged");
+    panorama.setPosition( map.getCenter() );
   });
   $(document).on("mapboundschanged", function(){
     $('#updateresultsdiv').removeClass('hidden');

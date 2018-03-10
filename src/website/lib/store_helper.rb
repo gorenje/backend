@@ -99,10 +99,34 @@ module StoreHelper
     _checkVersion(Agent.new.searches.get(data.to_query))
   end
 
+  def searches_by_radius(center, radius, not_owner, keywords = [])
+    data = {
+      :center    => center,
+      :radius    => radius,
+      :keywords  => keywords,
+      :not_owner => not_owner,
+      :is_active => "true",
+    }
+
+    _checkVersion(Agent.new.searches.get(data.to_query))
+  end
+
   def offers(sw, ne, not_owner, keywords = [])
     data = {
       :sw        => sw,
       :ne        => ne,
+      :keywords  => keywords,
+      :not_owner => not_owner,
+      :is_active => "true",
+    }
+
+    _checkVersion(Agent.new.offers.get(data.to_query))
+  end
+
+  def offers_by_radius(center, radius, not_owner, keywords = [])
+    data = {
+      :center    => center,
+      :radius    => radius,
       :keywords  => keywords,
       :not_owner => not_owner,
       :is_active => "true",

@@ -11,7 +11,7 @@ post '/google/album' do
   if params[:text].empty?
     halt(413, "Text missing")
   end
-  if (params[:link] =~ /@([[:digit:]\.]+),([[:digit:]\.]+)/).nil?
+  if (params[:link] =~ /@([-?[:digit:]\.]+),([-?[:digit:]\.]+)/).nil?
     halt(413, "Link wrong format")
   end
 

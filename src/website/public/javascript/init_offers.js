@@ -71,6 +71,29 @@ function mapChangedCallback() {
   });
 }
 
+function panoChangedCallback() {
+  var center = panorama.getPosition();
+
+  $('#pagination').html("")
+  returnedOffers = {}
+  startWaiting();
+
+  $.ajax({
+    url:  "/api/offers.json",
+    data: { keywords: $('#searchterms').val(),
+            c: { latitude: center.lat(), longitude: center.lng() },
+            r: 300
+    },
+    method: 'get',
+    dataType: 'json'
+  }).done(function(data){
+    constructPagination(data);
+    stopWaiting();
+  }).fail(function(){
+    stopWaiting();
+  });
+}
+
 $(document).ready(function(){
   $(document).on('mapinitialized.firstcallinitmap', function() {
     $(document).off('.firstcallinitmap');
@@ -91,6 +114,7 @@ $(document).ready(function(){
   });
 
   $(document).on('mapchanged', mapChangedCallback);
+  $(document).on('panochanged', panoChangedCallback);
 
   $('#addressselector').on('change', function(){
     if (!$('#addressselector').find('option:selected')) return;

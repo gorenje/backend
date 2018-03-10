@@ -7,15 +7,28 @@ get '/api/searches.json' do
       @user = User.find(session[:user_id])
       owner = @user.userid_for_sendbird
 
-      TrackerHelper.
-        search_for_searches({ :kw => params[:keywords] || '',
-                              :sw => params[:sw],
-                              :ne => params[:ne],
-                              :by => owner })
+      if params[:r]
+        TrackerHelper.
+          search_for_searches({ :kw     => params[:keywords] || '',
+                                :center => params[:c],
+                                :radius => params[:r],
+                                :by     => owner })
 
-      StoreHelper.
-        searches(params[:sw], params[:ne], owner,
-                 (params[:keywords]||"").downcase.split(/[[:space:]]+/))
+        StoreHelper.
+          searches_by_radius(params[:c], params[:r], owner,
+                             (params[:keywords]||"").downcase.
+                               split(/[[:space:]]+/))
+      else
+        TrackerHelper.
+          search_for_searches({ :kw => params[:keywords] || '',
+                                :sw => params[:sw],
+                                :ne => params[:ne],
+                                :by => owner })
+
+        StoreHelper.
+          searches(params[:sw], params[:ne], owner,
+                   (params[:keywords]||"").downcase.split(/[[:space:]]+/))
+      end
     end.map do |hsh|
       hsh.tap do |h|
         fill_hash(h, cnt+=1)
