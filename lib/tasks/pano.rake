@@ -2,7 +2,7 @@
 ['sinatra','haml','thin','rest-client','yaml'].map { |a| require(a) }
 
 namespace :webapp do
-  desc "Run a simple webserver on top of kubectl"
+  desc "Run a simple webserver on top of google sphere images"
   task(:pano) { Thin::Server.new(3001).tap { |s| s.app = PanoApp }.start }
 end
 
@@ -32,7 +32,7 @@ class PanoApp < Sinatra::Base
     }.to_yaml
   end
 
-  get '/duplicate' do
+  get '/duplicates' do
     u,p = ["USER","PASSWORD"].map { |a| ENV["PUSHTECH_API_#{a}"] }
     data = JSON(RestClient.get("https://#{u}:#{p}@store.staging.pushtech.de"+
                                "/offers?owner=GoogleAlbum"))["data"].
@@ -68,7 +68,7 @@ class PanoApp < Sinatra::Base
         :heading => $4.to_f,
         :pitch   => $5.to_f - 90
       },
-      :zoom => y_to_zoom($3.to_f, $1.to_f).to_i
+      :zoom => 0
     }.to_json
   end
 
@@ -147,16 +147,18 @@ __END__
         width: 45%;
       }
   %body
-    %h1
-      Looking at the Sun
+    #operations
       %button{ :onclick => "nextLocation();" } Next Sun
       %button#createsun{ :onclick => "createSun();" } Create Sun
       %a#details{ :href => "", :target => "_blank" } Details
+      %a{ :href => "/duplicates", :target => "_blank" } Duplicates
+      %a{ :href => "/export", :target => "_blank" } Export
+      %a{ :href => "https://gist.github.com/gorenje/038a6a617f6501921bcc8be9d2046386", :target => "_blank" } Gist
+      %a{ :href => "https://gist.github.com/gorenje/038a6a617f6501921bcc8be9d2046386/raw", :target => "_blank" } Data
     #url
     #map
     #pano
     #pano2
-    %br{:clear => "all"}/
 
     :javascript
       var panorama, map, panoramaOptions, panorama2, lastobjid = null;
