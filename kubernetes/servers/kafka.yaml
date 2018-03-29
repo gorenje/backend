@@ -48,10 +48,10 @@ spec:
           resources:
             requests:
               memory: "700Mi"
-              cpu: "150m"
+              cpu: "400m"
             limits:
               memory: "1000Mi"
-              cpu: "400m"
+              cpu: "500m"
           ports:
             - containerPort: 9092
           env:
