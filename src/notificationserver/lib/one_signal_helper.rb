@@ -26,6 +26,8 @@ module OneSignalHelper
       "android_group_message" => {
         "en" => "You have $[notif_count] new messages"
       },
+      "ios_badgeType" => "Increase",
+      "ios_badgeCount" => 1,
       "data" => {
         "sent_at" => Time.now.utc.strftime("%s%L").to_i
       }
