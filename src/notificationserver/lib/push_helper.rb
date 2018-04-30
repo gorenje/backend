@@ -2,13 +2,14 @@ module PushHelper
   extend self
 
   class PushNotification
-    attr_reader :url, :msg, :locale, :title
+    attr_reader :url, :msg, :locale, :title, :data
 
     def initialize(url, msg)
-      @msg = msg
-      @url = url
+      @msg    = msg
+      @url    = url
       @locale = nil
-      @title = nil
+      @title  = nil
+      @data   = {}
     end
 
     def localize(mapping)
@@ -20,6 +21,7 @@ module PushHelper
     def initialize(url, params)
       super(url, nil)
       @params = params
+      @data   = params[:data] || {}
     end
 
     def locale_for(mapping)
@@ -59,7 +61,10 @@ module PushHelper
   def open_chat(chat_name, chat_id, msg)
     url = "pushtech://chat/#{chat_name}/open/#{chat_id}"
     params = {
-      :key => :new_chat_message, :chat_message => msg
+      :key => :new_chat_message, :chat_message => msg, :data => {
+        "chat_name" => chat_name,
+        "chat_id"   => chat_id
+      }
     }
     new_notification(url, params)
   end
@@ -67,7 +72,15 @@ module PushHelper
   def open_search(search, offer)
     url = "pushtech://search/#{search.id}/#{offer.id}/matched"
     params = {
-      :key => :search_matched_offer, :offer => offer, :search => search
+      :key => :search_matched_offer, :offer => offer, :search => search,
+      :data => {
+        "search_id"        => search.id,
+        "search_device_id" => search.device_id,
+        "search_title"     => search.title,
+        "offer_id"         => offer.id,
+        "offer_device_id"  => offer.device_id,
+        "offer_title"      => offer.title,
+      }
     }
     new_notification(url, params)
   end
@@ -75,7 +88,15 @@ module PushHelper
   def open_offer(offer, search)
     url = "pushtech://offer/#{offer.id}/#{search.id}/matched"
     params = {
-      :key => :offer_matched_search, :offer => offer, :search => search
+      :key => :offer_matched_search, :offer => offer, :search => search,
+      :data => {
+        "search_id"        => search.id,
+        "search_device_id" => search.device_id,
+        "search_title"     => search.title,
+        "offer_id"         => offer.id,
+        "offer_device_id"  => offer.device_id,
+        "offer_title"      => offer.title,
+      }
     }
     new_notification(url, params)
   end

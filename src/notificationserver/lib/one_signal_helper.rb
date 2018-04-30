@@ -28,9 +28,9 @@ module OneSignalHelper
       },
       "ios_badgeType" => "Increase",
       "ios_badgeCount" => 1,
-      "data" => {
+      "data" => notification.data.merge({
         "sent_at" => Time.now.utc.strftime("%s%L").to_i
-      }
+      })
     }
     JSON( OneSignal::Notification.create(:params => params).body )
   end
