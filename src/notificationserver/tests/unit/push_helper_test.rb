@@ -7,8 +7,11 @@ class PushHelperTest < Minitest::Test
     chat_string = "%{chat_message}"
 
     assert_equal [:en,:de], I18n.available_locales
-    assert_equal offer_string, I18n.t(:offer_matched_search, :locale => :en)
-    assert_equal chat_string, I18n.t(:new_chat_message, :locale => :en)
+    i18n = TranslatorHelper.new("notification")
+    assert_equal(offer_string,
+                 i18n.message.send(:offer_matched_search, :locale => :en).t)
+    assert_equal(chat_string,
+                 i18n.message.send(:new_chat_message, :locale => :en).t)
   end
 
   context "simple PN" do
