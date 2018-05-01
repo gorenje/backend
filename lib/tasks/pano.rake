@@ -16,8 +16,27 @@ class PanoApp < Sinatra::Base
   }
   Failed = OpenStruct.new(:code => 500)
 
-  def y_to_zoom(y,lat)
-    Math.log(156543.03392 * Math.cos(lat * Math::PI / 180) / y, 2)
+  RegExp = /@([-?[:digit:]\.]+),([-?[:digit:]\.]+).+,([-?[:digit:]\.]+)y.*,([-?[:digit:]\.]+)h.*,([-?[:digit:]\.]+)t.+\!1s(.+)\!2e/
+
+  def link_to_hash(objid,link)
+    if link =~ RegExp
+      panoid = $6.length == 22 ? $6 : "F:#{CGI.escape($6)}"
+      { :link  => link,
+        :id    => panoid,
+        :objid => objid,
+        :location => {
+          :lat => $1.to_f,
+          :lng => $2.to_f
+        },
+        :pov => {
+          :heading => $4.to_f,
+          :pitch   => $5.to_f - 90
+        },
+        :zoom => 0
+      }
+    else
+      nil
+    end
   end
 
   get '/export' do
@@ -28,8 +47,11 @@ class PanoApp < Sinatra::Base
              select { |a| a["text"] =~ /looking straight at the sun/i }
 
     { :date => DateTime.now.to_s,
-      :data => data.map { |a| [a["_id"],a["extdata"]["link"]] }
-    }.to_yaml
+      :data => data.
+                 map { |a| [a["_id"],a["extdata"]["link"]] }.
+                 sort_by { |a,_| a }.
+                 map { |objid,link| link_to_hash(objid,link) }.compact
+    }.to_json
   end
 
   get '/duplicates' do
@@ -40,7 +62,7 @@ class PanoApp < Sinatra::Base
 
     @dups = data.map { |a| [a["_id"],a["extdata"]["link"]] }.
               group_by do |(_,link)|
-                link =~ /@([-?[:digit:]\.]+),([-?[:digit:]\.]+).+,([-?[:digit:]\.]+)y.*,([-?[:digit:]\.]+)h.*,([-?[:digit:]\.]+)t.+\!1s(.+)\!2e/
+                link =~ RegExp
                 $6
               end.to_a.select { |(_,b)| b.size > 1 }
 
@@ -49,27 +71,11 @@ class PanoApp < Sinatra::Base
 
   get '/image' do
     content_type :json
-    body = RestClient.get("https://gist.githubusercontent.com"+
-                          "/gorenje/038a6a617f6501921bcc8be9d2046386/raw").body
-    objid,link = YAML.load(body)[:data].reject {|a| a.first == params[:l]}.sample
+    data = JSON(RestClient.
+                  get("https://gist.githubusercontent.com"+
+                      "/gorenje/4086f765cde6236f06c4fde0a67e2dd3/raw").body)
 
-    puts link
-    link =~ /@([-?[:digit:]\.]+),([-?[:digit:]\.]+).+,([-?[:digit:]\.]+)y.*,([-?[:digit:]\.]+)h.*,([-?[:digit:]\.]+)t.+\!1s(.+)\!2e/
-
-    panoid = $6.length == 22 ? $6 : "F:#{CGI.escape($6)}"
-    { :link  => link,
-      :id    => panoid,
-      :objid => objid,
-      :location => {
-        :lat => $1.to_f,
-        :lng => $2.to_f
-      },
-      :pov => {
-        :heading => $4.to_f,
-        :pitch   => $5.to_f - 90
-      },
-      :zoom => 0
-    }.to_json
+    data["data"].reject { |a| a["objid"] == params[:l] }.sample.to_json
   end
 
   get '/add' do
@@ -132,6 +138,7 @@ __END__
 !!!
 %html
   %head
+    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"}
     %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"}
     %meta{:charset => "utf-8"}/
     %title Sun Traveller
@@ -143,8 +150,8 @@ __END__
       }
       #map, #pano {
         float: left;
-        height: 90%;
-        width: 45%;
+        height: 93%;
+        width: 50%;
       }
   %body
     #operations
@@ -154,7 +161,10 @@ __END__
       %a{ :href => "/duplicates", :target => "_blank" } Duplicates
       %a{ :href => "/export", :target => "_blank" } Export
       %a{ :href => "https://gist.github.com/gorenje/038a6a617f6501921bcc8be9d2046386", :target => "_blank" } Gist
-      %a{ :href => "https://gist.github.com/gorenje/038a6a617f6501921bcc8be9d2046386/raw", :target => "_blank" } Data
+      %a{ :href => "https://gist.github.com/gorenje/038a6a617f6501921bcc8be9d2046386/raw", :target => "_blank" } Current Data
+      %a{ :href => "#", :onclick => "startStreetDriver(); return false" } Start SD
+      %a{ :href => "#", :onclick => "stopStreetDriver(); return false" } stop SD
+
     #url
     #map
     #pano
@@ -162,10 +172,13 @@ __END__
 
     :javascript
       var panorama, map, panoramaOptions, panorama2, lastobjid = null;
+      var streetDriverTimeout = null;
+      var sdVisited = [], sdNotVisited = {};
+
       function createSun() {
         var link = $($('#pano').find('.gm-iv-address-link')[0]).find("a")
                                                               .attr("href");
-        $.get("http://localhost:3001/add?l=" + encodeURIComponent(link),
+        $.get("/add?l=" + encodeURIComponent(link),
               function(data){
                 $('#createsun').html("Done")
               })
@@ -174,21 +187,100 @@ __END__
       }
 
       function nextLocation() {
-        $.get( "http://localhost:3001/image?l="+lastobjid, function(data) {
+        $.get( "/image?l="+lastobjid, function(data) {
                  map.setCenter( data.location )
                  panorama2.setPano(data.id)
-                 // setTimeout(function(){
-                   panorama.setPov(data.pov)
-                   panorama.setZoom(data.zoom)
-                 //},1000)
+                 panorama.setPov(data.pov)
+                 panorama.setZoom(data.zoom)
                  lastobjid = data.objid;
                  $('#details').attr('href', "https://store.staging.pushtech.de/store/details/" + data.objid);
                })
       }
 
+      function linkClosestsToHeading() {
+        var links = panorama.getLinks();
+        if ( links.length === 1 ) { return links[0]; }
+
+        var currentHeading = panorama.getPov().heading;
+        var lnks = links.sort(function(a,b){
+          var hA = a.heading, hB = b.heading;
+          hA = hA < 0 ? hA + 360 : hA;
+          hB = hB < 0 ? hB + 360 : hB;
+          return Math.abs(currentHeading-hA) > Math.abs(currentHeading-hB);
+        });
+
+        return cacheLinks(lnks);
+      }
+
+      function cacheLinks(links) {
+        var returnLink = null;
+
+        _.each( links, function(elem,idx) {
+          if ( _.indexOf( sdVisited, elem.pano ) < 0 ) {
+            sdNotVisited[elem.pano] = elem;
+          }
+        });
+
+        if ( _.indexOf( sdVisited, links[0].pano) < 0 ) {
+          returnLink = links[0];
+        } else {
+          var link = sdNotVisited[_.last(_.keys(sdNotVisited))];
+          if ( link === undefined ) { return false; }
+          setHeading( link );
+          returnLink = link;
+        }
+
+        //if ( sdVisited.length > 150 ) {
+        //  sdVisited = sdVisited.slice(1, 151);
+        //}
+        sdVisited.push(returnLink.pano);
+        delete sdNotVisited[returnLink.pano]
+        return returnLink;
+      }
+
+      function followLink() {
+        var link = linkClosestsToHeading();
+        if (! link ) {
+          alert("We've lost contact")
+          clearTimeout( streetDriverTimeout );
+          return false;
+        }
+        setHeading(link);
+        panorama.setPano(link.pano);
+        return true;
+      }
+
+      function startStreetDriver() {
+        sdVisited = [];
+        sdNotVisited = {};
+        streetDriver();
+      }
+
+      function stopStreetDriver() {
+        if ( streetDriverTimeout !== null ) {
+          clearTimeout( streetDriverTimeout );
+          streetDriverTimeout = null;
+        }
+      }
+
+      function streetDriver() {
+        if ( followLink() ) {
+          streetDriverTimeout = setTimeout(function() {
+             streetDriver()
+          }, 3500);
+        }
+      }
+
+      function setHeading(link) {
+        var heading = link.heading;
+        if ( heading < 0 ) { heading += 360 }
+        var pov = panorama.getPov();
+        pov.heading = heading;
+        panorama.setPov(pov);
+      }
+
       function initialize() {
         google.maps.streetViewViewer = 'photosphere';
-
         var start = {lat: 36.058946, lng: -86.789344};
 
         panoramaOptions = {
@@ -204,6 +296,7 @@ __END__
             zoomControlOptions:{
                 position:google.maps.ControlPosition.RIGHT_TOP
             },
+            showRoadLabels: false,
             pov: {
               heading: 0,
               pitch: 10
