@@ -1,6 +1,6 @@
 # Notification Server
 
-Sends various push notifications out using OneSignal.
+Sends various push notifications out using [OneSignal](https://onesignal.com/).
 
 Also does callbacks via webhooks.
 

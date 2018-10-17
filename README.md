@@ -1,54 +1,87 @@
 # Pushtech Backend
 
-Complete backend for Push.
+Push provides a platform for matching searchers with offers, not unlike
+google, amazon, ebay and co. What makes Push different is that it is
+geo-location based. Meaning that searches and offers have a region defined
+in which that can match. Meaning matches won't be international, national only
+local.
+
+Secondly matches at bi-directional: a user can search for all "searches" in
+their area, in addition to searching for all offers in their area. This means
+that someone looking to offer a product in their neighbourhood, can first
+search for everything that users are looking for.
+
+Another feature is search persistence: a "search" (which can either be for an
+offer or a search) are continually done with changes in location of the user.
+Meaning, "searches" move with the searcher. In the same way, offers can also
+move with the offerer.
+
+This backend code was designed for this product idea. It is based on
+Kafka to provide an event bus so that components are decoupled. Mongo
+for doing geo-matching and redis for caching of events.
 
 ## Architecture
 
 *Insert Image Here*
 
-Ten main parts to the infrastructure:
+Main parts of the infrastructure:
 
-1. Front-facing [tracker](src/tracker) that takes in tracking requests
-   and pushes these to redis instance. The intention is to have
+1. [Storage](src/storage) is a mongo-based datastore for searches and
+   offers. Mongo is good at doing geo matching, hence it was chosen as
+   the datastore.
+
+2. [Website](src/website) providing a simple home page and web-based
+   Push service.
+
+3. [Tracker](src/tracker) that ingests tracking events
+   and pushes these to an redis instance. The intention is to have
    one redis per tracker instance, however this is not set in stone.
    Requests are considered fire-and-forget, meaning the client does not
    need to handle the response.
-2. [Kafkastore](src/kafkastore) then takes those tracking calls from redis,
-   does some magic ([geoIP lookup](src/kafkastore/lib/helpers.js#L46),
-   [device detection](src/kafkastore/lib/helpers.js#L48) and reformatting of the
+
+4. [Image server](src/imageserver) providing a store for images for offers
+   and searches. Basically the same as a amazon bucket but with
+   [image processing](src/imageserver/models/image_uploader.rb).
+
+5. [Kafkastore](src/kafkastore) then takes those tracking calls from redis,
+   does some magic ([geoIP lookup](src/kafkastore/lib/helpers.js#L25),
+   [device detection](src/kafkastore/lib/helpers.js#L27) and reformatting of the
    message). It then does a batch insert into kafka. The tracker does not
    store directly into kafka because of the extra geoIP lookup and also
    because we want to batch tracking calls together before handing them off
    to kafka.
-3. [Consumers](src/consumers) ingest events from kafka, doing whatever work
-   they are intended to do. At the moment, there are two consumers to
-   demostrate how consumers generally work.
-4. [Kafidx](src/kafidx) which is a simple web-socket based application
+
+6. [Notification Server](src/notificationserver) for sending push notifications
+   to the mobile application and also to the website. Notifications are sent
+   via [OneSignal](https://onesignal.com/).
+
+7. [Offer Server](src/offerserver) for generating seed offers of
+   various things on the internet. All offer generators are
+   [here](src/offerserver/lib/importers).
+
+8. [Kafidx](src/kafidx) which is a simple web-socket based consumer
    which shows live tracking events as they come in. It is useful for debugging
    consumers and generally ensuring that events are going through the
    system.
-5. [Nodejs consumers](src/consumers.nodejs) which just provide some
+
+9. [Nodejs consumers](src/consumers.nodejs) which just provide some
    statistical data.
-6. [Ruby consumers](src/consumers.ruby) which trigger various actions
+
+10. [Ruby consumers](src/consumers.ruby) which trigger various actions
    when various events happen.
-7. [Website](src/website) providing a simple home page.
-8. [Image server](src/imageserver) providing a store for images for offers
-   and searches. Basically the same as a amazon bucket but with
-   [image processing](src/imageserver/models/image_uploader.rb).
-9. [Offer Server](src/offerserver) for generating offers of various places
-   are the internet. All offer generators are
-   [here](src/offerserver/lib/importers).
-10. [Kafka and Zookeeper](docker-compose/kafka-zookeeper.yml) - just that!
+
 11. [NFS Server](src/imageserver.nfs) for providing data storage for the
    the imageserver. This was not possible using a persistent volume since
    these are bound to a single node in kubernetes. Instead the imageserver
    now connects to the NFS server that has the persistent volume.
 
+12. [Kafka and Zookeeper](docker-compose/kafka-zookeeper.yml) - just that!
+
 Design decisions:
 
 1. Independent scaling of each component of the infrastructure.
-2. Decoupling of recieving events and handling those events.
-3. Maximum flexibility in the sending and creating new tracking events.
+2. Decoupling of recieving events, storing and handling those events.
+3. Maximum flexibility in sending and creating new tracking events.
 4. No assumption about what gets tracked and how many tracking calls come in.
 5. Each tracking event is independent and there is no assumption about
    ordering of tracking events.
@@ -69,7 +102,7 @@ What's missing?
 
 The [Rakefile](Rakefile) provides some helper tasks to make life that
 much easier. But to use it, you'll need ruby. Specifically, you will
-need [ruby 2.4.2](.ruby-version) which you can install using
+need [ruby 2.4.3](.ruby-version) which you can install using
 [rvm](https://en.wikipedia.org/wiki/Ruby_Version_Manager) or
 [rbenv](https://github.com/rbenv/rbenv). After that, it's a matter
 of installing bundler and all required gems:
@@ -84,7 +117,6 @@ Then have a look at all available tasks
 Done.
 
 ### Environment
-
 
 Some things are secret and therefore there is an ```.env``` file for
 storing those secrets. But these secrets are checked in, so you will have
