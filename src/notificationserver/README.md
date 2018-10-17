@@ -1,8 +1,19 @@
 # Notification Server
 
-Sends various push notifications out using [OneSignal](https://onesignal.com/).
+Sends various push notifications out using [OneSignal](https://onesignal.com/)
+and via webhooks to the [website](../website).
 
-Also does callbacks via webhooks.
+Clients [register](routes/register.rb) with the notification server.
+The notification server maintains a mapping between device id and one signal
+id and sendbird id. Clients are responsible for updating this mapping when
+they register with sendbird or one signal.
+
+Device Ids are the primary key for these mappings and clients can update
+any or all of their details using that.
+
+Also this provides an [endpoint](routes/sendbird.rb) for Sendbird callbacks
+when messages are sent to a group chat. So that other members of the chat
+are informed of new messages.
 
 ## Testing
 

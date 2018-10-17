@@ -1,17 +1,10 @@
-Push Backend
-----
+# Storage for Searches and Offers
 
-Store for Offers and Searches.
+MongoDB-based storage for offers and searches. Provides API calls for
+triggering notifications of matches.
 
-Local Testing
----
+## Testing with Mocha
 
-    while [ 1 ] ; do NOTIFY_HOST=https://notify.pushtech.de MONGOHQ_URL=mongodb://heroku:....<get from heroku config> foreman start ; done
-
-Done.
-
-Testing with Mocha
----
 
 First install mocha globally:
 
@@ -25,6 +18,6 @@ and things should be tested.
 
 For bonus points, setup mongo:
 
-    MONGOHQ_URL=mongodb://heroku:....<get from heroku config> mocha
+    MONGOHQ_URL=mongodb://heroku:....<use docker to start mongo> mocha
 
 This should not change the live database, just use it.
