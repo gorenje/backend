@@ -1,7 +1,7 @@
 # Consumers - NodeJS
 
 Kafka consumers for collecting statistical data. Data is persisted to a
-Redis store and displyed by the [kafidx](../src/kafidx) server.
+Redis store and displyed by the [kafidx](../kafidx) server.
 
 Data collected:
 
