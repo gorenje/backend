@@ -126,7 +126,7 @@ Start up the images (best results when docker has 6 cpus and 8 GB ram):
 
     rake docker:compose:spin_up
 
-Open relevant URLs:
+Open relevant URLs (requires Firefox and MacOS):
 
     rake docker:compose:open_urls
 
