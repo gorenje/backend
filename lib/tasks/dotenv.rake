@@ -28,6 +28,22 @@ namespace :dotenv do
     Base64.encode64(RsaKey.public_key.export).gsub(/\n/,'')
   end
 
+  def generate_random_username
+    [*?A..?Z].sample + ([1]*5).map { [*?a..?z].sample }.join
+  end
+
+  def generate_random_password
+    ([1]*10).map { [*?A..?Z,*?a..?z,*?0..?9].sample }.join
+  end
+
+  def enter_non_blank_value(name)
+    loop do
+      print "Enter non-blank value for #{name}: "
+      val = STDIN.readline.strip
+      return val unless val.empty?
+    end
+  end
+
   desc <<-EOF
     Interactively generate the .env file
   EOF
@@ -38,44 +54,49 @@ namespace :dotenv do
       end
     end
 
+    class String
+      def yes?
+        ["","Y","y"].include?(self)
+      end
+    end
+
     content = {}
-    last_comment_line = nil
 
     if File.exists?(".env")
       `mv .env .env.#{DateTime.now.strftime("%Y%m%d%H%m%S")}`
     end
 
     File.read(".env.template").split("\n").each do |line|
-      last_comment_line = line if line =~ /^#/
       next if line.strip.empty?
 
       if line =~ /^export (.+)=#\{(.*)}/
         name, default = $1, $2.strip
-        puts last_comment_line unless last_comment_line.empty?
 
         print "#{name} generate the value (#{default}) [Y/n]? "
-        response = STDIN.getc
-        content[name] =  if response =~ /\n/ || response =~ /y/i
+        response = STDIN.readline.strip
+        content[name] =  if response.yes?
                            eval(default)
                          else
-                           print "Enter the value: "
-                           STDIN.readline.strip
+                           enter_non_blank_value(name)
                          end
+
       elsif line =~ /^export (.+)=(.*)/
         name, default = $1, $2.strip
         unless default.empty?
           print "#{name} accept default value (#{default}) [Y/n]? "
-          response = STDIN.getc
-          content[name] = if response =~ /\n/ || response =~ /y/i
+          response = STDIN.readline.strip
+          content[name] = if response.yes?
                             default
                           else
-                            print "Enter the value: "
-                            STDIN.readline.strip
+                            enter_non_blank_value(name)
                           end
         else
-          print "Enter the value for #{name}: "
+          print "Enter value or leave blank for #{name}: "
           content[name] = STDIN.readline.strip
         end
+
+      elsif line =~ /^#/
+        puts "\033[0;m\033[1;32m" + line + "\033[0;m"
       end
     end
 
