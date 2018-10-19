@@ -2,9 +2,7 @@ extends layout.pug
 
 block content
   center
-    h1 Consumers
-
-  #events-listing
+    h1 Consumer Statistics
 
   script(src = "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment-with-locales.min.js")
   script(src = "//cdnjs.cloudflare.com/ajax/libs/ipaddr.js/1.5.4/ipaddr.min.js")
@@ -12,6 +10,8 @@ block content
   script(src = "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" )
 
   center
+    a( href = "/" ) Back
+    br
     table(border=0)
       thead
         tr

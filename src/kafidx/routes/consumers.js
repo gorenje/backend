@@ -58,8 +58,8 @@ router
     redisClient.on("connect", function () {
       redisClient.hget("_description", "name", function(err, result){
         if ( result ) {
-          var link = "<a target='_blank' href='/consumers/" + req.params.db +
-                     "/page'>" + result + "</a>"
+          var link = "<a href='/consumers/" + req.params.db + "/page'>" +
+                     result + "</a>"
           res.json({
             html: link,
             id: "row" + req.params.db
