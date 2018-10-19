@@ -9,6 +9,6 @@ the trackers are not pushing single events into kafka and can respond
 faster.
 
 In addition, the kafkastore does geo lookups for IPs and handles device
-detections from user agent strings. It also reformats message stored
-into kafka into a simple space-separated string, i.e. no JSON parsing
-required for messages.
+detections from user agent strings. It also [reformats](lib/helpers.js#L41-L45)
+message stored into kafka into a simple space-separated string, i.e. no JSON
+parsing required.

@@ -1,5 +1,7 @@
-# Simple Search and Offer Website
+# Website
 
-Very simply website for providing basic Push functionality.
+Website for provides basic functionality of the Push ideas. This mimics
+what the Push mobile application provides as functionality.
 
-Chat functionality is handled by [Sendbird](https://sendbird.com/).
+It allows for the creation of offers and searches. Searching for both and
+also chatting with users.

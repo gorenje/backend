@@ -20,71 +20,20 @@ This backend code was designed for this product idea. It is based on
 Kafka to provide an event bus so that components are decoupled. Mongo
 for doing geo-matching and redis for caching of events.
 
-## Architecture
+## Components
 
-*Insert Image Here*
-
-Main parts of the infrastructure:
-
-1. [Storage](src/storage) is a mongo-based datastore for searches and
-   offers. Mongo is good at doing geo matching, hence it was chosen as
-   the datastore.
-
-2. [Website](src/website) providing a simple home page and web-based
-   Push service.
-
-3. [Tracker](src/tracker) that ingests tracking events
-   and pushes these to an redis instance. The intention is to have
-   one redis per tracker instance, however this is not set in stone.
-   Requests are considered fire-and-forget, meaning the client does not
-   need to handle the response.
-
-4. [Image server](src/imageserver) providing a store for images for offers
-   and searches. Basically the same as a amazon bucket but with
-   [image processing](src/imageserver/models/image_uploader.rb).
-
-5. [Kafkastore](src/kafkastore) then takes those tracking calls from redis,
-   does some magic ([geoIP lookup](src/kafkastore/lib/helpers.js#L25),
-   [device detection](src/kafkastore/lib/helpers.js#L27) and reformatting of the
-   message). It then does a batch insert into kafka. The tracker does not
-   store directly into kafka because of the extra geoIP lookup and also
-   because we want to batch tracking calls together before handing them off
-   to kafka.
-
-6. [Notification Server](src/notificationserver) for sending push notifications
-   to the mobile application and also to the website. Notifications are sent
-   via [OneSignal](https://onesignal.com/).
-
-7. [Offer Server](src/offerserver) for generating seed offers of
-   various things on the internet. All offer generators are
-   [here](src/offerserver/lib/importers).
-
-8. [Kafidx](src/kafidx) which is a simple web-socket based consumer
-   which shows live tracking events as they come in. It is useful for debugging
-   consumers and generally ensuring that events are going through the
-   system.
-
-9. [Nodejs consumers](src/consumers.nodejs) which just provide some
-   statistical data.
-
-10. [Ruby consumers](src/consumers.ruby) which trigger various actions
-   when various events happen.
-
-11. [NFS Server](src/imageserver.nfs) for providing data storage for the
-   the imageserver. This was not possible using a persistent volume since
-   these are bound to a single node in kubernetes. Instead the imageserver
-   now connects to the NFS server that has the persistent volume.
-
-12. [Kafka and Zookeeper](docker-compose/kafka-zookeeper.yml) - just that!
+All components are found in [src](src) and interact together to provide
+the complete backend for the Push application.
 
 Design decisions:
 
 1. Independent scaling of each component of the infrastructure.
-2. Decoupling of recieving events, storing and handling those events.
-3. Maximum flexibility in sending and creating new tracking events.
+2. Decoupling of components by providing an event bus.
+3. Maximum flexibility in sending and creating new events.
 4. No assumption about what gets tracked and how many tracking calls come in.
 5. Each tracking event is independent and there is no assumption about
-   ordering of tracking events.
+   ordering of tracking events. Each event is complete and non-depended
+   on other events.
 
 What's missing?
 
@@ -95,8 +44,27 @@ What's missing?
    from the client.
 3. Logging and monitoring.
 
+[Kafka](https://kafka.apache.org/) provides the event bus and is the only
+common denomiator between components. Although, components do communicate
+directly with one another. Communication is via APIs, thus providing a
+clear interface how components can communicate.
 
-## Prerequistes for local testing
+Each component has limited scope of responsibility and care should be taken
+in dividing up what needs doing amongs components. An example of this
+is the [notification server](src/notificationserver) which is solely
+responsible for sending push notifications to mobile devices. All other
+components communicate via an API with the notification server when
+a notification should be sent.
+
+This allows for a central point of notification rate limiting, for example.
+Also, if the service provider (in this case OneSignal) for push notifications
+should be changed, then only the notification server needs to be modified.
+
+Also having separate components allows different coding languages to be
+used. There is no requirement to code all components on the same language.
+At the moment, NodeJS and Ruby have been used.
+
+## Prerequistes
 
 ### rake
 
@@ -129,7 +97,6 @@ and is the basis for a generated ```.env```:
 
 ### Docker
 
-
 [Docker](https://www.docker.com/docker-mac) needs to be installed.
 
 ### Kompose
@@ -140,13 +107,10 @@ is not required since the conversion was a one-off. Any changes to the
 kubernetes files should be done directly in the [kubernetes](kubernetes)
 directory.
 
-## Deployment
+## Starting Backend locally
 
-Currently the project can be deployed via docker and kubernetes. Docker
-is great for local testing, kubernetes for production.
-
-[Kubernetes](https://kubernetes.io/) was tested locally using
-[minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/).
+Project can be started locally by either using docker compose or
+minikube with kubectl.
 
 ### Using Docker Compose
 
