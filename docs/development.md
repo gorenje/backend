@@ -43,7 +43,7 @@ to use that docker. This is
 [described](../README.md#using-minikube-and-kubectl) in the readme. Also
 using minikube and kubectl can become confusing if you're deploying
 to a remote kubernetes system ... your environment can get very confusing
-and if not sure, open a new terminal window :-)
+and if not sure, open a new terminal window.
 
 Once docker is up, build all the backend images:
 
@@ -88,7 +88,7 @@ port to localhost. This is done by changing this
 to ```- 5432:5432``` which tells docker-compose to connect port 5432 of the
 container to the localhost port 5432.
 
-(BTW don't check this in since there is no reason to expose the database
+(BTW don't commit this change since there is no reason to expose the database
 port on localhost in normal operation and secondly there are multiple
 postgres databases and only one port!)
 
@@ -102,11 +102,7 @@ also migrate the database for you!).
 Now comes the stuff that is a bit painful but only needs to be done once.
 Setup the ```.env``` file for the website codebase. This is done locally
 in the [src/website](../src/website) directory. What needs defining can
-be found in the [website.yml](../../0ce53dee908ede1e6583cb23c09b0aa1b2a3824d/docker-compose/website.yml#L23-L50),
-i.e. it's non-trival!
-
-But remember the database url will be
-```postgres://user:pass@localhost:5432/dbname```!
+be found in the [website.yml](../../0ce53dee908ede1e6583cb23c09b0aa1b2a3824d/docker-compose/website.yml#L23-L50).
 
 Of course, there are bunch of other references to the other services
 in the backend, whether they also need to be started via docker-compose, is
@@ -157,8 +153,8 @@ spin up the website:
     rake docker:images:build
     eval $(cat .env) ; docker-compose -f docker-compose/website.yaml up
 
-Don't worry about the docker rebuild, it only rebuilds what has changed,
-i.e. is super quick. Also starting up the service is also quick.
+Don't worry about the docker rebuild, it only rebuilds what has changed.
+Also starting up the service is also quick.
 
 #### Take aways
 

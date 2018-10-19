@@ -20,7 +20,7 @@ services:
     links:
       - pgwebsite
     environment:
-      - RACK_ENV=development
+      - RACK_ENV=production
       - PORT=$WEBSITE_PORT
       - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
       - ASSETS_HOST=http://imageserver:$IMAGE_SERVER_PORT

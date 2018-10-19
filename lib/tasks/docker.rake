@@ -3,9 +3,9 @@ namespace :docker do
     desc "Build all images"
     task :build do
       system <<-EOF
-        for n in src/* ; do
-          cd $n
-          imagename=`basename $n`
+        for n in src/*/Dockerfile ; do
+          cd `dirname $n`
+          imagename=$(basename `dirname $n`)
           tagname="#{KubernetesNS}.${imagename}"
           prevversion=`docker images -a | grep ${tagname} | grep v1 | awk 'BEGIN { yes=0 } // { print $3; yes=1; } END { if (yes==0) { print "- unknown -" }}'`
           echo "\\033[1;31m!!! \\033[0;35mBuilding ====> ${imagename} \\033[0m"
@@ -20,8 +20,8 @@ namespace :docker do
     task :push do
       docker_account = ENV['DOCKER_ACCOUNT'] || 'gorenje'
       system <<-EOF
-        for n in src/* ; do
-          imagename=`basename $n`
+        for n in src/*/Dockerfile ; do
+          imagename=$(basename `dirname $n`)
           echo "!!! Pushing \\033[0;31m ====> ${imagename} \\033[0m"
           docker tag #{KubernetesNS}.${imagename}:v1 #{docker_account}/#{KubernetesNS}:${imagename}
           docker push #{docker_account}/#{KubernetesNS}:${imagename}
@@ -77,16 +77,19 @@ namespace :docker do
       EOF
     end
 
-    desc "Open pages that are relevant"
+    desc "Open pages that are relevant (MacOS only, requires Firefox)"
     task :open_urls do
       system <<-EOF
-        open -a Safari http://localhost:#{ENV['KAFIDX_PORT']}/kafidx
-        open -a Safari http://localhost:#{ENV['TRACKER_PORT']}/event?d=1
-        open -a Safari http://localhost:#{ENV['IMAGE_SERVER_PORT']}/assets
+        open -a Firefox http://#{ENV['KAFIDX_USER']}:#{ENV['KAFIDX_PASSWORD']}@localhost:#{ENV['KAFIDX_PORT']}
+        open -a Firefox http://#{ENV['IMAGESERVER_API_USER']}:#{ENV['IMAGESERVER_API_PASSWORD']}@localhost:#{ENV['IMAGE_SERVER_PORT']}/assets
 
+        open -a Firefox http://#{ENV['PUSHTECH_API_USER']}:#{ENV['PUSHTECH_API_PASSWORD']}@localhost:#{ENV['STORAGE_PORT']}/store/offers
+        open -a Firefox http://#{ENV['NOTIFICATION_API_USER']}:#{ENV['NOTIFICATION_API_PASSWORD']}@localhost:#{ENV['NOTIFICATION_SERVER_PORT']}/mappings
+        open -a Firefox http://#{ENV['OFFERSERVER_API_USER']}:#{ENV['OFFERSERVER_API_PASSWORD']}@localhost:#{ENV['OFFERSERVER_PORT']}/sidekiq
+        open -a Firefox http://#{ENV['CONSUMER_API_USER']}:#{ENV['CONSUMER_API_PASSWORD']}@localhost:#{ENV['CONSUMERS_RUBY_PORT']}/sidekiq
+
+        open -a Firefox http://localhost:#{ENV['TRACKER_PORT']}/event?d=1
         open -a Firefox http://localhost:#{ENV['WEBSITE_PORT']}
-        open -a Firefox http://localhost:#{ENV['STORAGE_PORT']}/store/offers
-        open -a Firefox http://localhost:#{ENV['NOTIFICATION_SERVER_PORT']}/mappings
       EOF
     end
 
