@@ -142,13 +142,11 @@ directory.
 
 ## Deployment
 
-
 Currently the project can be deployed via docker and kubernetes. Docker
 is great for local testing, kubernetes for production.
 
 [Kubernetes](https://kubernetes.io/) was tested locally using
-[minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/),
-whether this is respresentable for the production platform is to be seen.
+[minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/).
 
 ### Using Docker Compose
 
