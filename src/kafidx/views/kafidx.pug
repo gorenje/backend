@@ -3,12 +3,16 @@ extends layout.pug
 block content
   .row
     .col-md-6
-      h1 Live Kafka Events
+      h1 Live Event Stream
 
+  a( href = "/" ) Back
+  br
   span= "Current Group Id: "
   b= session.kafka_group_id
-  br
+  = " "
   a( href = "/kafidx/getgroupid" ) Reset Group Id
+  br
+  span= "Events Seen: "
   span#messageCounterField
 
   #events-listing
