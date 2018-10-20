@@ -62,6 +62,8 @@ services:
     environment:
       - RACK_ENV=production
       - DATABASE_URL=postgres://postgres:nicesecret@pgwebsite:5432/webs
+      - CRED_KEY_BASE64=$WEBSITE_CRED_KEY_BASE64
+      - CRED_IV_BASE64=$WEBSITE_CRED_IV_BASE64
     restart: "no"
 
 networks:
