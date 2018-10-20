@@ -15,6 +15,7 @@ services:
       - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis-consumer:6379?db=11
       - CONSUMER_NAME=stats_collector
+    restart: always
 
   event-counter:
     image: ${IMAGE_NAMESPACE}.consumers.nodejs:v1
@@ -24,6 +25,7 @@ services:
       - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis-consumer:6379?db=12
       - CONSUMER_NAME=event_counter
+    restart: always
 
   metadata-counter:
     image: ${IMAGE_NAMESPACE}.consumers.nodejs:v1
@@ -33,6 +35,7 @@ services:
       - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis-consumer:6379?db=10
       - CONSUMER_NAME=metadata_counter
+    restart: always
 
   search-counter:
     image: ${IMAGE_NAMESPACE}.consumers.nodejs:v1
@@ -42,6 +45,7 @@ services:
       - ZOOKEEPER_HOST=zookeeper:2181
       - REDIS_CONSUMER=redis://redis-consumer:6379?db=9
       - CONSUMER_NAME=search_counter
+    restart: always
 
 networks:
   default:
